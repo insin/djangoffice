@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Edit SQL Report '{{ sql_report.name|escape }}' | {% endblock %}
+{% block menu %}{% menu "reports" "sql_reports" %}{% endblock %}
+{% block content %}
+<h1>Edit SQL Report</h1>
+<form name="sqlReportForm" id="sqlReportForm" action="." method="POST">
+<table cellspacing="0">
+{{ form }}
+</table>
+<div class="buttons">
+  <button type="submit" class="positive"><img src="{{ MEDIA_URL }}img/script_edit.png" alt=""> Edit SQL Report</button>
+  <a href="{{ sql_report.get_absolute_url }}" class="negative"><img src="{{ MEDIA_URL }}img/cancel.png" alt=""> Cancel</a>
+</div>
+</form>
+{% endblock %}

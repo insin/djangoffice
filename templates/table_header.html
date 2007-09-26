@@ -1,0 +1,3 @@
+{% for header in headers %}<th{{ header.class_attr }}>
+  {% if header.sortable %}<a href="{{ header.url }}">{% endif %}{{ header.text }}{% if header.sortable %}</a>{% endif %}
+</th>{% endfor %}

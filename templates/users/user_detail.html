@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}User '{{ user_.get_full_name|escape }}' | {% endblock %}
+{% block menu %}{% menu "manage" "users" %}{% endblock %}
+{% block content %}
+<h1>User '{{ user_.get_full_name|escape }}'</h1>
+
+<table cellspacing="0">
+<tbody>
+<tr><th scope="col">Name:</th><td>{{ user_.get_full_name|escape }}</td></tr>
+<tr><th scope="col">Role:</th><td>{{ profile.get_role_display }}</td></tr>
+{% if profile.is_manager and profile.managed_users.count %}
+<tr>
+  <th scope="col">Managed users:</th>
+  <td>
+    <ul>
+      {% for managed_user in profile.managed_users.all %}<li>
+        <a href="{{ managed_user.get_absolute_url|escape }}">{{ managed_user.get_full_name|escape }}</a>
+      </li>{% endfor %}
+    </ul>
+  </td>
+</tr>
+{% endif %}
+<tr><th scope="col">Phone number:</th><td>{{ profile.phone_number|escape }}</td></tr>
+<tr><th scope="col">Mobile number:</th><td>{{ profile.mobile_number|escape|default:"&nbsp;" }}</td></tr>
+<tr><th scope="col">Email:</th><td><a href="mailto:{{ user.email|escape }}">{{ user.email|escape }}</a></td></tr>
+<tr><th scope="col">Disabled:</th><td>{{ user_.is_active|yesno:"No,Yes" }}</td></tr>
+</tbody>
+</table>
+<div class="buttons">
+  <a href="{% if profile.is_admin %}{% url edit_admin_user %}{% else %}{% url edit_user user_.username %}{% endif %}"><img src="{{ MEDIA_URL }}img/user_edit.png" alt=""> Edit User</a>
+  {% if not profile.is_admin %}<a href="{% url delete_user user_.username %}"><img src="{{ MEDIA_URL }}img/user_delete.png" alt=""> Delete User</a>{% endif %}
+</div>
+
+{% if not profile.is_admin %}
+<h2>Rates</h2>
+{% if rates %}
+<table cellspacing="0">
+<thead>
+  <tr>
+    <th>Effective From</th>
+    <th>Standard Rate</th>
+    <th>Overtime Rate</th>
+  </tr>
+</thead>
+<tbody>
+  {% for rate in rates %}<tr class="{% cycle odd,even %}">
+    <td>{{ rate.effective_from }}</td>
+    <td>{{ rate.standard_rate }}</td>
+    <td>{{ rate.overtime_rate }}</td>
+  </tr>{% endfor %}
+</tbody>
+</table>
+{% else %}
+<p>No Rates yet.</p>
+{% endif %}
+<div class="buttons">
+  <a href="{% url edit_user_rates user_.username %}"><img src="{{ MEDIA_URL }}img/coins.png" alt=""> Manage Rates</a>
+</div>
+{% endif %}
+
+<h2>Activities</h2>
+{% if activities %}
+<table cellspacing="0">
+<thead>
+  <tr>
+    <th>Number</th>
+    <th>Job</th>
+    <th>Created by</th>
+    <th>Created at</th>
+    <th>Priority</th>
+    <th>Description</th>
+  </tr>
+</thead>
+<tbody>
+  {% for activity in activities %}<tr class="{% cycle odd,even %}">
+    <td><a href="{{ activity.get_absolute_url }}">{{ activity.formatted_number }}</a></td>
+    <td><a href="{{ activity.job.get_absolute_url }}">{{ activity.job|escape }}</a></td>
+    <td>{{ activity.created_by.get_full_name|escape }}</td>
+    <td>{{ activity.created_at }}</td>
+    <td>{{ activity.get_priority_display }}</td>
+    <td>{{ activity.description|escape|linebreaksbr }}</td>
+  </tr>{% endfor %}
+</tbody>
+</table>
+{% else %}
+<p>No Activities yet.</p>
+{% endif %}
+<div class="buttons">
+  <a href="{% url add_activity %}?assigned_to={{ user_.id }}"><img src="{{ MEDIA_URL }}img/note_add.png" alt=""> Add Activity</a>
+</div>
+{% endblock %}

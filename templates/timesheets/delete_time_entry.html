@@ -1,0 +1,47 @@
+{% extends "base.html" %}{% load timesheet %}
+{% block title %}Delete Time Entry | {% endblock %}
+{% block menu %}{% menu "timesheets" %}{% endblock %}
+{% block content %}
+<h1>Delete Time Entry</h1>
+<form name="timeEntryForm" id="timeEntryForm" action="." method="POST">
+<p>Are you sure you want to delete the following Time Entry?</p>
+<dl>
+  <dt>For user:</dt>
+  <dd>{{ user_.get_full_name }}</dd>
+  <dt>Week commencing:</dt>
+  <dd>{{ timesheet.week_commencing }}</dd>
+</dl>
+<table cellspacing="0">
+<thead>
+  <tr>
+    <th>Job</th>
+    <th>Task</th>
+    {% day_headers timesheet.week_commencing %}
+    <th>Total</th>
+    <th><acronym title="Overtime">OT</acronym></th>
+    <th>Description</th>
+  </tr>
+</thead>
+<tbody>
+  <tr class="odd editable">
+    <td>{{ entry.job_display|escape }}</td>
+    <td>{{ entry.task_name|escape }}</td>
+    <td>{{ entry.mon }}</td>
+    <td>{{ entry.tue }}</td>
+    <td>{{ entry.wed }}</td>
+    <td>{{ entry.thu }}</td>
+    <td>{{ entry.fri }}</td>
+    <td>{{ entry.sat }}</td>
+    <td>{{ entry.sun }}</td>
+    <td>{{ entry.total_time_booked }}</td>
+    <td>{{ entry.overtime }}</td>
+    <td>{{ entry.description|escape }}</td>
+  </tr>
+</tbody>
+</table>
+<div class="buttons">
+  <button type="submit" class="negative"><img src="{{ MEDIA_URL }}img/time_delete.png" alt=""> Delete Time Entry</button>
+  <a href="{{ timesheet.get_absolute_url }}" class="negative"><img src="{{ MEDIA_URL }}img/cancel.png" alt=""> Cancel</a>
+</div>
+</form>
+{% endblock %}

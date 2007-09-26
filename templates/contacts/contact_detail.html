@@ -1,0 +1,46 @@
+{% extends "base.html" %}{% load officeaid_tags %}
+{% block title %}Contact '{{ contact.full_name|escape }}' | {% endblock %}
+{% block menu %}{% menu "manage" "contacts" %}{% endblock %}
+{% block content %}
+<h1>Contact '{{ contact.full_name|escape }}'</h1>
+
+<table cellspacing="0">
+<tbody>
+{% contact_rows contact %}
+</tbody>
+</table>
+<div class="buttons">
+  <a href="{% url edit_contact contact.id %}"><img src="{{ MEDIA_URL }}img/group_edit.png" alt=""> Edit Contact</a>
+</div>
+
+<h2>Activities</h2>
+{% if activities %}
+<table cellspacing="0">
+<thead>
+  <tr>
+    <th>Number</th>
+    <th>Job</th>
+    <th>Created by</th>
+    <th>Created at</th>
+    <th>Priority</th>
+    <th>Description</th>
+  </tr>
+</thead>
+<tbody>
+  {% for activity in activities %}<tr class="{% cycle odd,even %}">
+    <td><a href="{{ activity.get_absolute_url }}">{{ activity.formatted_number }}</a></td>
+    <td><a href="{{ activity.job.get_absolute_url }}">{{ activity.job|escape }}</a></td>
+    <td>{{ activity.created_by.get_full_name|escape }}</td>
+    <td>{{ activity.created_at }}</td>
+    <td>{{ activity.get_priority_display }}</td>
+    <td>{{ activity.description|escape }}</td>
+  </tr>{% endfor %}
+</tbody>
+</table>
+{% else %}
+<p>No Activities yet.</p>
+{% endif %}
+<div class="buttons">
+  <a href="{% url add_activity %}?contact={{ contact.id }}"><img src="{{ MEDIA_URL }}img/note_add.png" alt=""> Add Activity</a>
+</div>
+{% endblock %}

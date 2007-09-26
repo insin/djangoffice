@@ -1,0 +1,34 @@
+{% extends "base.html" %}{% load officeaid_tags %}
+{% block title %}Select Jobs For Invoice | {% endblock %}
+{% block menu %}{% menu "invoices" "create_invoices" %}{% endblock %}
+{% block content %}
+<h1>Select Jobs For Invoice</h1>
+
+<p>Select the Jobs you wish to create invoices for.</p>
+
+<h2>Filters</h2>
+{% job_filter_form filter_form %}
+
+{% if jobs %}
+{{ form.non_field_errors.as_ul }}
+<form name="selectJobsForm" id="selectJobsForm" action="." method="POST">
+<table cellspacing="0">
+<thead>
+  <tr>
+    <th>&nbsp;</th>
+{% table_header headers %}
+  </tr>
+</thead>
+<tbody>
+  {{ form.jobs }}
+</tbody>
+</table>
+<div class="buttons">
+  <input type="hidden" name="step" value="1">
+  <button type="submit"><img src="{{ MEDIA_URL }}img/table_add.png" alt=""> Select Jobs</button>
+</div>
+</form>
+{% else %}
+<h2>No Jobs found</h2>
+{% endif %}
+{% endblock %}

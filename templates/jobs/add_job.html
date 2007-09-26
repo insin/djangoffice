@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Add Job | {% endblock %}
+{% block menu %}{% menu "manage" "jobs" %}{% endblock %}
+{% block content %}
+<h1>Add Job</h1>
+
+<form name="addJobForm" id="addJobForm" action="." method="POST">
+
+<h2>Job Details</h2>
+<table cellspacing="0">
+<tbody>
+{{ job_form }}
+</tbody>
+</table>
+
+<h2>Tasks</h2>
+<table cellspacing="0">
+<thead>
+  <tr>
+    <th scope="col">Type</th>
+    <th scope="col">Users</th>
+    <th scope="col">Estimate Hours</th>
+    <th scope="col">Start Date</th>
+    <th scope="col">End Date</th>
+  </tr>
+</thead>
+<tbody>
+  {% for form in task_forms %}<tr class="{% cycle odd,even %}">
+    <td><label for="id_t{{ form.task_type.id }}-add">{{ form.add }} {{ form.task_type.name|escape }}</label></td>
+    <td>
+      {{ form.assigned_users }}
+      {% if form.assigned_users.errors %}<br>{{ form.assigned_users.errors.as_text }}{% endif %}
+    </td>
+    </td>
+    <td>
+      {{ form.estimate_hours }}
+      {% if form.estimate_hours.errors %}<br>{{ form.estimate_hours.errors.as_text }}{% endif %}
+    </td>
+    <td>
+      {{ form.start_date }}
+      {% if form.start_date.errors %}<br>{{ form.start_date.errors.as_text }}{% endif %}
+    </td>
+    <td>
+      {{ form.end_date }}
+      {% if form.end_date.errors %}<br>{{ form.end_date.errors.as_text }}{% endif %}
+    </td>
+  </tr>{% endfor %}
+</tbody>
+</table>
+
+<div class="buttons">
+  <button type="submit" class="positive"><img src="{{ MEDIA_URL }}img/add.png" alt=""> Add Job</button>
+  <a href="{% url job_list %}" class="negative"><img src="{{ MEDIA_URL }}img/cancel.png" alt=""> Cancel</a>
+</div>
+
+</form>
+{% endblock %}

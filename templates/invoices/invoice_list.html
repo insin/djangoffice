@@ -1,0 +1,33 @@
+{% extends "base.html" %}{% load officeaid_tags %}{% load money %}
+{% block title %}Invoices | {% endblock %}
+{% block menu %}{% menu "invoices" "invoices" %}{% endblock %}
+{% block content %}
+<h1>Invoices</h1>
+
+{% if invoice_list %}
+<table cellspacing="0">
+<thead>
+  <tr>
+{% table_header headers %}
+  </tr>
+</thead>
+<tbody>
+  {% for invoice in invoice_list %}<tr class="{% cycle odd,even %}">
+    <td><a href="{{ invoice.get_absolute_url }}">{{ invoice.formatted_number }}</a></td>
+    <td>{{ invoice.date }}</td>
+    <td>{{ invoice.start_period|default:"-" }}</td>
+    <td>{{ invoice.end_period|default:"-" }}</td>
+    <td>{{ invoice.job_fee_currency|escape }}</td>
+    <td>{{ invoice.amount_invoiced|money }}</td>
+    <td>{% if invoice.amount_received %}{{ invoice.amount_received|money }}{% else %}-{% endif %}</td>
+    <td>{{ invoice.job_number|pad_number }}</td>
+    <td>{{ invoice.job_name|escape }}</td>
+    <td>{{ invoice.client_name|escape }}</td>
+    <td>{{ invoice.primary_contact_first_name }} {{ invoice.primary_contact_last_name }}</td>
+  </tr>{% endfor %}
+</tbody>
+</table>
+{% else %}
+<p class="noneyet">No Invoices found.</p>
+{% endif %}
+{% endblock %}

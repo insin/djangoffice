@@ -1,0 +1,231 @@
+from django import newforms as forms
+from django.contrib.auth.models import User
+from django.db.models.query import Q
+from officeaid.forms import FilterBaseForm
+from officeaid.forms.fields import (DynamicModelChoiceField,
+    MultipleDynamicModelChoiceField)
+from officeaid.models import (Client, Contact, Job, FEE_BASIS_CHOICES,
+    FEE_CURRENCY_CHOICES, JOB_STATUS_CHOICES)
+
+SEARCH_TYPE_CHOICES = (
+    (1, u'Job Number'),
+    (2, u'Job Name'),
+    (3, u'Primary Contact Name'),
+    (4, u'Billing Address Contact Name'),
+    (5, u'Job Contact Name'),
+)
+
+USER_SEARCH_TYPE_CHOICES = (
+    (1, u'Director'),
+    (2, u'Associate/Project Manager'),
+    (3, u'Assigned to Job Task'),
+)
+
+JOB_STATUS_SEARCH_CHOICES = ((u'', 'All Jobs'),) + JOB_STATUS_CHOICES
+
+DATE_SEARCH_TYPE_CHOICES = (
+    (1, 'Start Date'),
+    (2, 'Expected End Date'),
+)
+
+class JobFilterForm(FilterBaseForm, forms.Form):
+    """
+    A form for Job search criteria.
+    """
+    search           = forms.CharField(required=False)
+    search_type      = forms.IntegerField(required=False, widget=forms.Select(choices=SEARCH_TYPE_CHOICES))
+    user             = forms.ChoiceField(required=False)
+    user_search_type = forms.IntegerField(required=False, widget=forms.Select(choices=USER_SEARCH_TYPE_CHOICES))
+    status           = forms.ChoiceField(required=False, choices=JOB_STATUS_SEARCH_CHOICES)
+    client           = forms.ChoiceField(required=False)
+    date_search_type = forms.IntegerField(required=False, widget=forms.Select(choices=DATE_SEARCH_TYPE_CHOICES))
+    start_date       = forms.DateField(required=False)
+    end_date         = forms.DateField(required=False)
+
+    def __init__(self, *args, **kwargs):
+        super(JobFilterForm, self).__init__(*args, **kwargs)
+        self.fields['user'].choices = [(u'', '---------')] + \
+            [(u.id, u.get_full_name()) \
+             for u in User.objects.exclude(userprofile__role='A')]
+        self.fields['client'].choices = [(u'', '---------')] + \
+            [(c.id, c.name) for c in Client.objects.all()]
+        self.make_distinct = False
+
+    def get_filters(self):
+        """
+        Creates a ``Q`` object defining search criteria based on the
+        contents of this form.
+
+        Returns ``None``If the form is invalid or no searchcriteria were
+        provided.
+        """
+        if not self.is_valid():
+            return None
+        filters = []
+
+        # General search
+        if self.cleaned_data['search']:
+            search_value = self.cleaned_data['search']
+            search_type = self.cleaned_data['search_type']
+            if search_type == 1:
+                filters.append(Q(name__icontains=search_value))
+            elif search_type == 2:
+                filters.append(Q(number=search_value))
+            elif search_type == 3:
+                filters.append(
+                    Q(primary_contact__first_name__icontains=search_value) | \
+                    Q(primary_contact__last_name__icontains=search_value))
+            elif search_type == 4:
+                filters.append(
+                    Q(billing_contact__first_name__icontains=search_value) | \
+                    Q(billing_contact__last_name__icontains=search_value))
+            elif search_type == 5:
+                filters.append(
+                    Q(job_contacts__first_name__icontains=search_value) | \
+                    Q(job_contacts__last_name__icontains=search_value))
+                self.make_distinct = True
+
+        # User search
+        if self.cleaned_data['user']:
+            search_user = self.cleaned_data['user']
+            user_search_type = self.cleaned_data['user_search_type']
+            if user_search_type == 1:
+                filters.append(Q(director=search_user))
+            elif user_search_type == 2:
+                filters.append(Q(project_manager=search_user))
+            elif user_search_type == 3:
+                filters.append(Q(tasks__assigned_users=search_user))
+                self.make_distinct = True
+
+        # Status search
+        if self.cleaned_data['status']:
+            filters.append(Q(status=self.cleaned_data['status']))
+
+        # Client search
+        if self.cleaned_data['client']:
+            filters.append(Q(client=self.cleaned_data['client']))
+
+        # Date search
+        date_search_type = self.cleaned_data['date_search_type']
+        if self.cleaned_data['start_date']:
+            start_date = self.cleaned_data['start_date']
+            if date_search_type == 1:
+                filters.append(Q(start_date__gte=start_date))
+            if date_search_type == 2:
+                filters.append(Q(end_date__gte=start_date))
+        if self.cleaned_data['end_date']:
+            end_date = self.cleaned_data['end_date']
+            if date_search_type == 1:
+                filters.append(Q(start_date__lte=end_date))
+            if date_search_type == 2:
+                filters.append(Q(end_date__lte=end_date))
+
+        if len(filters) == 0:
+            return None
+        else:
+            import operator
+            print filters
+            return reduce(operator.and_, filters)
+
+class AddJobForm(forms.Form):
+    client          = forms.ChoiceField()
+    name            = forms.CharField(max_length=100)
+    number          = forms.IntegerField(required=False, min_value=1)
+    reference       = forms.CharField(required=False, max_length=16)
+    reference_date  = forms.DateField(required=False)
+    status          = forms.ChoiceField(choices=JOB_STATUS_CHOICES)
+    notes           = forms.CharField(required=False, widget=forms.Textarea())
+    director        = forms.ChoiceField()
+    project_manager = forms.ChoiceField()
+    architect       = forms.ChoiceField()
+    primary_contact = DynamicModelChoiceField(Contact)
+    billing_contact = DynamicModelChoiceField(Contact)
+    job_contacts    = MultipleDynamicModelChoiceField(Contact, required=False)
+    start_date      = forms.DateField(required=False)
+    end_date        = forms.DateField(required=False)
+    fee_basis       = forms.ChoiceField(required=False, choices=FEE_BASIS_CHOICES)
+    fee_amount      = forms.DecimalField(required=False, max_digits=8, decimal_places=2)
+    fee_currency    = forms.ChoiceField(choices=FEE_CURRENCY_CHOICES)
+    contingency     = forms.DecimalField(required=False, max_digits=6, decimal_places=2)
+
+    def __init__(self, clients, users, *args, **kwargs):
+        super(AddJobForm, self).__init__(*args, **kwargs)
+        self.fields['client'].choices = clients
+        self.fields['director'].choices = self.fields['project_manager'].choices = \
+            self.fields['architect'].choices = users
+
+    def clean_number(self):
+        if self.cleaned_data['number']:
+            if Job.objects.filter(number=self.cleaned_data['number']).count():
+                raise forms.ValidationError(u'This number is already in use.')
+        return self.cleaned_data['number']
+
+    def clean_end_date(self):
+        if self.cleaned_data['start_date'] and self.cleaned_data['end_date']:
+            if self.cleaned_data['end_date'] < self.cleaned_data['start_date']:
+                raise forms.ValidationError(
+                    u'If given, this field must be later than or equal to Start Date.')
+        return self.cleaned_data['end_date']
+
+    def clean_fee_amount(self):
+        if 'fee_basis' in self.cleaned_data and \
+           self.cleaned_data['fee_amount'] is None:
+            if self.cleaned_data['fee_basis'] == u'S':
+                raise forms.ValidationError(
+                    u'This field is required if Fee Basis is Set Fee.')
+            elif self.cleaned_data['fee_basis'] == u'P':
+                raise forms.ValidationError(
+                    u'This field is required if Fee Basis is Percentage.')
+        return self.cleaned_data['fee_amount']
+
+    def save(commit=True):
+        return forms.save_instance(self, Job(), commit=commit)
+
+class AddTaskForm(forms.Form):
+    add            = forms.BooleanField(required=False)
+    assigned_users = forms.MultipleChoiceField(required=False, widget=forms.SelectMultiple(attrs={'size': 4}))
+    estimate_hours = forms.DecimalField(max_digits=6, decimal_places=2, min_value=0, required=False)
+    start_date     = forms.DateField(required=False)
+    end_date       = forms.DateField(required=False)
+
+    def __init__(self, task_type, users, *args, **kwargs):
+        kwargs['prefix'] = 'task%s' % task_type.id
+        super(AddTaskForm, self).__init__(*args, **kwargs)
+        self.fields['assigned_users'].choices = users
+        self.task_type = task_type
+
+    def clean_assigned_users(self):
+        if self.cleaned_data['add']:
+            if not self.cleaned_data.get('assigned_users') or \
+               len(self.cleaned_data['assigned_users']) == 0:
+                raise forms.ValidationError(
+                    u'You must assign at least one user.')
+        return self.cleaned_data['assigned_users']
+
+    def clean_estimate_hours(self):
+        if self.cleaned_data['add'] and not \
+           self.cleaned_data['estimate_hours']:
+            raise forms.ValidationError(u'You must provide an estimate.')
+        return self.cleaned_data['estimate_hours']
+
+    def clean_end_date(self):
+        if self.cleaned_data.get('start_date', None) and \
+           self.cleaned_data.get('end_date', None):
+            if self.cleaned_data['end_date'] < self.cleaned_data['start_date']:
+                raise forms.ValidationError(
+                    u'Must be later than or equal to start date.')
+        return self.cleaned_data['end_date']
+
+class EditJobForm(AddJobForm):
+    def __init__(self, job, clients, users, *args, **kwargs):
+        super(EditJobForm, self).__init__(clients, users, *args, **kwargs)
+        del self.fields['number']
+        self.job = job
+        opts = Job._meta
+        for f in opts.fields + opts.many_to_many:
+            if not f.name in self.fields:
+                continue
+            self.fields[f.name].initial = f.value_from_object(job)
+
+    def save(commit=True):
+        return forms.save_instance(self, self.job, commit=commit)

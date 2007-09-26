@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Delete Client '{{ client.name|escape }}' | {% endblock %}
+{% block menu %}{% menu "manage" "clients" %}{% endblock %}
+{% block content %}
+<h1>Delete Client</h1>
+<form name="clientForm" id="clientForm" action="." method="POST">
+<p>Are you sure you want to delete the Client '{{ client.name|escape }}'?</p>
+<div class="buttons">
+  <button type="submit" class="negative"><img src="{{ MEDIA_URL }}img/delete.png" alt=""> Delete Client</button>
+  <a href="{{ client.get_absolute_url }}" class="negative"><img src="{{ MEDIA_URL }}img/cancel.png" alt=""> Cancel</a>
+</div>
+</form>
+{% endblock %}

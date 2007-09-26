@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Add Contact | {% endblock %}
+{% block menu %}{% menu "manage" "contacts" %}{% endblock %}
+{% block content %}
+<h1>Add Contact</h1>
+<form name="contactForm" id="contactForm" action="." method="POST">
+<table cellspacing="0">
+<tbody>
+{{ form }}
+</tbody>
+</table>
+<div class="buttons">
+  <button type="submit" class="positive"><img src="{{ MEDIA_URL }}img/group_add.png" alt=""> Add Contact</button>
+  <a href="{% url contact_list %}" class="negative"><img src="{{ MEDIA_URL }}img/cancel.png" alt=""> Cancel</a>
+</div>
+</form>
+{% endblock %}

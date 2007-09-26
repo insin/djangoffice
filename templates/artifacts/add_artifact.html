@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Add Artifact | {% endblock %}
+{% block menu %}{% menu "manage" "jobs" %}{% endblock %}
+{% block content %}
+<h1>Add Artifact</h1>
+<form name="artifactForm" id="artifactForm" action="." method="POST" enctype="multipart/form-data">
+<table cellspacing="0">
+<tbody>
+{{ form }}
+</tbody>
+</table>
+<div class="buttons">
+  <button type="submit" class="positive"><img src="{{ MEDIA_URL }}img/attach.png" alt=""> Upload Artifact</button>
+  <a href="{% url artifact_list job.formatted_number %}" class="negative"><img src="{{ MEDIA_URL }}img/cancel.png" alt=""> Cancel</a>
+</div>
+</form>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}{% load money %}
+{% block title %}Add Rate for '{{ task_type.name|escape }}' | {% endblock %}
+{% block menu %}{% menu "manage" "task_types" %}{% endblock %}
+{% block content %}
+<h1>Add Rate for '{{ task_type.name|escape }}'</h1>
+
+<form name="addTaskTypeRateForm" id="addTaskTypeRateForm" action="." method="POST">
+<table cellspacing="0">
+<tbody>
+{{ form }}
+</tbody>
+</table>
+<div class="buttons">
+  <button type="submit" class="positive"><img src="{{ MEDIA_URL }}img/coins_add.png" alt=""> Add Rate</button>
+  <a href="{% url edit_task_type_rates task_type.id %}" class="negative"><img src="{{ MEDIA_URL }}img/cancel.png" alt=""> Cancel</a>
+</div>
+</form>
+
+{% if rates %}
+<h2>Current Rates</h2>
+<table cellspacing="0">
+<thead>
+<tr>
+  <th>Effective From</th>
+  <th>Standard Rate</th>
+  <th>Overtime Rate</th>
+</tr>
+</thead>
+<tbody>
+{% for rate in rates %}<tr class="{% cycle odd,even %}">
+  <td>{{ rate.effective_from }}</td>
+  <td>{{ rate.standard_rate|money }}</td>
+  <td>{{ rate.overtime_rate|money }}</td>
+</tr>{% endfor %}
+</tbody>
+</table>
+{% endif %}
+{% endblock %}

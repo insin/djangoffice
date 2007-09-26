@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Expense Type '{{ expense_type.name|escape }}' | {% endblock %}
+{% block menu %}{% menu "manage" "expense_types" %}{% endblock %}
+{% block content %}
+<h1>Expense Type '{{ expense_type.name|escape }}'</h1>
+
+<table cellspacing="0">
+<tbody>
+<tr><th scope="col">Name:</th><td>{{ expense_type.name|escape }}</td></tr>
+<tr><th scope="col">Description:</th><td>{{ expense_type.description|escape|linebreaksbr }}</td></tr>
+<tr><th scope="col">Limit:</th><td>{{ expense_type.limit }}</td></tr>
+<tbody>
+</table>
+<div class="buttons">
+  <a href="{% url edit_expense_type expense_type.id %}"><img src="{{ MEDIA_URL }}img/pencil.png" alt=""> Edit Expense Type</a>
+</div>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Assign Contact{% ifequal mode "multiple" %}s{% endifequal %} | {% endblock%}
+{% block extrahead %}
+  <script type="text/javascript" src="{{ MEDIA_URL }}js/DOMBuilder.js"></script>
+  <script type="text/javascript" src="{{ MEDIA_URL }}js/AssignContacts.js"></script>
+  <script type="text/javascript">
+  var mediaURL = "{{ MEDIA_URL }}";
+  var allContacts = {{ contact_json }};
+  Event.onDOMReady(function()
+  {
+      DomBuilder.apply(window);
+      AssignContacts.init(allContacts, {mode: "{{ mode }}"});
+  });
+  </script>
+{% endblock %}
+{% block content %}
+<h1>Assign Contact{% ifequal mode "multiple" %}s{% endifequal %}</h1>
+
+<form name="filterForm" id="filterForm">
+  <div>
+    <select name="property">
+      <option value="last_name">Last Name</option>
+      <option value="first_name">First Name</option>
+      <option value="company_name">Company</option>
+      <option value="position">Position</option>
+    </select>
+    contains
+    <input type="text" name="criteria">
+    <input type="button" value="Filter" id="filterButton">
+  </div>
+  <div class="letters">
+    Surname starts with:
+    {% for letter in letters %}
+    <span class="control" id="letter{{ letter }}">{{ letter }}</span>
+    {% endfor %}
+  </div>
+</form>
+
+<form name="contactForm" id="contactForm">
+  <h2>Matching Contacts</h2>
+  <table cellspacing="1">
+  <colgroup width="1" align="center" span="2"></colgroup>
+  <colgroup span="9"></colgroup>
+  <thead>
+  <tr>
+    <th>&nbsp;</th>
+    <th>Name</th>
+    <th>Company</th>
+    <th>Position</th>
+  </tr>
+  </thead>
+  <tbody id="contacts">
+  </tbody>
+  </table>
+  <div class="buttons">
+    <button class="positive" id="selectContacts"><img src="{{ MEDIA_URL }}img/group{% ifequal mode "single" %}_go{% endifequal %}.png" alt=""> {% ifequal mode "single" %}Assign Contact{% else %}Select Contacts{% endifequal %}</button>
+    {% ifequal mode "single" %}<button class="negative" id="cancelButton"><img src="{{ MEDIA_URL }}img/cancel.png" alt=""> Cancel</button>{% endifequal %}
+  </div>
+</form>
+
+{% ifequal mode "multiple" %}
+<h2>Selected Contacts</h2>
+<table cellspacing="0">
+<col width="1" align="center"></col>
+<thead>
+  <tr>
+    <th>&nbsp;</th>
+    <th>Name</th>
+    <th>Company</th>
+    <th>Position</th>
+  </tr>
+</thead>
+<tbody id="selectedContactTableBody">
+</tbody>
+</table>
+<div class="buttons">
+  <button class="positive" id="assignSelectedContacts"><img src="{{ MEDIA_URL }}img/group_go.png" alt=""> Assign Contacts</button>
+  <button class="negative" id="cancelButton"><img src="{{ MEDIA_URL }}img/cancel.png" alt=""> Cancel</button>
+</div>
+{% endifequal %}
+{% endblock %}

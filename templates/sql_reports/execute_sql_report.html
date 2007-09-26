@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Execute SQL Report '{{ sql_report.name|escape }}' | {% endblock %}
+{% block menu %}{% menu "reports" "sql_reports" %}{% endblock %}
+{% block content %}
+<h1>Execute SQL Report '{{ sql_report.name|escape }}'</h1>
+<p>This SQL Report contains a number of parameters - please provide values for these below.</p>
+<p>Any date parameters should be specified in <code>YYYY-MM-DD</code> format; for example, today's date is <code>{% now "Y-m-d" %}</code>.</p>
+<form name="sqlReportForm" id="sqlReportForm" action="." method="POST">
+<table cellspacing="0">
+{{ form }}
+</table>
+<div class="buttons">
+  <button type="submit" class="positive"><img src="{{ MEDIA_URL }}img/script_go.png" alt=""> Execute SQL Report</button>
+  <a href="{% url sql_report_list %}" class="negative"><img src="{{ MEDIA_URL }}img/cancel.png" alt=""> Cancel</a>
+</div>
+</form>
+{% endblock %}

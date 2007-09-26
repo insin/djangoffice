@@ -1,0 +1,41 @@
+{% extends "base.html" %}{% load timesheet %}{% load money %}
+{% block title %}Delete Expense | {% endblock %}
+{% block menu %}{% menu "timesheets" %}{% endblock %}
+{% block content %}
+<h1>Delete Expense</h1>
+<form name="expenseForm" id="expenseForm" action="." method="POST">
+<p>Are you sure you want to delete the following Expense?</p>
+<dl>
+  <dt>For user:</dt>
+  <dd>{{ user_.get_full_name }}</dd>
+  <dt>Week commencing:</dt>
+  <dd>{{ timesheet.week_commencing }}</dd>
+</dl>
+<table cellspacing="0">
+<thead>
+  <tr>
+    <th>Job</th>
+    <th>Type</th>
+    <th>Date</th>
+    <th>Amount</th>
+    <th>Description</th>
+    <th>Billable</th>
+  </tr>
+</thead>
+<tbody>
+  <tr class="odd editable">
+    <td>{{ expense.job_display|escape }}</td>
+    <td>{{ expense.type_name|escape }}</td>
+    <td>{{ expense.date }}</td>
+    <td>{{ expense.amount|money }}</td>
+    <td>{{ expense.description|escape }}</td>
+    <td>{{ expense.billable|yesno:"Yes,No" }}</td>
+  </tr>
+</tbody>
+</table>
+<div class="buttons">
+  <button type="submit" class="negative"><img src="{{ MEDIA_URL }}img/time_delete.png" alt=""> Delete Expense</button>
+  <a href="{{ timesheet.get_absolute_url }}" class="negative"><img src="{{ MEDIA_URL }}img/cancel.png" alt=""> Cancel</a>
+</div>
+</form>
+{% endblock %}

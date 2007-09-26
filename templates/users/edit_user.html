@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Edit User '{{ user_.get_full_name|escape }}' | {% endblock %}
+{% block menu %}{% menu "manage" "users" %}{% endblock %}
+{% block content %}
+<h1>Edit User '{{ user_.get_full_name|escape }}'</h1>
+<form name="userForm" id="userForm" action="." method="POST">
+<table cellspacing="0">
+<tbody>
+{{ form }}
+</tbody>
+</table>
+<div class="buttons">
+  <button type="submit" class="positive"><img src="{{ MEDIA_URL }}img/user_edit.png" alt=""> Edit User</button>
+  <a href="{{ user_.get_absolute_url|escape }}" class="negative"><img src="{{ MEDIA_URL }}img/cancel.png" alt=""> Cancel</a>
+</div>
+</form>
+{% endblock %}

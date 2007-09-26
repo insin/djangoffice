@@ -1,0 +1,28 @@
+{% extends "base.html" %}{% load officeaid_tags %}
+{% block title %}Expense Types | {% endblock %}
+{% block menu %}{% menu "manage" "expense_types" %}{% endblock %}
+{% block content %}
+<h1>Expense Types</h1>
+
+{% if expense_type_list %}
+<table cellspacing="0">
+<thead>
+  <tr>
+{% table_header headers %}
+  </tr>
+</thead>
+<tbody>
+  {% for expense_type in expense_type_list %}<tr class="{% cycle odd,even %}">
+    <td><a href="{{ expense_type.get_absolute_url }}">{{ expense_type.name|escape }}</a></td>
+    <td>{{ expense_type.description|escape|linebreaksbr }}</a></td>
+    <td>{{ expense_type.limit }}</a></td>
+  </tr>{% endfor %}
+</tbody>
+</table>
+{% else %}
+<p class="noneyet">No Expense Types yet.</p>
+{% endif %}
+<div class="buttons">
+  <a href="{% url add_expense_type %}"><img src="{{ MEDIA_URL }}img/add.png" alt=""> Add Expense Type</a>
+</div>
+{% endblock %}

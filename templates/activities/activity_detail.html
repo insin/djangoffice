@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Activity {{ activity.formatted_number }} | {% endblock %}
+{% block menu %}{% menu "activities" %}{% endblock %}
+{% block content %}
+<h1>Activity {{ activity.formatted_number }}</h1>
+
+<table cellspacing="0">
+<tbody>
+<tr><th scope="col">Job:</th><td><a href="{{ activity.job.get_absolute_url }}">{{ activity.job|escape }}</td></tr>
+<tr><th scope="col">Created by:</th><td>{{ activity.created_by.get_full_name|escape }}</td></tr>
+<tr><th scope="col">Created at:</th><td>{{ activity.created_at }}</td></tr>
+<tr><th scope="col">Description:</th><td>{{ activity.description|escape|linebreaksbr }}</td></tr>
+<tr><th scope="col">Priority:</th><td>{{ activity.get_priority_display }}</td></tr>
+{% if activity.assigned_to %}
+<tr><th scope="col">Assigned to:</th><td>{{ activity.assigned_to.get_full_name|escape }}</td></tr>
+{% else %}
+<tr><th scope="col">Contact:</th><td>{{ activity.contact.full_name|escape }}</td></tr>
+{% endif %}
+<tr><th scope="col">Due date:</th><td>{{ activity.due_date }}</td></tr>
+<tr><th scope="col">Completed:</th><td>{{ activity.completed|yesno:"Yes,No" }}</td></tr>
+{% if activity.completed %}
+<tr><th scope="col">Completed at:</th><td>{{ activity.completed_at }}</td></tr>
+{% endif %}
+</tbody>
+</table>
+
+{% if not activity.completed %}
+<div class="buttons">
+  <a href="{% url edit_activity activity.id %}"><img src="{{ MEDIA_URL }}img/note_edit.png" alt=""> Edit Activity</a>
+</div>
+{% endif %}
+{% endblock %}

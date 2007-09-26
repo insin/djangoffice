@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Add Task Type | {% endblock %}
+{% block menu %}{% menu "manage" "task_types" %}{% endblock %}
+{% block content %}
+<h1>Add Task Type</h1>
+<form name="taskTypeForm" id="taskTypeForm" action="." method="POST">
+<table cellspacing="0">
+<tbody>
+{{ form }}
+</tbody>
+</table>
+<div class="buttons">
+  <button type="submit" class="positive"><img src="{{ MEDIA_URL }}img/add.png" alt=""> Add Task Type</button>
+  <a href="{% url task_type_list %}" class="negative"><img src="{{ MEDIA_URL }}img/cancel.png" alt=""> Cancel</a>
+</div>
+</form>
+{% endblock %}

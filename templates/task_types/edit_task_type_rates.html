@@ -1,0 +1,37 @@
+{% extends "base.html" %}{% load money %}
+{% block title %}Edit Rates for '{{ task_type.name|escape }}' | {% endblock %}
+{% block menu %}{% menu "manage" "task_types" %}{% endblock %}
+{% block content %}
+<h1>Edit Rates for '{{ task_type.name|escape }}'</h1>
+
+{% if rates %}
+<form name="editTaskTypeRatesForm" id="editTaskTypeRatesForm" action="." method="POST">
+<table cellspacing="0">
+<thead>
+<tr>
+  {% if editable_rates %}<th><input type="image" src="{{ MEDIA_URL }}img/coins_delete.png" alt="Delete" title="Delete Selected Rates"></th>{% endif %}
+  <th>Effective From</th>
+  <th>Standard Rate</th>
+  <th>Overtime Rate</th>
+</tr>
+</thead>
+<tbody>
+{% for rate,form in rates %}<tr class="{% cycle odd,even %}">
+  {% if editable_rates %}<td>{% if rate.editable %}<input type="checkbox" name="rate_id" value="{{ rate.id }}">{% else %}&nbsp;{% endif %}</td>{% endif %}
+  <td>{{ rate.effective_from }}</td>
+  <td>{% if rate.editable %}{{ form.standard_rate }}{% else %}{{ rate.standard_rate|money }}{% endif %}</td>
+  <td>{% if rate.editable %}{{ form.overtime_rate }}{% else %}{{ rate.overtime_rate|money }}{% endif %}</td>
+</tr>{% endfor %}
+</tbody>
+</table>
+{% endif %}
+
+<div class="buttons">
+  {% if editable_rates %}
+  <button type="submit" class="positive"><img src="{{ MEDIA_URL }}img/pencil.png" alt=""> Edit Rates</button>
+  {% endif %}
+  <a href="{% url add_task_type_rate task_type.id %}" class="positive"><img src="{{ MEDIA_URL }}img/coins_add.png" alt=""> Add Rate</a>
+  <a href="{{ task_type.get_absolute_url }}" class="negative"><img src="{{ MEDIA_URL }}img/cancel.png" alt=""> Cancel</a>
+</div>
+</form>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "base.html" %}{% load officeaid_tags %}
+{% block title %}Users | {% endblock %}
+{% block menu %}{% menu "manage" "users" %}{% endblock %}
+{% block content %}
+<h1>Users</h1>
+
+{% if user.userprofile.is_admin %}
+<h2>Administrator</h2>
+<table cellspacing="0">
+<thead>
+<tr>
+  <th>User Name</th>
+  <th>Forename</th>
+  <th>Surname</th>
+  <th>Email</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+  <td><a href="{% url edit_admin_user %}">{{ admin.username|escape }}</a></td>
+  <td>{{ admin.first_name|escape }}</td>
+  <td>{{ admin.last_name|escape }}</td>
+  <td>{{ admin.email|escape }}</td>
+</tr>
+</tbody>
+</table>
+{% endif %}
+
+<h2>Users</h2>
+{% if user_list %}
+<table cellspacing="0">
+<thead>
+  <tr>
+{% table_header headers %}
+  </tr>
+</thead>
+<tbody>
+  {% for user_ in user_list %}<tr class="{% cycle odd,even %}">
+    <td><a href="{{ user_.get_absolute_url|escape }}">{{ user_.username|escape }}</a></td>
+    <td>{{ user_.get_profile.get_role_display|escape }}</td>
+    <td>{{ user_.first_name|escape }}</td>
+    <td>{{ user_.last_name|escape }}</td>
+    <td>{{ user_.email|escape }}</td>
+    <td>{{ user_.get_profile.disabled|yesno:"Disabled,Enabled" }}</td>
+  </tr>
+  {% endfor %}
+</tbody>
+</table>
+{% else %}
+<p>No Users yet.</p>
+{% endif %}
+<div class="buttons">
+  <a href="{% url add_user %}"><img src="{{ MEDIA_URL }}img/user_add.png" alt=""> Add User</a>
+</div>
+{% endblock %}

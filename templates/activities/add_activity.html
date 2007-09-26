@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Add Activity | {% endblock %}
+{% block menu %}{% menu "activities" %}{% endblock %}
+{% block content %}
+<h1>Add Activity</h1>
+<form name="activityForm" id="activityForm" action="." method="POST">
+<table cellspacing="0">
+<tbody>
+{{ form }}
+</tbody>
+</table>
+<div class="buttons">
+  <button type="submit" class="positive"><img src="{{ MEDIA_URL }}img/note_add.png" alt=""> Add Activity</button>
+  <a href="{% url activity_list %}" class="negative"><img src="{{ MEDIA_URL }}img/cancel.png" alt=""> Cancel</a>
+</div>
+</form>
+{% endblock %}

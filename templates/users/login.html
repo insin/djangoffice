@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Login | {% endblock %}
+{% block menu %}{% menu "login" %}{% endblock %}
+{% block extrahead %}
+  <script type="text/javascript">
+  Event.onDOMReady(function()
+  {
+      if ($("loginForm") != null)
+      {
+          Form.focusFirstElement("loginForm");
+      }
+  });
+  </script>
+{% endblock %}
+{% block content %}
+<h1>Login</h1>
+{% if form.has_errors %}
+<ul class="errors"><li>Your username and password didn't match. Please try again.</li></ul>
+{% endif %}
+<form name="loginForm" id="loginForm" action="." method="POST">
+  <table cellspacing="0">
+  <tbody>
+    <tr class="odd"><th scope="row"><label for="id_username">Username:</label></th><td>{{ form.username }}</td></tr>
+    <tr class="even"><th scope="row"><label for="id_password">Password:</label</th><td>{{ form.password }}</td></tr>
+  </tbody>
+  </table>
+  <div class="buttons">
+    <input type="hidden" name="next" value="{{ next|escape }}">
+    <button type="submit" class="positive"><img src="{{ MEDIA_URL }}img/door_in.png" alt=""> Login</button>
+  </div>
+</form>
+{% endblock %}

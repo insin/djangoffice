@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Edit Activity {{ activity.formatted_number }} | {% endblock %}
+{% block menu %}{% menu "activities" %}{% endblock %}
+{% block content %}
+<h1>Edit Activity</h1>
+<form name="activityForm" id="activityForm" action="." method="POST">
+<div>
+<table cellspacing="0">
+{{ form }}
+</table>
+</div>
+<div class="buttons">
+  <button type="submit" class="positive"><img src="{{ MEDIA_URL }}img/note_edit.png" alt=""> Edit Activity</button>
+  <a href="{{ activity.get_absolute_url }}" class="negative"><img src="{{ MEDIA_URL }}img/cancel.png" alt=""> Cancel</a>
+</div>
+</form>
+{% endblock %}

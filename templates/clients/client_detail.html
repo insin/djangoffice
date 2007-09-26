@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Client '{{ client.name|escape }}' | {% endblock %}
+{% block menu %}{% menu "manage" "clients" %}{% endblock %}
+{% block content %}
+<h1>Client '{{ client.name|escape }}'</h1>
+
+<table cellspacing="0">
+<tbody>
+<tr><th scope="col">Name:</th><td>{{ client.name|escape }}</td></tr>
+<tr><th scope="col">Notes:</th><td>{{ client.notes|escape|linebreaks }}</td></tr>
+<tbody>
+</table>
+<div class="buttons">
+  <a href="{% url edit_client client.id %}"><img src="{{ MEDIA_URL }}img/pencil.png" alt=""> Edit Client</a>
+</div>
+
+<h2>Jobs</h2>
+{% if jobs %}
+<table cellspacing="0">
+<thead>
+  <tr>
+    <th>Number</th>
+    <th>Name</th>
+    <th>Status</th>
+  </tr>
+</thead>
+<tbody>
+  {% for job in jobs %}<tr class="{% cycle odd,even %}">
+    <td><a href="{{ job.get_absolute_url }}">{{ job.formatted_number }}</a></td>
+    <td>{{ job.name|escape }}</td>
+    <td>{{ job.get_status_display }}</td>
+  </tr>{% endfor %}
+</tbody>
+</table>
+{% else %}
+<p>No Jobs yet.</p>
+{% endif %}
+<div class="buttons">
+  <a href="{% url add_job %}?client={{ client.id }}"><img src="{{ MEDIA_URL }}img/add.png" alt=""> Add Job</a>
+</div>
+
+<h2>Contacts</h2>
+{% if contacts %}
+<table cellspacing="0">
+<thead>
+  <tr>
+    <th>Name</th>
+    <th>Company</th>
+  </tr>
+</thead>
+<tbody>
+  {% for contact in contacts %}<tr class="{% cycle odd,even %}">
+    <td><a href="{{ contact.get_absolute_url }}">{{ contact.name|escape }}</a></td>
+    <td>{{ contact.company|escape }}</td>
+  </tr>{% endfor %}
+</tbody>
+</table>
+{% else %}
+<p>No Contacts yet.</p>
+{% endif %}
+<div class="buttons">
+  <a href="{% url add_contact %}?client={{ client.id }}"><img src="{{ MEDIA_URL }}img/group_add.png" alt=""> Add Contact</a>
+</div>
+{% endblock %}

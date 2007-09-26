@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Edit Contact '{{ contact.full_name|escape }}' | {% endblock %}
+{% block menu %}{% menu "manage" "contacts" %}{% endblock %}
+{% block content %}
+<h1>Edit Contact</h1>
+<form name="contactForm" id="contactForm" action="." method="POST">
+<div>
+<table cellspacing="0">
+{{ form }}
+</table>
+</div>
+<div class="buttons">
+  <button type="submit" class="positive"><img src="{{ MEDIA_URL }}img/group_edit.png" alt=""> Edit Contact</button>
+  <a href="{{ contact.get_absolute_url }}" class="negative"><img src="{{ MEDIA_URL }}img/cancel.png" alt=""> Cancel</a>
+</div>
+</form>
+{% endblock %}

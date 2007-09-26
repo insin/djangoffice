@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Bulk Approval{% if not form %} Results{% endif %} | {% endblock %}
+{% block menu %}{% menu "timesheets" "bulk_approval" %}{% endblock %}
+{% block content %}
+<h1>Bulk Approval {% if not form %} Results{% endif %}</h1>
+{% if form %}
+<form name="clientForm" id="clientForm" action="." method="POST">
+<table cellspacing="0">
+<tbody>
+{{ form }}
+</tbody>
+</table>
+<div class="buttons">
+  <button type="submit" class="positive"><img src="{{ MEDIA_URL }}img/tick.png" alt=""> Bulk Approve</button>
+  <a href="{% url timesheet_index %}" class="negative"><img src="{{ MEDIA_URL }}img/cancel.png" alt=""> Cancel</a>
+</div>
+</form>
+{% else %}
+<p><strong>{{ approved_time_entries }}</strong> Time Entr{{ approved_time_entries|pluralize:"y,ies" }} and <strong>{{ approved_expenses }}</strong> Expense{{ approved_expenses|pluralize}} between the dates of <strong>{{ start_date }}</strong> and <strong>{{ end_date }}</strong> (inclusive) were approved.</p>
+{% endif %}
+{% endblock %}

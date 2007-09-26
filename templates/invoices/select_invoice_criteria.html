@@ -1,0 +1,130 @@
+{% extends "base.html" %}{% load officeaid_tags %}{% load invoice_tags %}{% load money %}
+{% block title %}Select Invoice Criteria | {% endblock %}
+{% block menu %}{% menu "invoices" "create_invoices" %}{% endblock %}
+{% block content %}
+<h1>Select Invoice Criteria</h1>
+
+{{ form.non_field_errors.as_ul }}
+
+<form name="invoiceCriteriaForm" id="invoiceCriteriaForm" action="." method="POST">
+<div style="float: left; width: 55%;">
+  <table cellspacing="0">
+  <tbody>
+    {% if single_job %}
+    <tr><th scope="row">Client</th><td>{{ jobs.0.client|escape }}</td></tr>
+    <tr><th scope="row">Job</th><td>{{ jobs.0|escape }}</td></tr>
+    {% number_field_for_job jobs.0 from form as number_field %}
+    <tr><th scope="row"><label for="id_number{{ jobs.0.id }}">Manual Invoice #</label></th><td>{{ number_field }}</td></tr>
+    {% endif %}
+    <tr><th scope="row">{{ form.type.label_tag }}</th><td>{{ form.type.errors.as_ul }}{{ form.type }}</td></tr>
+    <tr><th scope="row">{{ form.date.label_tag }}</th><td>{{ form.date.errors.as_ul }}{{ form.date }}</td></tr>
+    <tr><th scope="row">{{ form.start_period.label_tag }}</th><td>{{ form.start_period.errors.as_ul }}{{ form.start_period }}</td></tr>
+    <tr><th scope="row">{{ form.end_period.label_tag }}</th><td>{{ form.end_period.errors.as_ul }}{{ form.end_period }}</td></tr>
+    <tr><th scope="row">{{ form.show_hours_booked_by_date.label_tag }}</th><td>{{ form.show_hours_booked_by_date.errors.as_ul }}{{ form.show_hours_booked_by_date }}</td></tr>
+    <tr><th scope="row">{{ form.show_tasks_by_user.label_tag }}</th><td>{{ form.show_tasks_by_user.errors.as_ul }}{{ form.show_tasks_by_user }}</td></tr>
+    <tr><th scope="row">{{ form.show_tasks_summary.label_tag }}</th><td>{{ form.show_tasks_summary.errors.as_ul }}{{ form.show_tasks_summary }}</td></tr>
+    <tr><th scope="row">{{ form.show_expenses_by_user.label_tag }}</th><td>{{ form.show_expenses_by_user.errors.as_ul }}{{ form.show_expenses_by_user }}</td></tr>
+    <tr><th scope="row">{{ form.show_expenses_summary.label_tag }}</th><td>{{ form.show_expenses_summary.errors.as_ul }}{{ form.show_expenses_summary }}</td></tr>
+    <tr><th scope="row">{{ form.show_final_totals.label_tag }}</th><td>{{ form.show_final_totals.errors.as_ul }}{{ form.show_final_totals }}</td></tr>
+    <tr><th scope="row">{{ form.show_financials.label_tag }}</th><td>{{ form.show_financials.errors.as_ul }}{{ form.show_financials }}</td></tr>
+  </tbody>
+  </table>
+  {% if single_job %}
+  <fieldset>
+    <legend>Total Effort Override</legend>
+    <table cellspacing="0">
+    <tbody>
+    <tr><th scope="row">{{ form.total_amount.label_tag }}</th><td>{{ form.total_amount.errors.as_ul }}{{ form.total_amount }}</td></tr>
+    </tbody>
+    </table>
+  </fieldset>
+  <fieldset>
+    <legend>Additional Hours</legend>
+    <table cellspacing="0">
+    <tbody>
+    <tr><th scope="row">{{ form.additional_hours.label_tag }}</th><td>{{ form.additional_hours.errors.as_ul }}{{ form.additional_hours }}</td></tr>
+    <tr><th scope="row">{{ form.additional_hours_cost.label_tag }}</th><td>{{ form.additional_hours_cost.errors.as_ul }}{{ form.additional_hours_cost }}</td></tr>
+    <tr><th scope="row">{{ form.additional_hours_description.label_tag }}</th><td>{{ form.additional_hours_description.errors.as_ul }}{{ form.additional_hours_description }}</td></tr>
+    </tbody>
+    </table>
+  </fieldset>
+  <fieldset>
+    <legend>Misc / Expense Override or Additional</legend>
+    <table cellspacing="0">
+    <tbody>
+    <tr><th scope="row">{{ form.extra_expense_amount.label_tag }}</th><td>{{ form.extra_expense_amount.errors.as_ul }}{{ form.extra_expense_amount }}</td></tr>
+    <tr><th scope="row">{{ form.extra_expense_description.label_tag }}</th><td>{{ form.extra_expense_description.errors.as_ul }}{{ form.extra_expense_description }}</td></tr>
+    <tr><th scope="row">{{ form.extra_expense_override.label_tag }}</th><td>{{ form.extra_expense_override.errors.as_ul }}{{ form.extra_expense_override }}</td></tr>
+    </tbody>
+    </table>
+  </fieldset>
+  {% endif %}
+</div>
+
+<div style="float: right; width: 45%">
+{% if single_job %}
+  <h2>Invoice History</h2>
+  {% if jobs.0.invoices.count %}
+  <table cellspacing="0">
+  <colgroup align="center"></colgroup>
+  <colgroup align="left" span="2"></colgroup>
+  <thead>
+    <tr>
+      <th scope="col">Invoice #</th>
+      <th scope="col">Date</th>
+      <th scope="col">From</th>
+      <th scope="col">To</th>
+      <th scope="col">Amount</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for invoice in jobs.0.invoices.all %}<tr class="{% cycle odd,even %}">
+    <td>{{ invoice.formatted_number }}</td>
+    <td>{{ invoice.date }}</td>
+    <td>{% if invoice.start_period %}{{ invoice.start_period }}{% else %}-{% endif %}</td>
+    <td>{% if invoice.end_period %}{{ invoice.end_period }}{% else %}-{% endif %}</td>
+    <td>{{ invoice.amount|money }}</td>
+  </tr>{% endfor %}
+  </tbody>
+  <tfoot>
+    <tr class="totals">
+      <td colspan="4" class="totalLabel">Total</td>
+      <td>TODO</td>
+    </tr>
+  </tfoot>
+  </table>
+  {% else %}
+  <p class="noneyet">No Invoices yet.</p>
+  {% endif %}
+</div>
+{% else %}
+  <h2>Jobs To Be Invoiced</h3>
+  <table cellspacing="0">
+  <colgroup align="center"></colgroup>
+  <colgroup align="left" span="2"></colgroup>
+  <thead>
+    <tr>
+      <th scope="col">Job</th>
+      <th scope="col">Manual Invoice #</th>
+      <th scope="col">&nbsp;</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for job in jobs %}<tr class="{% cycle odd,even %}">
+    <td>{{ job|escape }}</td>
+    {% number_field_for_job job from form as number_field %}
+    <td>{{ number_field }}</td>
+    <td><input type="submit" name="draft_invoice{{ job.id }}" value="Create Draft"></td>
+  </tr>{% endfor %}
+  </tbody>
+  </table>
+{% endif %}
+</div>
+
+<div class="buttons" style="clear: both;">
+  <input type="hidden" name="step" value="2">
+  <button type="submit" name="create_invoices"><img src="{{ MEDIA_URL }}img/add.png" alt=""> Create Invoices</button>
+</div>
+{{ job_form.as_hidden }}
+</form>
+{% endblock %}

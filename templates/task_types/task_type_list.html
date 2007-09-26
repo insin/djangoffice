@@ -1,0 +1,26 @@
+{% extends "base.html" %}{% load officeaid_tags %}
+{% block title %}Task Types | {% endblock %}
+{% block menu %}{% menu "manage" "task_types" %}{% endblock %}
+{% block content %}
+<h1>Task Types</h1>
+
+{% if task_type_list %}
+<table cellspacing="0">
+<thead>
+  <tr>
+{% table_header headers %}
+  </tr>
+</thead>
+<tbody>
+  {% for task_type in task_type_list %}<tr class="{% cycle odd,even %}">
+    <td><a href="{{ task_type.get_absolute_url }}">{{ task_type.name|escape }}</a></td>
+  </tr>{% endfor %}
+</tbody>
+</table>
+{% else %}
+<p class="noneyet">No Task Types yet.</p>
+{% endif %}
+<div class="buttons">
+  <a href="{% url add_task_type %}"><img src="{{ MEDIA_URL }}img/add.png" alt=""> Add Task Type</a>
+</div>
+{% endblock %}

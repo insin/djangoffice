@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Edit Admin User | {% endblock %}
+{% block menu %}{% menu "manage" "users" %}{% endblock %}
+{% block content %}
+<h1>Edit Admin User</h1>
+<form name="adminUserForm" id="adminUserForm" action="." method="POST">
+<table cellspacing="0">
+{{ form }}
+</table>
+<div class="buttons">
+  <button type="submit" class="positive"><img src="{{ MEDIA_URL }}img/user_edit.png" alt=""> Edit Admin User</button>
+  <a href="{% url user_list %}" class="negative"><img src="{{ MEDIA_URL }}img/cancel.png" alt=""> Cancel</a>
+</div>
+</form>
+{% endblock %}

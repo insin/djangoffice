@@ -1,0 +1,86 @@
+{% extends "base.html" %}{% load timesheet %}
+{% block title %}Timesheet | {% endblock %}
+{% block extrahead %}
+  <script type="text/javascript" src="{{ MEDIA_URL }}js/SelectUpdater.js"></script>
+  <script type="text/javascript">
+  var jobToTaskMapping = {{ task_json }};
+  Event.onDOMReady(function()
+  {
+      {% for entry,form in time_entries %}{% if entry.is_editable %}new SelectUpdater("id_entry{{ entry.id }}-job", "id_entry{{ entry.id }}-task", jobToTaskMapping);{% endif %}{% endfor %}
+  });
+  </script>
+{% endblock %}
+{% block menu %}{% menu "timesheets" %}{% endblock %}
+{% block content %}
+<h1>Timesheet</h1>
+<dl>
+  <dt>For user:</dt>
+  <dd>{{ user_.get_full_name }}</dd>
+  <dt>Week commencing:</dt>
+  <dd>{{ timesheet.week_commencing }}</dd>
+</dl>
+
+<form name="timesheetForm" id="timesheetForm" action="." method="POST">
+{% if not user_.get_profile.is_admin %}
+<h2>Time Entries</h2>
+<table cellspacing="0">
+<thead>
+  <tr>
+    <th>&nbsp;</th>
+    <th>Job</th>
+    <th>Task</th>
+    {% day_headers timesheet.week_commencing %}
+    <th>Total</th>
+    <th><acronym title="Overtime">OT</acronym></th>
+    <th>Description</th>
+    <th>Booked</th>
+    <th>Estimate</th>
+    <th>Remaining</th>
+    <th>Approved</th>
+    <th>Invoice #</th>
+  </tr>
+</thead>
+<tbody>
+  {% for entry,form in time_entries %}<tr class="{% cycle odd,even %} {% if not entry.is_editable %}non{% endif %}editable">
+  {% edit_time_entry_row entry form %}
+  </tr>{% endfor %}
+</tbody>
+</table>
+<div class="buttons">
+  <a href="{{ timesheet|add_time_entry_url:user_ }}" title="Add a new Time Entry"><img src="{{ MEDIA_URL }}img/time_add.png" alt=""> Add Time Entry</a>
+</div>
+{% endif %}
+
+<h2>Expenses</h2>
+<table cellspacing="0">
+<thead>
+  <tr>
+    <th>&nbsp;</th>
+    <th>Job</th>
+    <th>Type</th>
+    <th>Date</th>
+    <th>Amount</th>
+    <th>Description</th>
+    <th>Billable</th>
+    <th>Approved</th>
+    <th>Invoice #</th>
+  </tr>
+</thead>
+<tbody>
+  {% for expense,form in expenses %}<tr class="{% cycle odd,even %}">
+  {% edit_expense_row expense form %}
+  </tr>{% endfor %}
+</tbody>
+</table>
+<div class="buttons">
+  <a href="{{ timesheet|add_expense_url:user_ }}" title="Add a new Expense"><img src="{{ MEDIA_URL }}img/coins_add.png" alt=""> Add Expense</a>
+</div>
+
+<div class="buttons">
+  <button type="submit" name="save" class="positive" title="Save changes made to the Timesheet"><img src="{{ MEDIA_URL }}img/calendar_edit.png" alt=""> Save Timesheet</button>
+  {% if not user.get_profile.is_user %}
+  <button type="submit" name="approve" class="positive" title="Approve all unapproved Timesheet items"><img src="{{ MEDIA_URL }}img/tick.png" alt=""> Approve All</button>
+  {% endif %}
+</div>
+</form>
+{% endblock %}

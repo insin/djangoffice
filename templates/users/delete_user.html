@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Delete User | {% endblock %}
+{% block menu %}{% menu "manage" "users" %}{% endblock %}
+{% block content %}
+<h1>Delete User</h1>
+<form name="userForm" id="userForm" action="." method="POST">
+<p>Are you sure you want to delete the User '{{ user_.get_full_name|escape }}'?</p>
+<div class="buttons">
+  <button type="submit" class="negative"><img src="{{ MEDIA_URL }}img/delete.png" alt=""> Delete User</button>
+  <a href="{{ user_.get_absolute_url|escape }}" class="negative"><img src="{{ MEDIA_URL }}img/cancel.png" alt=""> Cancel</a>
+</div>
+</form>
+{% endblock %}

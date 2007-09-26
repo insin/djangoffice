@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Add Client | {% endblock %}
+{% block menu %}{% menu "manage" "clients" %}{% endblock %}
+{% block content %}
+<h1>Add Client</h1>
+<form name="clientForm" id="clientForm" action="." method="POST">
+<table cellspacing="0">
+<tbody>
+{{ form }}
+</tbody>
+</table>
+<div class="buttons">
+  <button type="submit" class="positive"><img src="{{ MEDIA_URL }}img/add.png" alt=""> Add Client</button>
+  <a href="{% url client_list %}" class="negative"><img src="{{ MEDIA_URL }}img/cancel.png" alt=""> Cancel</a>
+</div>
+</form>
+{% endblock %}

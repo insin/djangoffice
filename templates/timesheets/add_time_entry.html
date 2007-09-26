@@ -1,0 +1,56 @@
+{% extends "base.html" %}{% load timesheet %}
+{% block title %}Add Time Entry | {% endblock %}
+{% block extrahead %}
+  <script type="text/javascript" src="{{ MEDIA_URL }}js/SelectUpdater.js"></script>
+  <script type="text/javascript">
+  var jobToTaskMapping = {{ task_json }};
+  Event.onDOMReady(function()
+  {
+      new SelectUpdater("id_job", "id_task", jobToTaskMapping);
+  });
+  </script>
+{% endblock %}
+{% block menu %}{% menu "timesheets" %}{% endblock %}
+{% block content %}
+<h1>Add Time Entry</h1>
+<dl>
+  <dt>For user:</dt>
+  <dd>{{ user_.get_full_name }}</dd>
+  <dt>Week commencing:</dt>
+  <dd>{{ timesheet.week_commencing }}</dd>
+</dl>
+
+{{ form.errors }}
+<form name="timeEntryForm" id="timeEntryForm" action="." method="POST">
+<table cellspacing="0">
+<thead>
+  <tr>
+    <th>Job</th>
+    <th>Task</th>
+    {% day_headers timesheet.week_commencing %}
+    <th><acronym title="Overtime">OT</acronym></th>
+    <th>Description</th>
+  </tr>
+</thead>
+<tbody>
+  <tr class="odd">
+    <td>{{ form.job }}</td>
+    <td>{{ form.task }}</td>
+    <td>{{ form.mon }}</td>
+    <td>{{ form.tue }}</td>
+    <td>{{ form.wed }}</td>
+    <td>{{ form.thu }}</td>
+    <td>{{ form.fri }}</td>
+    <td>{{ form.sat }}</td>
+    <td>{{ form.sun }}</td>
+    <td>{{ form.overtime }}</td>
+    <td>{{ form.description }}</td>
+  </tr>
+</tbody>
+</table>
+<div class="buttons">
+  <button type="submit" class="positive"><img src="{{ MEDIA_URL }}img/time_add.png" alt=""> Add Time Entry</button>
+  <a href="{{ timesheet.get_absolute_url }}" class="negative"><img src="{{ MEDIA_URL }}img/cancel.png" alt=""> Cancel</a>
+</div>
+</form>
+{% endblock %}

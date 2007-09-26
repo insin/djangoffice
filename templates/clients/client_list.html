@@ -1,0 +1,26 @@
+{% extends "base.html" %}{% load officeaid_tags %}
+{% block title %}Clients | {% endblock %}
+{% block menu %}{% menu "manage" "clients" %}{% endblock %}
+{% block content %}
+<h1>Clients</h1>
+
+{% if client_list %}
+<table cellspacing="0">
+<thead>
+  <tr>
+{% table_header headers %}
+  </tr>
+</thead>
+<tbody>
+  {% for client in client_list %}<tr class="{% cycle odd,even %}">
+    <td><a href="{{ client.get_absolute_url }}">{{ client.name|escape }}</a></td>
+  </tr>{% endfor %}
+</tbody>
+</table>
+{% else %}
+<p class="noneyet">No Clients yet.</p>
+{% endif %}
+<div class="buttons">
+  <a href="{% url add_client %}"><img src="{{ MEDIA_URL }}img/add.png" alt=""> Add Client</a>
+</div>
+{% endblock %}

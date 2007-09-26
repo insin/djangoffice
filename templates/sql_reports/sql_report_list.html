@@ -1,0 +1,29 @@
+{% extends "base.html" %}{% load officeaid_tags %}
+{% block title %}SQL Reports | {% endblock %}
+{% block menu %}{% menu "reports" "sql_reports" %}{% endblock %}
+{% block content %}
+<h1>SQL Reports</h1>
+
+{% if sql_report_list %}
+<table cellspacing="0">
+<thead>
+  <tr>
+{% table_header headers %}
+    <th>&nbsp;</th>
+  </tr>
+</thead>
+<tbody>
+  {% for sql_report in sql_report_list %}<tr class="{% cycle odd,even %}">
+    <td>{% if user.get_profile.is_admin %}<a href="{{ sql_report.get_absolute_url }}">{% endif %}{{ sql_report.name|escape }}{% if user.get_profile.is_admin %}</a>{% endif %}</td>
+    {% if user.get_profile.is_admin %}<th>{{ sql_report.get_access_display|escape }}</td>{% endif %}
+    <td><a href="{% url execute_sql_report sql_report.id %}">Execute</a></td>
+  </tr>{% endfor %}
+</tbody>
+</table>
+{% else %}
+<p class="noneyet">No SQL Reports yet.</p>
+{% endif %}
+<div class="buttons">
+  <a href="{% url add_sql_report %}"><img src="{{ MEDIA_URL }}img/script_add.png" alt=""> Add SQL Report</a>
+</div>
+{% endblock %}

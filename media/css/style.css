@@ -1,0 +1,32 @@
+body { font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif; font-size: 12px; }
+a img { border: none; }
+img { vertical-align: text-bottom; }
+
+/* Lists */
+ul.messages { margin: 0; padding: 0; }
+  ul.messages li { list-style-type: none; padding: 4px 5px 4px 25px; margin: 0 0 3px 0; border: 1px solid #c2e1ef; color: #336699; background: #dff4ff url("../img/information.png") 5px .3em no-repeat; }
+ul.errorlist { margin: 0; padding: 0; }
+  ul.errorlist li { list-style-type: none; padding: 4px 5px 4px 25px; margin: 0 0 3px 0; border: 1px solid #f00; color: #fff; background: #f00 url("../img/error.png") 5px .3em no-repeat; }
+
+/* From http://particletree.com/features/rediscovering-the-button-element/ */
+/* Buttons */
+.buttons { overflow: hidden; }
+.buttons a, .buttons button { float: left; margin: 0 5px 0 0; background-color: #f5f5f5; border: 1px solid #dedede; border-top: 1px solid #eee; border-left: 1px solid #eee; font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif; font-size: 100%; line-height: 130%; text-decoration: none; font-weight: bold; color: #565656; cursor: pointer; padding: 5px 10px 5px 10px; }
+.buttons button { width: auto; overflow: visible; padding: 5px 10px 5px 7px; }
+.buttons button img, .buttons a img { margin-right: 3px; border: none; width: 16px; height: 16px; vertical-align: text-top; }
+  /* Standard */
+  button:hover, .buttons a:hover, button.over { background-color: #dff4ff; border: 1px solid #c2e1ef; color: #336699; }
+  .buttons a:active{ background-color: #6299c5; border: 1px solid #6299c5; color: #fff; }
+  /* Positive */
+  button.positive, .buttons a.positive { color: #529214; }
+  .buttons a.positive:hover, button.positive:hover, button.positiveover { background-color: #E6EFC2; border: 1px solid #C6D880; color: #529214; }
+  .buttons a.positive:active { background-color: #529214; border: 1px solid #529214; color: #fff; }
+  /* Negative */
+  .buttons a.negative, button.negative { color: #d12f19; }
+  .buttons a.negative:hover, button.negative:hover, button.negativeover { background: #fbe3e4; border: 1px solid #fbc2c4; color: #d12f19; }
+  .buttons a.negative:active { background-color: #d12f19; border: 1px solid #d12f19; color: #fff; }
+
+/* Javascript Controls */
+img.control { cursor: pointer; }
+span.control { text-decoration: underline; color: #00f; cursor: pointer; }
+div.letters span.control { padding-right: 3px; }

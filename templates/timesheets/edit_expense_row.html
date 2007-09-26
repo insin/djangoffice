@@ -1,0 +1,21 @@
+{% load timesheet %}{% load money %}{% if expense.is_editable %}
+  <td><a href="{% delete_expense_url timesheet user_ expense.id %}"><img src="{{ MEDIA_URL }}img/delete.png" alt="Delete" title="Delete this Expense"></a></th>
+  <td>{{ form.job }}</td>
+  <td>{{ form.type }}</td>
+  <td>{{ form.date }}</td>
+  <td>{{ form.amount }}</td>
+  <td>{{ form.description}}</td>
+  <td>{{ form.billable }}</td>
+  <td>{% if form.can_approve %}{{ form.approved }}{% else %}{{ expense.approved_by_id|yesno:"Yes,No" }}{% endif %}</td>
+  <td>-</td>
+{% else %}
+  <td>&nbsp;</td>
+  <td>{{ expense.job_display|escape }}</td>
+  <td>{{ expense.type_name|escape }}</td>
+  <td>{{ expense.date }}</td>
+  <td>{{ expense.amount|money }}</td>
+  <td>{{ expense.description|escape }}</td>
+  <td>{{ expense.billable|yesno:"Yes,No" }}</td>
+  <td>{% if form and form.can_approve %}{{ form.approved }}{% else %}{{ expense.approved_by_id|yesno:"Yes,No" }}{% endif %}</td>
+  <td>{% if expense.is_invoiced %}{{ expense.invoice.formatted_number }}{% else %}-{% endif %}</td>
+{% endif %}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}{% load officeaid_tags %}
+{% block title %}Artifact Detail | {% endblock %}
+{% block menu %}{% menu "manage" "jobs" %}{% endblock %}
+{% block content %}
+<h1>Artifact Detail</h1>
+
+<table cellspacing="0">
+<tbody>
+  <tr><th scope="col">Job:</th><td><a href="{{ job.get_absolute_url }}">{{ job|escape }}</td></tr>
+  <tr><th scope="col">Description:</th><td>{{ artifact.description|escape }}</td></tr>
+  <tr><th scope="col">File:</th><td>{{ artifact.file|escape }}</td></tr></tr>
+  <tr><th scope="col">File size:</th><td>{{ artifact.get_file_size }}</td></tr>
+  <tr><th scope="col">Created at:</th><td>{{ artifact.created_at }}</td></tr>
+  {% ifnotequal artifact.created_at artifact.updated_at %}
+  <tr><th scope="col">Updated at:</th><td>{{ artifact.updated_at }}</td></tr>
+  {% endifnotequal %}
+  <tr><th scope="col">Access:</th><td>{{ artifact.get_access_display }}</td></tr>
+</tbody>
+</table>
+<div class="buttons">
+  <a href="{% url edit_artifact job.formatted_number artifact.id %}"><img src="{{ MEDIA_URL }}img/pencil.png" alt=""> Edit Artifact</a>
+  <a href="{% url download_artifact job.formatted_number artifact.id %}" class="positive"><img src="{{ MEDIA_URL }}img/attach.png" alt=""> Download Artifact</a>
+</div>
+{% endblock %}

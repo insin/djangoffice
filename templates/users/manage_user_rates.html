@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Rates for '{{ user_.get_full_name|escape }}' | {% endblock %}
+{% block menu %}{% menu "manage" "users" %}{% endblock %}
+{% block content %}
+<h1>Rates for '{{ user_.get_full_name|escape }}'</h1>
+
+{% if rates %}
+<form name="editUserRatesForm" id="editUserRatesForm" action="." method="POST">
+<table cellspacing="0">
+<thead>
+<tr>
+  <th>Effective From</th>
+  <th>Standard Rate</th>
+  <th>Overtime Rate</th>
+</tr>
+</thead>
+<tbody>
+{% for rate in rates %}<tr>
+  <td>{{ rate.effective_from }}</td>
+  <td>{% if rate.editable %}<input type="text" name="rate.{{ rate.id }}.standard_rate" value="{{ rate.standard_rate }}">{% else %}{{ rate.standard_rate }}{% endif %}</td>
+  <td>{% if rate.editable %}<input type="text" name="rate.{{ rate.id }}.overtime_rate" value="{{ rate.overtime_rate }}">{% else %}{{ rate.overtime_rate }}{% endif %}</td>
+</tr>{% endfor %}
+</tbody>
+</table>
+{% if rates_editable %}
+<div class="buttons">
+  <input type="hidden" name="action" value="edit">
+  <button type="submit" class="positive"><img src="{{ MEDIA_URL }}img/tick.png" alt=""> Edit User Rates</button>
+  <a href="{{ user_.get_absolute_url|escape }}" class="negative"><img src="{{ MEDIA_URL }}img/cancel.png" alt=""> Cancel</a>
+</div>
+{% endif %}
+</form>
+{% endif %}
+
+<form name="addUserRateForm" id="addUserRateForm" action="." method="POST">
+<table cellspacing="0">
+<tbody>
+{{ add_form }}
+</tbody>
+</table>
+<div class="buttons">
+  <input type="hidden" name="action" value="add">
+  <button type="submit" class="positive"><img src="{{ MEDIA_URL }}img/coins_add.png" alt=""> Add User Rate</button>
+  <a href="{{ user_.get_absolute_url|escape }}" class="negative"><img src="{{ MEDIA_URL }}img/cancel.png" alt=""> Cancel</a>
+</div>
+</form>
+{% endblock %}

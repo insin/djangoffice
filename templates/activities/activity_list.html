@@ -1,0 +1,55 @@
+{% extends "base.html" %}{% load officeaid_tags %}
+{% block title %}Activities | {% endblock %}
+{% block menu %}{% menu "activities" %}{% endblock %}
+{% block content %}
+<h1>Activities</h1>
+
+<h2>Filters</h2>
+<form name="activityFilterForm" id="activityFilterForm" action="." method="GET">
+<table cellspacing="0">
+<tbody>
+{{ filter_form }}
+<tr>
+  <th>Contact:</th>
+  <td>
+    <div class="buttons"
+    <span id="contactName"></span>
+    <button type="button" id="selectContactButton" class="positive"><img src="{{ MEDIA_URL }}img/group_add.png" alt=""> Select Contact</button>
+    <button type="button" id="clearContactButton" class="negative"><img src="{{ MEDIA_URL }}img/group_delete.png" alt=""> Clear Contact</button>
+    </div>
+  </td>
+</tr>
+</tbody>
+</table>
+<div class="buttons">
+  <button type="submit" class="positive"><img src="{{ MEDIA_URL }}img/tick.png" alt=""> Apply Filters</button>
+</div>
+</form>
+
+{% if activity_list %}
+<table cellspacing="0">
+<thead>
+  <tr>
+{% table_header headers %}
+  </tr>
+</thead>
+<tbody>
+  {% for activity in activity_list %}<tr class="{% cycle odd,even %}">
+    <td><a href="{{ activity.get_absolute_url }}">{{ activity.formatted_number }}</a></td>
+    <td><a href="{{ activity.job.get_absolute_url }}">{{ activity.job|escape }}</a></td>
+    <td>{{ activity.created_by.get_full_name|escape }}</td>
+    <td>{{ activity.created_at }}</td>
+    <td>{{ activity.get_priority_display }}</td>
+    <td>{% if activity.assigned_to %}{{ activity.assigned_to.get_full_name|escape }}{% else %}-{% endif %}</td>
+    <td>{% if activity.contact %}<a href="{{ activity.contact.get_absolute_url }}">{{ activity.contact.full_name|escape }}</a>{% else %}-{% endif %}</td>
+    <td>{{ activity.description|escape }}</td>
+  </tr>{% endfor %}
+</tbody>
+</table>
+{% else %}
+<h2>No Activities found</h2>
+{% endif %}
+<div class="buttons">
+  <a href="{% url add_activity %}"><img src="{{ MEDIA_URL }}img/note_add.png" alt=""> Add Activity</a>
+</div>
+{% endblock %}

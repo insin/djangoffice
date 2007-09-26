@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Add Expense | {% endblock %}
+{% block menu %}{% menu "timesheets" %}{% endblock %}
+{% block content %}
+<h1>Add Expense</h1>
+<dl>
+  <dt>For user:</dt>
+  <dd>{{ user_.get_full_name }}</dd>
+  <dt>Week commencing:</dt>
+  <dd>{{ timesheet.week_commencing }}</dd>
+</dl>
+
+{{ form.errors }}
+<form name="expenseForm" id="expenseForm" action="." method="POST">
+<table cellspacing="0">
+<thead>
+  <tr>
+    <th>Job</th>
+    <th>Type</th>
+    <th>Date</th>
+    <th>Amount</th>
+    <th>Description</th>
+    <th>Billable</th>
+  </tr>
+</thead>
+<tbody>
+  <tr class="odd">
+    <td>{{ form.job }}</td>
+    <td>{{ form.type }}</td>
+    <td>{{ form.date }}</td>
+    <td>{{ form.amount }}</td>
+    <td>{{ form.description}}</td>
+    <td>{{ form.billable }}</td>
+  </tr>
+</tbody>
+</table>
+<div class="buttons">
+  <button type="submit" class="positive"><img src="{{ MEDIA_URL }}img/coins_add.png" alt=""> Add Expense</button>
+  <a href="{{ timesheet.get_absolute_url }}" class="negative"><img src="{{ MEDIA_URL }}img/cancel.png" alt=""> Cancel</a>
+</div>
+</form>
+{% endblock %}

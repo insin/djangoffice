@@ -1,0 +1,32 @@
+{% extends "base.html" %}{% load officeaid_tags %}
+{% block title %}Jobs | {% endblock %}
+{% block menu %}{% menu "manage" "jobs" %}{% endblock %}
+{% block content %}
+<h1>Jobs</h1>
+
+<h2>Filters</h2>
+{% job_filter_form filter_form %}
+
+{% if job_list %}
+<table cellspacing="0">
+<thead>
+  <tr>
+{% table_header headers %}
+  </tr>
+</thead>
+<tbody>
+  {% for job in job_list %}<tr class="{% cycle odd,even %}">
+    <td><a href="{{ job.get_absolute_url }}">{{ job.formatted_number }}</a></td>
+    <td>{{ job.name|escape }}</td>
+    <td>{{ job.client.name|escape }}</td>
+    <td>{{ job.get_status_display|escape }}</td>
+  </tr>{% endfor %}
+</tbody>
+</table>
+{% else %}
+<h2>No Jobs found</h2>
+{% endif %}
+<div class="buttons">
+  <a href="{% url add_job %}"><img src="{{ MEDIA_URL }}img/add.png" alt=""> Add Job</a>
+</div>
+{% endblock %}

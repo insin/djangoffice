@@ -1,0 +1,39 @@
+{% load timesheet %}{% if entry.is_editable %}
+  <td><a href="{% delete_time_entry_url timesheet user_ entry.id %}"><img src="{{ MEDIA_URL }}img/delete.png" alt="Delete" title="Delete this Time Entry"></a></td>
+  <td>{{ form.job }}</td>
+  <td>{{ form.task }}</td>
+  <td>{{ form.mon }}</td>
+  <td>{{ form.tue }}</td>
+  <td>{{ form.wed }}</td>
+  <td>{{ form.thu }}</td>
+  <td>{{ form.fri }}</td>
+  <td>{{ form.sat }}</td>
+  <td>{{ form.sun }}</td>
+  <td>{{ entry.total_time_booked }}</td>
+  <td>{{ form.overtime }}</td>
+  <td>{{ form.description }}</td>
+  <td>{{ entry.task_hours_booked }}</td>
+  <td>{{ entry.task_estimate_hours }}</td>
+  <td>{{ entry|task_remaining }}</td>
+  <td>{% if form.can_approve %}{{ form.approved }}{% else %}{{ entry.approved_by_id|yesno:"Yes,No" }}{% endif %}</td>
+  <td>-</td>
+{% else %}
+  <td>&nbsp;</td>
+  <td>{{ entry.job_display|escape }}</td>
+  <td>{{ entry.task_name|escape }}</td>
+  <td>{{ entry.mon }}</td>
+  <td>{{ entry.tue }}</td>
+  <td>{{ entry.wed }}</td>
+  <td>{{ entry.thu }}</td>
+  <td>{{ entry.fri }}</td>
+  <td>{{ entry.sat }}</td>
+  <td>{{ entry.sun }}</td>
+  <td>{{ entry.total_time_booked }}</td>
+  <td>{{ entry.overtime }}</td>
+  <td>{{ entry.description|escape }}</td>
+  <td>{{ entry.task_hours_booked }}</td>
+  <td>{{ entry.task_estimate_hours }}</td>
+  <td>{{ entry|task_remaining }}</td>
+  <td>{% if form and form.can_approve %}{{ form.approved }}{% else %}{{ entry.approved_by_id|yesno:"Yes,No" }}{% endif %}</td>
+  <td>{% if entry.is_invoiced %}{{ entry.invoice.formatted_number }}{% else %}-{% endif %}</td>
+{% endif %}

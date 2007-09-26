@@ -1,0 +1,228 @@
+{% extends "base.html" %}{% load officeaid_tags %}
+{% block title %}Job {{ job.formatted_number }} - {{ job.name|escape }} | {% endblock %}
+{% block menu %}{% menu "manage" "jobs" %}{% endblock %}
+{% block content %}
+<h1>Job {{ job.formatted_number }} - {{ job.name|escape }}</h1>
+
+<div class="buttons">
+  <a href="{% url edit_job job.formatted_number %}"><img src="{{ MEDIA_URL }}img/pencil.png" alt=""> Edit Job</a>
+</div>
+
+<div class="section" id="jobDetailsSection">
+  <h2>Job Details</h2>
+  <table cellspacing="0">
+  <tbody>
+  <tr><th scope="row">Number:</th><td>{{ job.formatted_number }}</td></tr>
+  <tr><th scope="row">Name:</th><td>{{ job.name|escape }}</td></tr>
+  {% if job.reference %}
+  <tr><th scope="row">Reference:</th><td>{{ job.reference|escape }}</td></tr>
+  <tr><th scope="row">Reference date:</th><td>{{ job.reference_date }}</td></tr>
+  {% endif %}
+  <tr><th scope="row">Status:</th><td>{{ job.get_status_display|escape }}</td></tr>
+  <tr><th scope="row">Client:</th><td><a href="{{ job.client.get_absolute_url|escape }}">{{ job.client.name|escape }}</a></td></tr>
+  <tr><th scope="row">Primary contact:</th><td><a href="{{ job.primary_contact.get_absolute_url }}">{{ job.primary_contact.full_name|escape }}</a></td></tr>
+  <tr><th scope="row">Billing contact:</th><td>{% if job.billing_contact %}<a href="{{ job.billing_contact.get_absolute_url }}">{{ job.billing_contact.full_name|escape }}</a>{% else %}None{% endif %}</a></td></tr>
+  <tr>
+    <th scope="row">Job contacts:</th>
+    <td>
+      {% if job_contacts %}
+      <ul>
+        {% for contact in job_contacts %}<li>
+          <a href="{{ contact.get_absolute_url|escape }}">{{ contact.full_name|escape }}</a>
+        </li>{% endfor %}
+      </ul>
+      {% else %}
+      None
+      {% endif %}
+    </td>
+  </tr>
+  <tr><th scope="row">Director:</th><td><a href="{{ job.director.get_absolute_url }}">{{ job.director.get_full_name|escape }}</a></td></tr>
+  <tr><th scope="row">Project manager:</th><td><a href="{{ job.project_manager.get_absolute_url }}">{{ job.project_manager.get_full_name|escape }}</a></td></tr>
+  <tr><th scope="row">Architect:</th><td><a href="{{ job.architect.get_absolute_url }}">{{ job.architect.get_full_name|escape }}</a></td></tr>
+  <tr><th scope="row">Start date:</th><td>{{ job.start_date|default:"N/A" }}</td></tr>
+  <tr><th scope="row">Expected end date:</th><td>{{ job.end_date|default:"N/A" }}</td></tr>
+  <tr><th scope="row">Fee basis:</th><td>{{ job.get_fee_basis_display|escape|default:"N/A" }}</td></tr>
+  <tr><th scope="row">Fee amount:</th><td>{{ job.fee_amount|default:"N/A" }}</td></tr>
+  <tr><th scope="row">Fee currency:</th><td>{{ job.get_fee_currency_display|escape }}</td></tr>
+  <tr><th scope="row">Notes:</th><td>{{ job.notes|escape|linebreaksbr|default:"N/A" }}</td></tr>
+  </tbody>
+  </table>
+</div>
+
+<div class="section" id="activitiesSection">
+  <h2>Activities</h2>
+  {% if activities %}
+  <table cellspacing="0">
+  <thead>
+    <tr>
+      <th>Number</th>
+      <th>Created by</th>
+      <th>Created at</th>
+      <th>Assigned to</th>
+      <th>Contact</th>
+      <th>Priority</th>
+      <th>Description</th>
+      <th>Completed</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for activity in activities %}<tr class="{% cycle odd,even %}">
+      <td><a href="{{ activity.get_absolute_url }}">{{ activity.formatted_number }}</a></td>
+      <td><a href="{{ activity.created_by.get_absolute_url }}">{{ activity.created_by.get_full_name|escape }}</a></td>
+      <td>{{ activity.created_at }}</td>
+      <td>{{ activity.assigned_to.get_full_name|escape|default:"-" }}</td>
+      <td>{{ activity.contact.full_name|escape|default:"-" }}</a></td>
+      <td>{{ activity.get_priority_display|escape }}</td>
+      <td>{{ activity.description|escape|linebreaksbr }}</td>
+      <td>{{ activity.completed|yesno:"Yes,No" }}</td>
+    </tr>{% endfor %}
+  </tbody>
+  </table>
+  {% else %}
+  <p>No Activities yet.</p>
+  {% endif %}
+  <div class="buttons">
+    <a href="{% url add_activity %}?job={{ job.id }}"><img src="{{ MEDIA_URL }}img/note_add.png" alt=""> Add Activity</a>
+  </div>
+</div>
+
+<div class="section" id="contactDetailsSection">
+  <h2>Contact Details</h2>
+
+  <h3>Primary Contact</h3>
+  <table cellspacing="0">
+  <tbody>
+  {% contact_rows job.primary_contact %}
+  </tbody>
+  </table>
+
+  {% if job.billing_contact %}
+  <h3>Billing Contact</h3>
+  <table cellspacing="0">
+  <tbody>
+  {% contact_rows job.billing_contact %}
+  </tbody>
+  </table>
+  {% endif %}
+
+  {% if job_contacts %}
+  {% for contact in job_contacts %}
+  <h3>Job Contact #{{ forloop.counter }}</h3>
+  <table cellspacing="0">
+  <tbody>
+  {% contact_rows contact %}
+  </tbody>
+  </table>
+  {% endfor %}
+  {% endif %}
+</div>
+
+<div class="section" id="tasksSection">
+  <h2>Tasks</h2>
+  <table cellspacing="0">
+  <thead>
+    <tr>
+      <th scope="col">Type</th>
+      <th scope="col">Users</th>
+      <th scope="col">Estimate Hours</th>
+      <th scope="col">Estimate Cost</th>
+      <th scope="col">Actual</th>
+      <th scope="col">Actual Cost</th>
+      <th scope="col">Predicted Cost</th>
+      <th scope="col">Start Date</th>
+      <th scope="col">End Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for task in tasks %}<tr class="{% cycle odd,even %}">
+      <td>{{ task.task_type.name|escape }}</label></td>
+      <td>
+        <ul>
+          {% for user_ in task.assigned_users.all %}<li>
+            <a href="{{ user_.get_absolute_url }}">{{ user_.get_full_name|escape }}</a>
+          </li>{% endfor %}
+        </ul>
+      </td>
+      <td>{{ task.estimate_hours }}</td>
+      <td>TODO</td>
+      <td>TODO</td>
+      <td>TODO</td>
+      <td>TODO</td>
+      <td>{{ task.start_date|default:"-" }}</td>
+      <td>{{ task.end_date|default:"-" }}</td>
+    </tr>{% endfor %}
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="2">&nbsp;</td>
+      <td>TODO</td>
+      <td>TODO</td>
+      <td>TODO</td>
+      <td>TODO</td>
+      <td>TODO</td>
+      <td colspan="2">&nbsp;</td>
+    </tr>
+  </tfoot>
+  </table>
+</div>
+
+<div class="section" id="invoicesSection">
+  <h2>Invoices</h2>
+  <table cellspacing="0">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Date</th>
+      <th scope="col">From</th>
+      <th scope="col">To</th>
+      <th scope="col">Amount (&pound;)</th>
+      <th scope="col">Received (&pound;)</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for invoice in invoices %}<tr class="{% cycle odd,even %}">
+      <td><a href="{{ invoice.get_absolute_url }}">{{ invoice.formatted_number }}</a></td>
+      <td>{{ invoice.date }}</td>
+      <td>{{ invoice.start_period }}</td>
+      <td>{{ invoice.end_period }}</td>
+      <td>{{ invoice.amount_invoiced }}</td>
+      <td>{{ invoice.amount_received }}</td>
+    </tr>{% endfor %}
+  </tbody>
+  </table>
+
+  <div class="buttons">
+    <a href="{% url select_jobs_for_invoice %}?job={{ job.id }}"><img src="{{ MEDIA_URL }}img/page_add.png" alt=""> Create Invoice</a>
+  </div>
+</div>
+
+<div class="section" id="artifactsSection">
+  <h2>Artifacts</h2>
+  <table cellspacing="0">
+  <thead>
+    <tr>
+      <th scope="col">Description</th>
+      <th scope="col">File</th>
+      <th scope="col">Size</th>
+      <th scope="col">Created On</th>
+      <th scope="col">Uploaded On</th>
+      <th scope="col">Access</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for artifact in artifacts %}<tr class="{% cycle odd,even %}">
+      <td>{{ artifact.description|escape }}</td>
+      <td>{{ artifact.file|escape }}</td>
+      <td>{{ artifact.get_file_size }}</td>
+      <td>{{ artifact.created_at }}</td>
+      <td>{{ artifact.updated_at }}</td>
+      <td>{{ artifact.get_access_display }}</td>
+    </tr>{% endfor %}
+  </tbody>
+  </table>
+
+  <div class="buttons">
+    <a href="{% url add_artifact job.formatted_number %}"><img src="{{ MEDIA_URL }}img/attach.png" alt=""> Add Artifact</a>
+  </div>
+</div>
+{% endblock %}

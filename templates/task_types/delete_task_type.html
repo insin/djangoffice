@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Delete Task Type '{{ task_type.name|escape }}' | {% endblock %}
+{% block menu %}{% menu "manage" "task_types" %}{% endblock %}
+{% block content %}
+<h1>Delete Task Type</h1>
+<form name="taskTypeForm" id="taskTypeForm" action="." method="POST">
+<p>Are you sure you want to delete the Task Type '{{ task_type.name|escape }}'?</p>
+<div class="buttons">
+  <button type="submit" class="negative"><img src="{{ MEDIA_URL }}img/delete.png" alt=""> Delete Task Type</button>
+  <a href="{{ task_type.get_absolute_url }}" class="negative"><img src="{{ MEDIA_URL }}img/cancel.png" alt=""> Cancel</a>
+</div>
+</form>
+{% endblock %}

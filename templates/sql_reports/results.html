@@ -1,0 +1,21 @@
+{% extends "print.html" %}
+{% block title %}{{ sql_report.name|escape }} Report{% endblock %}
+{% block content %}
+<h1>{{ sql_report.name|escape }} Report</h1>
+<table cellpadding="0">
+<thead>
+  <tr>
+    {% for heading in headings %}
+    <th>{{ heading|escape }}</th>
+    {% endfor %}
+  </tr>
+</thead>
+<tbody>
+  {% for row in results %}<tr class="{% cycle odd,even %}">
+    {% for column in row %}
+    <td>{{ column|escape }}</td>
+    {% endfor %}
+  </tr>{% endfor %}
+</tbody>
+</table>
+{% endblock %}

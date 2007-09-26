@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Edit Expense Type '{{ expense_type.name|escape }}' | {% endblock %}
+{% block menu %}{% menu "manage" "expense_types" %}{% endblock %}
+{% block content %}
+<h1>Edit Expense Type</h1>
+<form name="expenseTypeForm" id="expenseTypeForm" action="." method="POST">
+<table cellspacing="0">
+{{ form }}
+</table>
+<div class="buttons">
+  <button type="submit" class="positive"><img src="{{ MEDIA_URL }}img/tick.png" alt=""> Edit Expense Type</button>
+  <a href="{{ expense_type.get_absolute_url }}" class="negative"><img src="{{ MEDIA_URL }}img/cancel.png" alt=""> Cancel</a>
+</div>
+</form>
+{% endblock %}

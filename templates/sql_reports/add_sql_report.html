@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Add SQL Report | {% endblock %}
+{% block menu %}{% menu "reports" "sql_reports" %}{% endblock %}
+{% block content %}
+<h1>Add SQL Report</h1>
+<form name="sqlReportForm" id="sqlReportForm" action="." method="POST">
+<table cellspacing="0">
+<tbody>
+{{ form }}
+</tbody>
+</table>
+<div class="buttons">
+  <button type="submit" class="positive"><img src="{{ MEDIA_URL }}img/script_add.png" alt=""> Add SQL Report</button>
+  <a href="{% url sql_report_list %}" class="negative"><img src="{{ MEDIA_URL }}img/cancel.png" alt=""> Cancel</a>
+</div>
+</form>
+{% endblock %}

@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+  <title>{% block title %}{% endblock %}{{ APPLICATION_NAME }} | {{ COMPANY_NAME }}</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="Author" content="Jonathan Buchanan">
+  <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/style.css" media="screen,projection">
+  <script type="text/javascript" src="{{ MEDIA_URL }}js/Prototype.js"></script>
+  <!--[if lt IE 7]><style type="text/css">img { behavior: url("{{ MEDIA_URL }}css/pngbehavior.htc"); }</style><link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/ie.css" media="screen,projection"><script type="text/javascript" src="{{ MEDIA_URL }}js/ie.js"></script><![endif]-->
+  {% block extrahead %}{% endblock %}
+</head>
+<body>
+
+{% block menu %}{% endblock %}
+
+{% if messages %}
+<ul class="messages">
+  {% for message in messages %}<li>
+  {{ message|escape }}
+  </li>{% endfor %}
+</ul>
+{% endif %}
+
+<div id="content">
+{% block content %}{% endblock %}
+</div>
+
+{% if debug %}
+<div id="debug">
+  <h2>Queries</h2>
+  <p>
+    {{ sql_queries|length }} Quer{{ sql_queries|pluralize:"y,ies" }}
+    {% ifnotequal sql_queries|length 0 %}
+    (<span style="cursor: pointer;" onclick="var s=document.getElementById('debugQueryTable').style;s.display=s.display=='none'?'':'none';this.innerHTML=this.innerHTML=='Show'?'Hide':'Show';">Show</span>)
+    {% endifnotequal %}
+  </p>
+  <table id="debugQueryTable" style="display: none;">
+    <col width="1"></col>
+    <col></col>
+    <col width="1"></col>
+    <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">SQL</th>
+      <th scope="col">Time</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for query in sql_queries %}<tr class="{% cycle odd,even %}">
+      <td>{{ forloop.counter }}</td>
+      <td>{{ query.sql|escape }}</td>
+      <td>{{ query.time }}</td>
+    </tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+</body>
+</html>

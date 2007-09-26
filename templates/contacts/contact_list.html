@@ -1,0 +1,27 @@
+{% extends "base.html" %}{% load officeaid_tags %}
+{% block title %}Contacts | {% endblock %}
+{% block menu %}{% menu "manage" "contacts" %}{% endblock %}
+{% block content %}
+<h1>Contacts</h1>
+
+{% if contact_list %}
+<table cellspacing="0">
+<thead>
+  <tr>
+{% table_header headers %}
+  </tr>
+</thead>
+<tbody>
+  {% for contact in contact_list %}<tr class="{% cycle odd,even %}">
+    <td><a href="{{ contact.get_absolute_url }}">{{ contact.full_name|escape }}</a></td>
+    <td>{{ contact.company_name|escape }}</td>
+  </tr>{% endfor %}
+</tbody>
+</table>
+{% else %}
+<p class="noneyet">No Contacts yet.</p>
+{% endif %}
+<div class="buttons">
+  <a href="{% url add_contact %}"><img src="{{ MEDIA_URL }}img/group_add.png" alt=""> Add Contact</a>
+</div>
+{% endblock %}
