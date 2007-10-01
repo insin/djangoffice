@@ -571,17 +571,15 @@ class TaskOptions(dbsettings.Group):
     vacation_task_id = dbsettings.PositiveIntegerValue(u'Vacation Task id')
 
 class TaskManager(models.Manager):
-    def for_user_timesheet(self, user):
+    def with_task_type_name(self):
         """
-        Creates a ``QuerySet`` containing all Tasks to which the given
-        User is assigned, giving each Task an additional
-        ``task_type_name`` attribute containing the name of its Task
-        Type.
+        Creates a ``QuerySet`` containing Tasks, giving each Task an additional
+        ``task_type_name`` attribute containing the name of its Task, Type.
         """
         opts = self.model._meta
         task_type_opts = TaskType._meta
         task_type_table = qn(task_type_opts.db_table)
-        return super(TaskManager, self).get_query_set().filter(assigned_users=user).extra(
+        return super(TaskManager, self).get_query_set().extra(
             select={
                 'task_type_name': '%s.%s' % (
                     task_type_table,
@@ -596,6 +594,15 @@ class TaskManager(models.Manager):
                 qn(task_type_opts.pk.column),
             )]
         ).order_by('task_type_name')
+
+    def for_user_timesheet(self, user):
+        """
+        Creates a ``QuerySet`` containing all Tasks to which the given
+        User is assigned, giving each Task an additional
+        ``task_type_name`` attribute containing the name of its Task
+        Type.
+        """
+        return self.with_task_type_name().filter(assigned_users=user)
 
 class Task(models.Model):
     """

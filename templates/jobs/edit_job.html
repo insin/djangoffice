@@ -26,11 +26,10 @@
 </thead>
 <tbody>
   {% for form in task_forms %}<tr class="{% cycle odd,even %}">
-    <td><label for="id_t{{ form.task_type.id }}-add">{{ form.add }} {{ form.task_type.name|escape }}</label></td>
+    <td>{{ form.task.task_type_name|escape }}</td>
     <td>
       {{ form.assigned_users }}
       {% if form.assigned_users.errors %}<br>{{ form.assigned_users.errors.as_text }}{% endif %}
-    </td>
     </td>
     <td>
       {{ form.estimate_hours }}

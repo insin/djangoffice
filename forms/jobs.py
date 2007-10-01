@@ -148,9 +148,10 @@ class AddJobForm(forms.Form):
     fee_currency    = forms.ChoiceField(choices=FEE_CURRENCY_CHOICES)
     contingency     = forms.DecimalField(required=False, max_digits=6, decimal_places=2)
 
-    def __init__(self, clients, users, *args, **kwargs):
+    def __init__(self, users, *args, **kwargs):
         super(AddJobForm, self).__init__(*args, **kwargs)
-        self.fields['client'].choices = clients
+        self.fields['client'].choices = [(client['id'], client['name']) \
+            for client in Client.objects.values('id', 'name')]
         self.fields['director'].choices = self.fields['project_manager'].choices = \
             self.fields['architect'].choices = users
 
@@ -216,9 +217,53 @@ class AddTaskForm(forms.Form):
                     u'Must be later than or equal to start date.')
         return self.cleaned_data['end_date']
 
+class EditTaskForm(forms.Form):
+    assigned_users = forms.MultipleChoiceField(required=False, widget=forms.SelectMultiple(attrs={'size': 4}))
+    estimate_hours = forms.DecimalField(max_digits=6, decimal_places=2, min_value=0, required=False)
+    start_date     = forms.DateField(required=False)
+    end_date       = forms.DateField(required=False)
+
+    def __init__(self, task, users, *args, **kwargs):
+        kwargs['prefix'] = 'task%s' % task.task_type_id
+        super(EditTaskForm, self).__init__(*args, **kwargs)
+        self.fields['assigned_users'].choices = users
+        self.fields['assigned_users'].initial = task.assigned_users.all()
+        self.fields['estimate_hours'].initial = task.estimate_hours
+        self.fields['start_date'].initial = task.start_date
+        self.fields['end_date'].initial = task.end_date
+        self.task = task
+
+    def clean_assigned_users(self):
+        if not self.cleaned_data.get('assigned_users') or \
+           len(self.cleaned_data['assigned_users']) == 0:
+            raise forms.ValidationError(
+                u'You must assign at least one user.')
+        return self.cleaned_data['assigned_users']
+
+    def clean_estimate_hours(self):
+        if not self.cleaned_data['estimate_hours']:
+            raise forms.ValidationError(u'You must provide an estimate.')
+        return self.cleaned_data['estimate_hours']
+
+    def clean_end_date(self):
+        if self.cleaned_data.get('start_date', None) and \
+           self.cleaned_data.get('end_date', None):
+            if self.cleaned_data['end_date'] < self.cleaned_data['start_date']:
+                raise forms.ValidationError(
+                    u'Must be later than or equal to start date.')
+        return self.cleaned_data['end_date']
+
+    def save(self):
+        self.task.assigned_users = self.cleaned_data['assigned_users']
+        self.task.estimate_hours= self.cleaned_data['estimate_hours']
+        self.task.start_date = self.cleaned_data['start_date']
+        self.task.end_date = self.cleaned_data['end_date']
+        self.task.save()
+        return self.task
+
 class EditJobForm(AddJobForm):
-    def __init__(self, job, clients, users, *args, **kwargs):
-        super(EditJobForm, self).__init__(clients, users, *args, **kwargs)
+    def __init__(self, job, users, *args, **kwargs):
+        super(EditJobForm, self).__init__(users, *args, **kwargs)
         del self.fields['number']
         self.job = job
         opts = Job._meta

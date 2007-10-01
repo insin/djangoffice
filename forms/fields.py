@@ -1,3 +1,5 @@
+import copy
+
 from django import newforms as forms
 from django.core import validators
 from django.newforms.fields import EMPTY_VALUES
@@ -69,6 +71,12 @@ class DynamicChoice(forms.Widget):
                 pass
         return u'<input%s>%s' % (flatatt(final_attrs), display_text)
 
+    def __deepcopy__(self, memo):
+        result = DynamicChoice(self.model, copy.deepcopy(self.attrs),
+            self.display_template, self.display_func)
+        memo[id(self)] = result
+        return result
+
 class MultipleDynamicModelChoiceField(forms.ChoiceField):
     widget = forms.SelectMultiple
 
@@ -85,11 +93,13 @@ class MultipleDynamicModelChoiceField(forms.ChoiceField):
         return self._initial
 
     def _set_initial(self, value):
-        # Setting initial also sets choices on the widget.
+        # Setting initial also sets choices on the widget. Accepts a list of
+        # instances or primary keys, which will be looked up.
         self._initial = value
         if value is not None and len(value):
-            self.choices = [(i.pk, self.display_func(i)) for i in \
-                self.model._default_manager.filter(pk__in=value)]
+            if not isinstance(value[0], self.model):
+                value = self.model._default_manager.filter(pk__in=value)
+            self.choices = [(i.pk, self.display_func(i)) for i in value]
 
     initial = property(_get_initial, _set_initial)
 
