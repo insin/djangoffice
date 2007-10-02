@@ -171,8 +171,9 @@ def edit_job(request, job_number):
             elif not new_tasks_valid:
                 new_tasks_valid = False
 
-        # If all data is valid, edit the Job and its Tasks
-        if job_form.is_valid() and tasks_valid:
+        # If all data is valid, edit the Job and its Tasks, creating any
+        # new Tasks if necessary.
+        if job_form.is_valid() and tasks_valid and new_tasks_valid:
             job = job_form.save()
             for task_form in task_forms:
                 task_form.save()
