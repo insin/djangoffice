@@ -72,6 +72,10 @@ class DynamicChoice(forms.Widget):
         return u'<input%s>%s' % (flatatt(final_attrs), display_text)
 
     def __deepcopy__(self, memo):
+        """
+        Implements deep copying to deep copy ``attrs`` and avoid any
+        attempt to copy ``display_func``.
+        """
         result = DynamicChoice(self.model, copy.deepcopy(self.attrs),
             self.display_template, self.display_func)
         memo[id(self)] = result

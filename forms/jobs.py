@@ -4,7 +4,7 @@ from django.db.models.query import Q
 from officeaid.forms import FilterBaseForm
 from officeaid.forms.fields import (DynamicModelChoiceField,
     MultipleDynamicModelChoiceField)
-from officeaid.models import (Client, Contact, Job, FEE_BASIS_CHOICES,
+from officeaid.models import (Client, Contact, Job, Task, FEE_BASIS_CHOICES,
     FEE_CURRENCY_CHOICES, JOB_STATUS_CHOICES)
 
 SEARCH_TYPE_CHOICES = (
@@ -217,6 +217,28 @@ class AddTaskForm(forms.Form):
                     u'Must be later than or equal to start date.')
         return self.cleaned_data['end_date']
 
+    def save(job):
+        task = Task.objects.create(job=job, task_type=self.task_type,
+            estimate_hours=self.cleaned_data['estimate_hours'],
+            start_date=self.cleaned_data['start_date'],
+            end_date=self.cleaned_data['end_date'])
+        task.assigned_users = self.cleaned_data['assigned_users']
+        return task
+
+class EditJobForm(AddJobForm):
+    def __init__(self, job, users, *args, **kwargs):
+        super(EditJobForm, self).__init__(users, *args, **kwargs)
+        del self.fields['number']
+        self.job = job
+        opts = Job._meta
+        for f in opts.fields + opts.many_to_many:
+            if not f.name in self.fields:
+                continue
+            self.fields[f.name].initial = f.value_from_object(job)
+
+    def save(commit=True):
+        return forms.save_instance(self, self.job, commit=commit)
+
 class EditTaskForm(forms.Form):
     assigned_users = forms.MultipleChoiceField(required=False, widget=forms.SelectMultiple(attrs={'size': 4}))
     estimate_hours = forms.DecimalField(max_digits=6, decimal_places=2, min_value=0, required=False)
@@ -260,17 +282,3 @@ class EditTaskForm(forms.Form):
         self.task.end_date = self.cleaned_data['end_date']
         self.task.save()
         return self.task
-
-class EditJobForm(AddJobForm):
-    def __init__(self, job, users, *args, **kwargs):
-        super(EditJobForm, self).__init__(users, *args, **kwargs)
-        del self.fields['number']
-        self.job = job
-        opts = Job._meta
-        for f in opts.fields + opts.many_to_many:
-            if not f.name in self.fields:
-                continue
-            self.fields[f.name].initial = f.value_from_object(job)
-
-    def save(commit=True):
-        return forms.save_instance(self, self.job, commit=commit)

@@ -95,12 +95,7 @@ def add_job(request):
         if job_valid and tasks_valid:
             job = job_form.save()
             for task_form in completed_task_forms:
-                task = Task.objects.create(job=job,
-                    task_type=task_form.task_type,
-                    estimate_hours=task_form.cleaned_data['estimate_hours'],
-                    start_date=task_form.cleaned_data['start_date'],
-                    end_date=task_form.cleaned_data['end_date'])
-                task.assigned_users = task_form.cleaned_data['assigned_users']
+                task_form.save(job)
             request.user.message_set.create(
                 message=u'The %s was added successfully.' \
                         % Job._meta.verbose_name)
@@ -143,11 +138,12 @@ def edit_job(request, job_number):
              for u in User.objects.exclude(userprofile__role='A') \
                                    .order_by('first_name', 'last_name')]
     tasks = Task.objects.with_task_type_name().filter(job=job)
+    task_types = TaskType.objects.non_admin().exclude(tasks__job=job)
 
     if request.method == 'POST':
         job_form = EditJobForm(job, users, data=request.POST)
 
-        # Tasks
+        # Existing Tasks
         tasks_valid = True
         task_forms = []
         for task in tasks:
@@ -156,11 +152,26 @@ def edit_job(request, job_number):
             if not task_form.is_valid() and tasks_valid:
                 tasks_valid = False
 
+        # New Tasks
+        new_tasks_valid = True
+        new_task_forms = []
+        completed_new_task_forms = []
+        for task_type in task_types:
+            task_form = AddTaskForm(task_type, users, data=request.POST)
+            new_task_forms.append(task_form)
+            if task_form.is_valid():
+                if task_form.cleaned_data['add']:
+                    completed_new_task_forms.append(task_form)
+            elif not new_tasks_valid:
+                new_tasks_valid = False
+
         # If all data is valid, edit the Job and its Tasks
         if job_form.is_valid() and tasks_valid:
             job = job_form.save()
             for task_form in task_forms:
                 task_form.save()
+            for task_form in completed_new_task_forms:
+                task_form.save(job)
             request.user.message_set.create(
                 message=u'The %s was edited successfully.' \
                         % Job._meta.verbose_name)
@@ -168,10 +179,13 @@ def edit_job(request, job_number):
     else:
         job_form = EditJobForm(job, users)
         task_forms = [EditTaskForm(task, users) for task in tasks]
+        new_task_forms = [AddTaskForm(task_type, users) \
+                          for task_type in task_types]
     return render_to_response('jobs/edit_job.html', {
             'job': job,
             'job_form': job_form,
             'task_forms': task_forms,
+            'new_task_forms': new_task_forms,
         }, RequestContext(request))
 
 @user_has_permission(is_admin_or_manager)
