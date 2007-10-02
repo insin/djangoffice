@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 
 from officeaid.forms.fields import (DynamicChoice, DynamicModelChoiceField,
-    MultipleDynamicModelChoiceField)
+    DynamicSelectMultiple, MultipleDynamicModelChoiceField)
 
 class FormTest(TestCase):
     """
@@ -16,12 +16,12 @@ class FormTest(TestCase):
     def testDynamicChoiceWidget(self):
         w = DynamicChoice(User)
         # Defaults
-        self.assertEquals(u'<input type="hidden" name="test">', w.render('test', None))
+        self.assertEquals(u'<input type="hidden" name="test"> <span id="test_display"></span>', w.render('test', None))
         self.assertEquals(u'<input type="hidden" name="test" value="1"> <span id="test_display">admin</span>',
             w.render('test', 1))
         # Non-existant or invalid PK given
-        self.assertEquals(u'<input type="hidden" name="test" value="4">', w.render('test', 4))
-        self.assertEquals(u'<input type="hidden" name="test" value="a">', w.render('test', 'a'))
+        self.assertEquals(u'<input type="hidden" name="test" value="4"> <span id="test_display"></span>', w.render('test', 4))
+        self.assertEquals(u'<input type="hidden" name="test" value="a"> <span id="test_display"></span>', w.render('test', 'a'))
         # Custom display template
         w = DynamicChoice(User, display_template=u' <span id="display_%(field_name)s">Currently selected: <strong>%(item)s</strong></span>')
         self.assertEquals(u'<input type="hidden" name="test" value="1"> <span id="display_test">Currently selected: <strong>admin</strong></span>',
@@ -30,6 +30,21 @@ class FormTest(TestCase):
         w = DynamicChoice(User, display_func=lambda x: x.get_full_name())
         self.assertEquals(u'<input type="hidden" name="test" value="1"> <span id="test_display">Admin User</span>',
             w.render('test', 1))
+
+    def testDynamicSelectMultipleWidget(self):
+        # Defaults
+        w = DynamicSelectMultiple(User)
+        self.assertEquals(u'<select multiple="multiple" name="test">\n</select>', w.render('test', []))
+        w = DynamicSelectMultiple(User)
+        self.assertEquals(u'<select multiple="multiple" name="test">\n<option value="1" selected="selected">admin</option>\n</select>', w.render('test', [1]))
+        # Non-existant or invalid PK given
+        w = DynamicSelectMultiple(User)
+        self.assertEquals(u'<select multiple="multiple" name="test">\n</select>', w.render('test', [4]))
+        w = DynamicSelectMultiple(User)
+        self.assertEquals(u'<select multiple="multiple" name="test">\n</select>', w.render('test', ['a']))
+        # Custom display function
+        w = DynamicSelectMultiple(User, display_func=lambda x: x.get_full_name())
+        self.assertEquals(u'<select multiple="multiple" name="test">\n<option value="1" selected="selected">Admin User</option>\n</select>', w.render('test', [1]))
 
     def testDynamicModelChoiceField(self):
         f = DynamicModelChoiceField(User)

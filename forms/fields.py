@@ -90,11 +90,11 @@ class MultipleDynamicModelChoiceField(forms.ChoiceField):
         self.model = model
         self.display_func = display_func
         super(MultipleDynamicModelChoiceField, self).__init__(*args, **kwargs)
+        self.widget = DynamicSelectMultiple(model, display_func=display_func)
         # HACK - assignment to self.initial in Field.__init__ isn't using
         #        the property this class defines.
         if 'initial' in kwargs:
             self.initial = kwargs['initial']
-        self.widget = DynamicSelectMultiple(model, display_func=display_func)
 
     def _get_initial(self):
         return self._initial
@@ -107,8 +107,7 @@ class MultipleDynamicModelChoiceField(forms.ChoiceField):
         if value is not None and len(value):
             if not isinstance(value[0], self.model):
                 value = self.model._default_manager.filter(pk__in=value)
-            self.choices = self.widget.choices = \
-                [(i.pk, self.display_func(i)) for i in value]
+            self.choices = [(i.pk, self.display_func(i)) for i in value]
 
     initial = property(_get_initial, _set_initial)
 
