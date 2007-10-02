@@ -6,13 +6,12 @@ from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
-from django.utils.datastructures import DotExpandedDict
 from django.views.generic import list_detail
 
 from officeaid.auth import is_admin, is_admin_or_manager, user_has_permission
 from officeaid.forms.jobs import (AddJobForm, AddTaskForm, EditJobForm,
     EditTaskForm, JobFilterForm)
-from officeaid.models import Client, Job, Task, TaskType
+from officeaid.models import Job, Task, TaskType
 from officeaid.views import SortHeaders
 
 LIST_HEADERS = (
@@ -23,6 +22,10 @@ LIST_HEADERS = (
 )
 
 def filter_jobs(request):
+    """
+    Handles filtering Jobss by search criteria, sorting, pagination and
+    restriction of Jobs to those accessible by the logged-in User.
+    """
     filter_form = JobFilterForm(data=request.GET)
     sort_headers = SortHeaders(request, LIST_HEADERS,
                                additional_params=filter_form.get_params())
@@ -41,7 +44,7 @@ def filter_jobs(request):
 @login_required
 def job_list(request):
     """
-    Lists Jobs, which are always filtered based on sytem settings and
+    Lists Jobs, which are always filtered based on system settings and
     the logged-in User's role.
 
     Jobs listed may be further filtered based on a number of criteria.
@@ -132,6 +135,9 @@ def job_detail(request, job_number):
 def edit_job(request, job_number):
     """
     Edits a Job and its Tasks.
+
+    New Tasks may also be added for Task Types which are not yet assigned
+    Tasks for the Job.
     """
     job = get_object_or_404(Job, number=job_number)
     users = [(u.id, u.get_full_name()) \

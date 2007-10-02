@@ -1,6 +1,9 @@
+import operator
+
 from django import newforms as forms
 from django.contrib.auth.models import User
 from django.db.models.query import Q
+
 from officeaid.forms import FilterBaseForm
 from officeaid.forms.fields import (DynamicModelChoiceField,
     MultipleDynamicModelChoiceField)
@@ -123,11 +126,12 @@ class JobFilterForm(FilterBaseForm, forms.Form):
         if len(filters) == 0:
             return None
         else:
-            import operator
-            print filters
             return reduce(operator.and_, filters)
 
 class AddJobForm(forms.Form):
+    """
+    A form for adding a new Job.
+    """
     client          = forms.ChoiceField()
     name            = forms.CharField(max_length=100)
     number          = forms.IntegerField(required=False, min_value=1)
@@ -183,6 +187,13 @@ class AddJobForm(forms.Form):
         return forms.save_instance(self, Job(), commit=commit)
 
 class AddTaskForm(forms.Form):
+    """
+    A form for adding a new Task.
+
+    Since a Job may have multiple Jobs, but only one Task with a given
+    Task Type, this form will automatically be prefixed with the Task's
+    Task Type id.
+    """
     add            = forms.BooleanField(required=False)
     assigned_users = forms.MultipleChoiceField(required=False, widget=forms.SelectMultiple(attrs={'size': 4}))
     estimate_hours = forms.DecimalField(max_digits=6, decimal_places=2, min_value=0, required=False)
@@ -226,6 +237,9 @@ class AddTaskForm(forms.Form):
         return task
 
 class EditJobForm(AddJobForm):
+    """
+    A form for editing a Job.
+    """
     def __init__(self, job, users, *args, **kwargs):
         super(EditJobForm, self).__init__(users, *args, **kwargs)
         del self.fields['number']
@@ -240,6 +254,13 @@ class EditJobForm(AddJobForm):
         return forms.save_instance(self, self.job, commit=commit)
 
 class EditTaskForm(forms.Form):
+    """
+    A form for editing a Task.
+
+    Since a Job may have multiple Jobs, but only one Task with a given
+    Task Type, this form will automatically be prefixed with the Task's
+    Task Type id.
+    """
     assigned_users = forms.MultipleChoiceField(required=False, widget=forms.SelectMultiple(attrs={'size': 4}))
     estimate_hours = forms.DecimalField(max_digits=6, decimal_places=2, min_value=0, required=False)
     start_date     = forms.DateField(required=False)
