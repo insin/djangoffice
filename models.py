@@ -57,7 +57,7 @@ class UserProfile(models.Model):
     A User's profile - defines user details additional to those present
     in ``django.contrib.auth.models.User``.
     """
-    user           = models.OneToOneField(User)
+    user           = models.ForeignKey(User, unique=True)
     role           = models.CharField(max_length=1, choices=USER_ROLE_CHOICES)
     managed_users  = models.ManyToManyField(User, null=True, blank=True, filter_interface=models.HORIZONTAL, related_name='managers', validator_list=[OnlyAllowedIfOtherFieldEquals('role', 'M', u'Only Managers may have Managed Users')])
     phone_number   = models.CharField(max_length=20, blank=True)
