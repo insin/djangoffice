@@ -1,5 +1,31 @@
 {% extends "base.html" %}
 {% block title %}Add Job | {% endblock %}
+{% block extrahead %}
+<script type="text/javascript" src="{% MEDIA_URL %}js/AssignJobContactsCallbacks.js"></script>
+<script type="text/javascript">
+var ASSIGN_CONTACTS_WINDOW = "assign_contacts_window";
+Event.onDOMReady(function()
+{
+    Event.observe("selectJobContactsButton", "click", function()
+    {
+        window.assignContactsCallback = AssignJobContactsCallbacks.jobContactsCallback;
+        window.open("{% url assign_contacts "multiple" %}", ASSIGN_CONTACTS_WINDOW);
+    });
+
+    Event.observe("selectPrimaryContactButton", "click", function()
+    {
+        window.assignContactsCallback = AssignJobContactsCallbacks.primaryContactCallback;
+        window.open("{% url assign_contacts "single" %}?job_id={{ job.id }}", ASSIGN_CONTACTS_WINDOW);
+    });
+
+    Event.observe("selectBillingContactButton", "click", function()
+    {
+        window.assignContactsCallback = AssignJobContactsCallbacks.billingContactCallback;
+        window.open("{% url assign_contacts "single" %}?job_id={{ job.id }}", ASSIGN_CONTACTS_WINDOW);
+    });
+});
+</script>
+{% endblock %}
 {% block menu %}{% menu "manage" "jobs" %}{% endblock %}
 {% block content %}
 <h1>Add Job</h1>

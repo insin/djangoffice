@@ -131,7 +131,15 @@ var AssignContacts =
                 selectedContacts.push(this.contacts[i]);
             }
         }
-        opener.assignContactsCallback(window, selectedContacts);
+
+        if (mode == "single")
+        {
+            opener.assignContactsCallback(window, selectedContacts[0]);
+        }
+        else
+        {
+            opener.assignContactsCallback(window, selectedContacts);
+        }
     },
 
     filterContactsByLetter: function(letter)

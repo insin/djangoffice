@@ -11,7 +11,7 @@ from django.template import RequestContext
 from django.utils import simplejson
 from django.views.generic import create_update, list_detail
 
-from officeaid.models import Contact
+from officeaid.models import Client, Contact, Job
 from officeaid.views import SortHeaders
 from officeaid.views.generic import add_object, edit_object
 
@@ -81,11 +81,21 @@ def assign_contacts(request, mode):
     """
     Assigns a Contact or Contacts from a pop-up window.
     """
+    contacts = Contact.objects.all()
+
+    if mode == 'multiple' and \
+       request.GET.get('job_id', None) and \
+       Job.objects.filter(pk=request.GET['job_id']).count():
+        contacts = contacts.exclude(job_contact_jobs=request.GET['job_id'])
+    elif request.GET.get('client_id', None) and \
+       Client.objects.filter(pk=request.GET['client_id']).count():
+        contacts = contacts.exclude(clients=request.GET['client_id'])
+
     contact_json = simplejson.dumps([dict(id=c.id, first_name=c.first_name,
         last_name=c.last_name, company_name=c.company_name,
-        position=c.position) for c in Contact.objects.all()])
+        position=c.position) for c in contacts])
     return render_to_response('contacts/assign_contacts.html', {
             'mode': mode,
-            'contact_json' : contact_json,
+            'contact_json': contact_json,
             'letters': string.uppercase,
         }, RequestContext(request))

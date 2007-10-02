@@ -3315,23 +3315,3 @@ Object.extend(Event, {
     Event._readyCallbacks.push(f);
   }
 });
-
-// DOM manipulation extensions
-Object.extend(Element, {
-  setText: function(element, text) {
-    var el = $(element);
-    if (el != null) {
-      Element.removeChildNodes(el);
-      el.appendChild(document.createTextNode(text));
-    }
-  },
-
-  removeChildNodes: function(element) {
-    var el = $(element);
-    if (el != null) {
-      while (el.firstChild) {
-        el.removeChild(el.firstChild);
-      }
-    }
-  }
-});
