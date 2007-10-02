@@ -132,7 +132,7 @@ var AssignContacts =
             }
         }
 
-        if (mode == "single")
+        if (this.options.mode == "single")
         {
             opener.assignContactsCallback(window, selectedContacts[0]);
         }
@@ -183,7 +183,7 @@ var AssignContacts =
     displayContacts: function(contacts)
     {
         var contactTable = $(this.options.contactTableBodyId);
-        Element.removeChildNodes(contactTable);
+        contactTable.update();
         for (var i = 0, l = contacts.length; i < l; i++)
         {
             if (!contacts[i].selected)
@@ -211,8 +211,8 @@ var AssignContacts =
 
     displaySelectedContacts: function()
     {
-        Element.removeChildNodes(this.options.selectedContactTableBodyId);
         var selectedTable = $(this.options.selectedContactTableBodyId);
+        selectedTable.update();
         var selectedContactCount = 0;
         for (var i = 0, l = this.contacts.length; i < l; i++)
         {

@@ -1,10 +1,13 @@
 import copy
+from itertools import chain
 
 from django import newforms as forms
 from django.core import validators
 from django.newforms.fields import EMPTY_VALUES
 from django.newforms.util import flatatt
+from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_unicode
+from django.utils.html import escape
 from django.utils.text import capfirst
 
 class DynamicModelChoiceField(forms.Field):
@@ -34,7 +37,7 @@ class DynamicModelChoiceField(forms.Field):
             else:
                 if not self.model._default_manager.filter(pk=value).count():
                     raise forms.ValidationError(
-                        u'This field must specify an existing %s' % \
+                        u'This field must specify an existing %s.' % \
                             capfirst(self.model._meta.verbose_name))
         return value
 
@@ -58,17 +61,18 @@ class DynamicChoice(forms.Widget):
     def render(self, name, value, attrs=None):
         if value is None: value = ''
         final_attrs = self.build_attrs(attrs, type='hidden', name=name)
-        display_text = ''
+        item = ''
         if value != '':
             final_attrs['value'] = force_unicode(value)
             try:
                 instance = self.model._default_manager.get(pk=value)
-                display_text = self.display_template % {
-                    'field_name': name,
-                    'item': self.display_func(instance),
-                }
+                item = escape(force_unicode(self.display_func(instance)))
             except self.model.DoesNotExist:
                 pass
+        display_text = self.display_template % {
+            'field_name': name,
+            'item': item,
+        }
         return u'<input%s>%s' % (flatatt(final_attrs), display_text)
 
     def __deepcopy__(self, memo):
@@ -82,8 +86,6 @@ class DynamicChoice(forms.Widget):
         return result
 
 class MultipleDynamicModelChoiceField(forms.ChoiceField):
-    widget = forms.SelectMultiple
-
     def __init__(self, model, display_func=lambda x: unicode(x), *args, **kwargs):
         self.model = model
         self.display_func = display_func
@@ -92,18 +94,21 @@ class MultipleDynamicModelChoiceField(forms.ChoiceField):
         #        the property this class defines.
         if 'initial' in kwargs:
             self.initial = kwargs['initial']
+        self.widget = DynamicSelectMultiple(model, display_func=display_func)
 
     def _get_initial(self):
         return self._initial
 
     def _set_initial(self, value):
-        # Setting initial also sets choices on the widget. Accepts a list of
-        # instances or primary keys, which will be looked up.
+        # Setting initial also sets choices on this field and the widget.
+        # Accepts a list of instances or primary keys, which will be
+        # looked up.
         self._initial = value
         if value is not None and len(value):
             if not isinstance(value[0], self.model):
                 value = self.model._default_manager.filter(pk__in=value)
-            self.choices = [(i.pk, self.display_func(i)) for i in value]
+            self.choices = self.widget.choices = \
+                [(i.pk, self.display_func(i)) for i in value]
 
     initial = property(_get_initial, _set_initial)
 
@@ -128,6 +133,43 @@ class MultipleDynamicModelChoiceField(forms.ChoiceField):
             if len(value) != \
                self.model._default_manager.filter(pk__in=pk_values).count():
                 raise forms.ValidationError(
-                    u'This field must specify existing %s' % \
+                    u'This field must specify existing %s.' % \
                         capfirst(self.model._meta.verbose_name_plural))
         return pk_values
+
+class DynamicSelectMultiple(forms.Widget):
+    """
+    Provides a ``<select>`` element which is intended to be manipulated
+    on the client side when implementing dynamic selection of a number of
+    instances of a given model, rather than displaying a list of
+    instances for selection.
+
+    As such, ``<option>`` elements in the HTML ``<select>`` element this
+    widget generates are always selected to ensure their resubmission,
+    and if choices are not set when rendering, they are looked up using
+    the primary key values which were previously submitted.
+    """
+    def __init__(self, model, attrs=None, choices=(),
+                 display_func=lambda x: unicode(x)):
+        self.model = model
+        self.attrs = attrs or {}
+        self.choices = choices
+        self.display_func = display_func
+
+    def render(self, name, value, attrs=None, choices=()):
+        if value is None: value = []
+        if value and not self.choices:
+            self.choices = [(i.pk, self.display_func(i)) for i in \
+                            self.model._default_manager.filter(pk__in=value)]
+        final_attrs = self.build_attrs(attrs, name=name)
+        output = [u'<select multiple="multiple"%s>' % flatatt(final_attrs)]
+        for option_value, option_label in chain(self.choices, choices):
+            output.append(u'<option value="%s" selected="selected">%s</option>' % (
+                escape(force_unicode(option_value)), escape(force_unicode(option_label))))
+        output.append(u'</select>')
+        return u'\n'.join(output)
+
+    def value_from_datadict(self, data, files, name):
+        if isinstance(data, MultiValueDict):
+            return data.getlist(name)
+        return data.get(name, None)

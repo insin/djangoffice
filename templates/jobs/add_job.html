@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Add Job | {% endblock %}
 {% block extrahead %}
-<script type="text/javascript" src="{% MEDIA_URL %}js/AssignJobContactsCallbacks.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/AssignJobContactsCallbacks.js"></script>
 <script type="text/javascript">
 var ASSIGN_CONTACTS_WINDOW = "assign_contacts_window";
 Event.onDOMReady(function()
@@ -35,7 +35,24 @@ Event.onDOMReady(function()
 <h2>Job Details</h2>
 <table cellspacing="0">
 <tbody>
-{{ job_form }}
+<tr><th>{{ job_form.client.label_tag }}</th><td>{% if job_form.client.errors %}{{ job_form.client.errors.as_ul }}{% endif %}{{ job_form.client }}</td></tr>
+<tr><th>{{ job_form.name.label_tag }}</th><td>{% if job_form.name.errors %}{{ job_form.name.errors.as_ul }}{% endif %}{{ job_form.name }}</td></tr>
+<tr><th>{{ job_form.number.label_tag }}</th><td>{% if job_form.number.errors %}{{ job_form.number.errors.as_ul }}{% endif %}{{ job_form.number }}</td></tr>
+<tr><th>{{ job_form.reference.label_tag }}</th><td>{% if job_form.reference.errors %}{{ job_form.reference.errors.as_ul }}{% endif %}{{ job_form.reference }}</td></tr>
+<tr><th>{{ job_form.reference_date.label_tag }}</th><td>{% if job_form.reference_date.errors %}{{ job_form.reference_date.errors.as_ul }}{% endif %}{{ job_form.reference_date }}</td></tr>
+<tr><th>{{ job_form.status.label_tag }}</th><td>{% if job_form.status.errors %}{{ job_form.status.errors.as_ul }}{% endif %}{{ job_form.status }}</td></tr>
+<tr><th>{{ job_form.notes.label_tag }}</th><td>{% if job_form.notes.errors %}{{ job_form.notes.errors.as_ul }}{% endif %}{{ job_form.notes }}</td></tr>
+<tr><th>{{ job_form.director.label_tag }}</th><td>{% if job_form.director.errors %}{{ job_form.director.errors.as_ul }}{% endif %}{{ job_form.director }}</td></tr>
+<tr><th>{{ job_form.project_manager.label_tag }}</th><td>{% if job_form.project_manager.errors %}{{ job_form.project_manager.errors.as_ul }}{% endif %}{{ job_form.project_manager }}</td></tr>
+<tr><th>{{ job_form.architect.label_tag }}</th><td>{% if job_form.architect.errors %}{{ job_form.architect.errors.as_ul }}{% endif %}{{ job_form.architect }}</td></tr>
+<tr><th>{{ job_form.primary_contact.label_tag }}</th><td>{% if job_form.primary_contact.errors %}{{ job_form.primary_contact.errors.as_ul }}{% endif %}{{ job_form.primary_contact }} <input type="button" id="selectPrimaryContactButton" value="Select Contact"></td></tr>
+<tr><th>{{ job_form.billing_contact.label_tag }}</th><td>{% if job_form.billing_contact.errors %}{{ job_form.billing_contact.errors.as_ul }}{% endif %}{{ job_form.billing_contact }} <input type="button" id="selectBillingContactButton" value="Select Contact"></td></tr>
+<tr><th>{{ job_form.job_contacts.label_tag }}</th><td>{% if job_form.job_contacts.errors %}{{ job_form.job_contacts.errors.as_ul }}{% endif %}{{ job_form.job_contacts }} <input type="button" id="selectJobContactsButton" value="Select Contacts"></td></tr>
+<tr><th>{{ job_form.start_date.label_tag }}</th><td>{% if job_form.start_date.errors %}{{ job_form.start_date.errors.as_ul }}{% endif %}{{ job_form.start_date }}</td></tr>
+<tr><th>{{ job_form.end_date.label_tag }}</th><td>{% if job_form.end_date.errors %}{{ job_form.end_date.errors.as_ul }}{% endif %}{{ job_form.end_date }}</td></tr>
+<tr><th>{{ job_form.fee_basis.label_tag }}</th><td>{% if job_form.fee_basis.errors %}{{ job_form.fee_basis.errors.as_ul }}{% endif %}{{ job_form.fee_basis }}</td></tr>
+<tr><th>{{ job_form.fee_amount.label_tag }}</th><td>{% if job_form.fee_amount.errors %}{{ job_form.fee_amount.errors.as_ul }}{% endif %}{{ job_form.fee_amount }}</td></tr>
+<tr><th>{{ job_form.fee_currency.label_tag }}</th><td>{% if job_form.fee_currency.errors %}{{ job_form.fee_currency.errors.as_ul }}{% endif %}{{ job_form.fee_currency }}</td></tr>
 </tbody>
 </table>
 

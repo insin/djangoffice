@@ -12,7 +12,7 @@ var AssignJobContactsCallbacks =
             var option = document.createElement("option");
             option.value = contacts[i].id;
             // Workaround for IE
-            option.appendChild(document.createTextNode(contacts[i].forename + " " + contacts[i].surname));
+            option.appendChild(document.createTextNode(contacts[i].first_name + " " + contacts[i].last_name));
             option.selected = true;
             select.appendChild(option);
         }
@@ -21,14 +21,14 @@ var AssignJobContactsCallbacks =
 
     primaryContactCallback: function(win, contact)
     {
-        $("primary_contact_display").update(contact.forename + " " + contact.surname);
-        $("id_primary_contact_id").value = contact.id;
+        $("primary_contact_display").update(contact.first_name + " " + contact.last_name);
+        $("id_primary_contact").value = contact.id;
         win.close();
     },
 
     billingContactCallback: function(win, contact)
     {
-        $("billing_contact_display").update(contact.forename + " " + contact.surname);
+        $("billing_contact_display").update(contact.first_name + " " + contact.last_name);
         $("id_billing_contact").value = contact.id;
         win.close();
     }
