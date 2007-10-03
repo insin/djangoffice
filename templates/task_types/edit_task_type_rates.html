@@ -7,6 +7,9 @@
 {% if rates %}
 <form name="editTaskTypeRatesForm" id="editTaskTypeRatesForm" action="." method="POST">
 <table cellspacing="0" class="data">
+{% if editable_rates %}
+<col width="1">
+{% endif %}
 <thead>
 <tr>
   {% if editable_rates %}<th><input type="image" src="{{ MEDIA_URL }}img/coins_delete.png" alt="Delete" title="Delete Selected Rates"></th>{% endif %}

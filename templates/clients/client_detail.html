@@ -12,6 +12,7 @@
 </table>
 <div class="buttons">
   <a href="{% url edit_client client.id %}"><img src="{{ MEDIA_URL }}img/pencil.png" alt=""> Edit Client</a>
+  {% if client.is_deleteable %}<a href="{% url delete_client client.id %}"><img src="{{ MEDIA_URL }}img/delete.png" alt=""> Delete Client</a>{% endif %}
 </div>
 
 <h2>Jobs</h2>
@@ -50,8 +51,8 @@
 </thead>
 <tbody>
   {% for contact in contacts %}<tr class="{% cycle odd,even %}">
-    <td><a href="{{ contact.get_absolute_url }}">{{ contact.name|escape }}</a></td>
-    <td>{{ contact.company|escape }}</td>
+    <td><a href="{{ contact.get_absolute_url }}">{{ contact.full_name|escape }}</a></td>
+    <td>{{ contact.company_name|escape }}</td>
   </tr>{% endfor %}
 </tbody>
 </table>

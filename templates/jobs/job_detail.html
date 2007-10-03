@@ -176,6 +176,7 @@
 
 <div class="section" id="invoicesSection">
   <h2>Invoices</h2>
+  {% if invoices %}
   <table cellspacing="0" class="data">
   <thead>
     <tr>
@@ -198,7 +199,9 @@
     </tr>{% endfor %}
   </tbody>
   </table>
-
+  {% else %}
+  <p>No Invoices yet.</p>
+  {% endif %}
   <div class="buttons">
     <a href="{% url select_jobs_for_invoice %}?job={{ job.id }}"><img src="{{ MEDIA_URL }}img/page_add.png" alt=""> Create Invoice</a>
   </div>
@@ -206,6 +209,7 @@
 
 <div class="section" id="artifactsSection">
   <h2>Artifacts</h2>
+  {% if artifacts %}
   <table cellspacing="0" class="data">
   <thead>
     <tr>
@@ -228,7 +232,9 @@
     </tr>{% endfor %}
   </tbody>
   </table>
-
+  {% else %}
+  <p>No Artifacts yet.</p>
+  {% endif %}
   <div class="buttons">
     <a href="{% url add_artifact job.formatted_number %}"><img src="{{ MEDIA_URL }}img/attach.png" alt=""> Add Artifact</a>
   </div>
