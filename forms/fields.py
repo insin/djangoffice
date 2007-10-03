@@ -32,13 +32,13 @@ class DynamicModelChoiceField(forms.Field):
         else:
             try:
                 value = self.model._meta.pk.to_python(value)
+                value = self.model._default_manager.get(pk=value)
             except validators.ValidationError, e:
                 raise forms.ValidationError(e.messages[0])
-            else:
-                if not self.model._default_manager.filter(pk=value).count():
-                    raise forms.ValidationError(
-                        u'This field must specify an existing %s.' % \
-                            capfirst(self.model._meta.verbose_name))
+            except self.model.DoesNotExist:
+                raise forms.ValidationError(
+                    u'This field must specify an existing %s.' % \
+                        capfirst(self.model._meta.verbose_name))
         return value
 
 class DynamicChoice(forms.Widget):
@@ -124,17 +124,17 @@ class MultipleDynamicModelChoiceField(forms.ChoiceField):
             raise ValidationError(ugettext(u'Enter a list of values.'))
         # Validate that each value in the value list is a valid primary key.
         pk_field = self.model._meta.pk
+        final_values = []
         try:
             pk_values = [pk_field.to_python(v) for v in value]
-        except validators.ValidationError, e:
-            raise forms.ValidationError(e.messages[0])
-        else:
-            if len(value) != \
-               self.model._default_manager.filter(pk__in=pk_values).count():
+            final_values = list(self.model._default_manager.filter(pk__in=pk_values))
+            if len(pk_values) != len(final_values):
                 raise forms.ValidationError(
                     u'This field must specify existing %s.' % \
                         capfirst(self.model._meta.verbose_name_plural))
-        return pk_values
+        except validators.ValidationError, e:
+            raise forms.ValidationError(e.messages[0])
+        return final_values
 
 class DynamicSelectMultiple(forms.Widget):
     """

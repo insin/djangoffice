@@ -132,16 +132,16 @@ class AddJobForm(forms.Form):
     """
     A form for adding a new Job.
     """
-    client          = forms.ChoiceField()
+    client          = forms.ModelChoiceField(queryset=Client.objects.all())
     name            = forms.CharField(max_length=100)
     number          = forms.IntegerField(required=False, min_value=1)
     reference       = forms.CharField(required=False, max_length=16)
     reference_date  = forms.DateField(required=False)
     status          = forms.ChoiceField(choices=JOB_STATUS_CHOICES)
     notes           = forms.CharField(required=False, widget=forms.Textarea())
-    director        = forms.ChoiceField()
-    project_manager = forms.ChoiceField()
-    architect       = forms.ChoiceField()
+    director        = forms.ModelChoiceField(queryset=User.objects.exclude(userprofile__role='A'))
+    project_manager = forms.ModelChoiceField(queryset=User.objects.exclude(userprofile__role='A'))
+    architect       = forms.ModelChoiceField(queryset=User.objects.exclude(userprofile__role='A'))
     primary_contact = DynamicModelChoiceField(Contact)
     billing_contact = DynamicModelChoiceField(Contact)
     job_contacts    = MultipleDynamicModelChoiceField(Contact, required=False)
@@ -183,8 +183,8 @@ class AddJobForm(forms.Form):
                     u'This field is required if Fee Basis is Percentage.')
         return self.cleaned_data['fee_amount']
 
-    def save(commit=True):
-        return forms.save_instance(self, Job(), commit=commit)
+    def save(self, commit=True):
+        return forms.save_instance(self, Job(), self.fields, commit=commit)
 
 class AddTaskForm(forms.Form):
     """
@@ -228,7 +228,7 @@ class AddTaskForm(forms.Form):
                     u'Must be later than or equal to start date.')
         return self.cleaned_data['end_date']
 
-    def save(job):
+    def save(self, job):
         task = Task.objects.create(job=job, task_type=self.task_type,
             estimate_hours=self.cleaned_data['estimate_hours'],
             start_date=self.cleaned_data['start_date'],
@@ -250,7 +250,7 @@ class EditJobForm(AddJobForm):
                 continue
             self.fields[f.name].initial = f.value_from_object(job)
 
-    def save(commit=True):
+    def save(self, commit=True):
         return forms.save_instance(self, self.job, commit=commit)
 
 class EditTaskForm(forms.Form):
@@ -270,7 +270,7 @@ class EditTaskForm(forms.Form):
         kwargs['prefix'] = 'task%s' % task.task_type_id
         super(EditTaskForm, self).__init__(*args, **kwargs)
         self.fields['assigned_users'].choices = users
-        self.fields['assigned_users'].initial = task.assigned_users.all()
+        self.fields['assigned_users'].initial = [user['id'] for user in task.assigned_users.values('id')]
         self.fields['estimate_hours'].initial = task.estimate_hours
         self.fields['start_date'].initial = task.start_date
         self.fields['end_date'].initial = task.end_date

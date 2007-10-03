@@ -49,7 +49,7 @@ class FormTest(TestCase):
     def testDynamicModelChoiceField(self):
         f = DynamicModelChoiceField(User)
         # Valid PK
-        self.assertEquals(1, f.clean('1'))
+        self.assertEquals(User.objects.get(pk=1), f.clean('1'))
         # Non-existant PK
         self.assertRaises(forms.ValidationError, f.clean, '4');
         # Invalid PK
@@ -58,7 +58,7 @@ class FormTest(TestCase):
     def testMultipleDynamicModelChoiceField(self):
         f = MultipleDynamicModelChoiceField(User)
         # Valid PKs
-        self.assertEquals([1, 2, 3], f.clean(['1', '2', '3']))
+        self.assertEquals(list(User.objects.filter(pk__in=[1,2,3])), f.clean(['1', '2', '3']))
         # Non-existant PK
         self.assertRaises(forms.ValidationError, f.clean, ['1', '2', '4']);
         # Invalid PK

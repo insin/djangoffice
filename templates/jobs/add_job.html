@@ -15,13 +15,13 @@ Event.onDOMReady(function()
     Event.observe("selectPrimaryContactButton", "click", function()
     {
         window.assignContactsCallback = AssignJobContactsCallbacks.primaryContactCallback;
-        window.open("{% url assign_contacts "single" %}?job_id={{ job.id }}", ASSIGN_CONTACTS_WINDOW);
+        window.open("{% url assign_contacts "single" %}", ASSIGN_CONTACTS_WINDOW);
     });
 
     Event.observe("selectBillingContactButton", "click", function()
     {
         window.assignContactsCallback = AssignJobContactsCallbacks.billingContactCallback;
-        window.open("{% url assign_contacts "single" %}?job_id={{ job.id }}", ASSIGN_CONTACTS_WINDOW);
+        window.open("{% url assign_contacts "single" %}", ASSIGN_CONTACTS_WINDOW);
     });
 });
 </script>
@@ -87,6 +87,15 @@ Event.onDOMReady(function()
       {% if form.end_date.errors %}<br>{{ form.end_date.errors.as_text }}{% endif %}
     </td>
   </tr>{% endfor %}
+  <tr class="contingency">
+    <td>Contingency</td>
+    <td>&nbsp;</td>
+    <td>
+      {{ job_form.contingency }}
+      {% if job_form.contingency.errors %}{{ job_form.contingency.errors.as_text }}{% endif %}
+    </td>
+    <td colspan="2">&nbsp;</td>
+  </tr>
 </tbody>
 </table>
 

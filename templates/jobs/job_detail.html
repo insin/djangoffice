@@ -49,6 +49,63 @@
   </table>
 </div>
 
+<div class="section" id="tasksSection">
+  <h2>Tasks</h2>
+  <table cellspacing="0">
+  <thead>
+    <tr>
+      <th scope="col">Type</th>
+      <th scope="col">Users</th>
+      <th scope="col">Estimate Hours</th>
+      <th scope="col">Estimate Cost</th>
+      <th scope="col">Actual</th>
+      <th scope="col">Actual Cost</th>
+      <th scope="col">Predicted Cost</th>
+      <th scope="col">Start Date</th>
+      <th scope="col">End Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for task in tasks %}<tr class="{% cycle odd,even %}">
+      <td>{{ task.task_type.name|escape }}</td>
+      <td>
+        <ul>
+          {% for user_ in task.assigned_users.all %}<li>
+            <a href="{{ user_.get_absolute_url }}">{{ user_.get_full_name|escape }}</a>
+          </li>{% endfor %}
+        </ul>
+      </td>
+      <td>{{ task.estimate_hours }}</td>
+      <td>TODO</td>
+      <td>TODO</td>
+      <td>TODO</td>
+      <td>TODO</td>
+      <td>{{ task.start_date|default:"-" }}</td>
+      <td>{{ task.end_date|default:"-" }}</td>
+    </tr>{% endfor %}
+    <tr class="contingency">
+      <td>Contingency</td>
+      <td>&nbsp;</td>
+      <td>{{ job.contingency }}</td>
+      <td colspan="3">TODO</td>
+      <td>TODO</td>
+      <td colspan="2">TODO</td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="2">&nbsp;</td>
+      <td>TODO</td>
+      <td>TODO</td>
+      <td>TODO</td>
+      <td>TODO</td>
+      <td>TODO</td>
+      <td colspan="2">&nbsp;</td>
+    </tr>
+  </tfoot>
+  </table>
+</div>
+
 <div class="section" id="activitiesSection">
   <h2>Activities</h2>
   {% if activities %}
@@ -115,55 +172,6 @@
   </table>
   {% endfor %}
   {% endif %}
-</div>
-
-<div class="section" id="tasksSection">
-  <h2>Tasks</h2>
-  <table cellspacing="0">
-  <thead>
-    <tr>
-      <th scope="col">Type</th>
-      <th scope="col">Users</th>
-      <th scope="col">Estimate Hours</th>
-      <th scope="col">Estimate Cost</th>
-      <th scope="col">Actual</th>
-      <th scope="col">Actual Cost</th>
-      <th scope="col">Predicted Cost</th>
-      <th scope="col">Start Date</th>
-      <th scope="col">End Date</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for task in tasks %}<tr class="{% cycle odd,even %}">
-      <td>{{ task.task_type.name|escape }}</label></td>
-      <td>
-        <ul>
-          {% for user_ in task.assigned_users.all %}<li>
-            <a href="{{ user_.get_absolute_url }}">{{ user_.get_full_name|escape }}</a>
-          </li>{% endfor %}
-        </ul>
-      </td>
-      <td>{{ task.estimate_hours }}</td>
-      <td>TODO</td>
-      <td>TODO</td>
-      <td>TODO</td>
-      <td>TODO</td>
-      <td>{{ task.start_date|default:"-" }}</td>
-      <td>{{ task.end_date|default:"-" }}</td>
-    </tr>{% endfor %}
-  </tbody>
-  <tfoot>
-    <tr>
-      <td colspan="2">&nbsp;</td>
-      <td>TODO</td>
-      <td>TODO</td>
-      <td>TODO</td>
-      <td>TODO</td>
-      <td>TODO</td>
-      <td colspan="2">&nbsp;</td>
-    </tr>
-  </tfoot>
-  </table>
 </div>
 
 <div class="section" id="invoicesSection">

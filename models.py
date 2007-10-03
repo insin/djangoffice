@@ -280,6 +280,23 @@ class TaskTypeManager(models.Manager):
             params=[settings.ADMIN_JOB_ID],
         )
 
+    def exclude_by_job(self, job_id):
+        """
+        Creates a ``QuerySet`` containing Task Types which are not
+        associated with Admin Job Tasks or Tasks for the Job with the
+        given id.
+        """
+        opts = self.model._meta
+        task_opts = Task._meta
+        return super(TaskTypeManager, self).get_query_set().extra(
+            where=['%s.%s NOT IN (SELECT %s FROM %s WHERE %s IN (%%s, %%s))' % (
+               qn(opts.db_table), qn(opts.pk.column),
+               qn(task_opts.get_field('task_type').column),
+               qn(task_opts.db_table), qn(task_opts.get_field('job').column)
+            )],
+            params=[settings.ADMIN_JOB_ID, job_id],
+        )
+
 class TaskType(models.Model):
     """
     A type of work which may be carried out as part of a Job.

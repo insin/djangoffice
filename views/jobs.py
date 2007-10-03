@@ -144,7 +144,7 @@ def edit_job(request, job_number):
              for u in User.objects.exclude(userprofile__role='A') \
                                    .order_by('first_name', 'last_name')]
     tasks = Task.objects.with_task_type_name().filter(job=job)
-    task_types = TaskType.objects.non_admin().exclude(tasks__job=job)
+    task_types = TaskType.objects.exclude_by_job(job.pk)
 
     if request.method == 'POST':
         job_form = EditJobForm(job, users, data=request.POST)
