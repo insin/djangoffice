@@ -65,7 +65,7 @@
 {% if single_job %}
   <h2>Invoice History</h2>
   {% if jobs.0.invoices.count %}
-  <table cellspacing="0">
+  <table cellspacing="0" class="data">
   <colgroup align="center"></colgroup>
   <colgroup align="left" span="2"></colgroup>
   <thead>
@@ -99,7 +99,7 @@
 </div>
 {% else %}
   <h2>Jobs To Be Invoiced</h3>
-  <table cellspacing="0">
+  <table cellspacing="0" class="data">
   <colgroup align="center"></colgroup>
   <colgroup align="left" span="2"></colgroup>
   <thead>

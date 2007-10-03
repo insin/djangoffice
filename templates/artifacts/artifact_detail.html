@@ -18,7 +18,7 @@
 </tbody>
 </table>
 <div class="buttons">
-  <a href="{% url edit_artifact job.formatted_number artifact.id %}"><img src="{{ MEDIA_URL }}img/pencil.png" alt=""> Edit Artifact</a>
-  <a href="{% url download_artifact job.formatted_number artifact.id %}" class="positive"><img src="{{ MEDIA_URL }}img/attach.png" alt=""> Download Artifact</a>
+  <a href="{% url edit_artifact job.formatted_number,artifact.id %}"><img src="{{ MEDIA_URL }}img/pencil.png" alt=""> Edit Artifact</a>
+  <a href="{% url download_artifact job.formatted_number,artifact.id %}" class="positive"><img src="{{ MEDIA_URL }}img/attach.png" alt=""> Download Artifact</a>
 </div>
 {% endblock %}

@@ -2,6 +2,15 @@ body { font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif; font-si
 a img { border: none; }
 img { vertical-align: text-bottom; }
 
+.odd { background-color: #fafcfd; }
+.even { background-color: #f3f9fa; }
+
+/* Tables */
+table.data { border-collapse: collapse; width: 100%; }
+table.data td, table.data th { border: 1px solid #0c5f72; padding: 4px 6px; text-align: left; }
+table.data th { background-color: #509DB7; color: #fff; font-weight: bold; }
+table.data th a { color: #fff; }
+
 /* Lists */
 ul.messages { margin: 0; padding: 0; }
   ul.messages li { list-style-type: none; padding: 4px 5px 4px 25px; margin: 0 0 3px 0; border: 1px solid #c2e1ef; color: #336699; background: #dff4ff url("../img/information.png") 5px .3em no-repeat; }

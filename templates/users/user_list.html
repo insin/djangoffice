@@ -6,7 +6,7 @@
 
 {% if user.userprofile.is_admin %}
 <h2>Administrator</h2>
-<table cellspacing="0">
+<table cellspacing="0" class="data">
 <thead>
 <tr>
   <th>User Name</th>
@@ -28,7 +28,7 @@
 
 <h2>Users</h2>
 {% if user_list %}
-<table cellspacing="0">
+<table cellspacing="0" class="data">
 <thead>
   <tr>
 {% table_header headers %}

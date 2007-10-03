@@ -23,7 +23,7 @@
 <form name="timesheetForm" id="timesheetForm" action="." method="POST">
 {% if not user_.get_profile.is_admin %}
 <h2>Time Entries</h2>
-<table cellspacing="0">
+<table cellspacing="0" class="data">
 <thead>
   <tr>
     <th>&nbsp;</th>
@@ -52,7 +52,7 @@
 {% endif %}
 
 <h2>Expenses</h2>
-<table cellspacing="0">
+<table cellspacing="0" class="data">
 <thead>
   <tr>
     <th>&nbsp;</th>
