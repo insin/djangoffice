@@ -172,3 +172,13 @@ class DynamicSelectMultiple(forms.Widget):
         if isinstance(data, MultiValueDict):
             return data.getlist(name)
         return data.get(name, None)
+
+    def __deepcopy__(self, memo):
+        """
+        Implements deep copying to deep copy ``attrs`` and ``choices``,
+        and to avoid any attempt to copy ``display_func``.
+        """
+        result = DynamicSelectMultiple(self.model, copy.deepcopy(self.attrs),
+            copy.deepcopy(self.choices), self.display_func)
+        memo[id(self)] = result
+        return result
