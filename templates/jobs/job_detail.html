@@ -6,6 +6,7 @@
 
 <div class="buttons">
   <a href="{% url edit_job job.formatted_number %}"><img src="{{ MEDIA_URL }}img/pencil.png" alt=""> Edit Job</a>
+  {% if job.is_deleteable %}<a href="{% url delete_job job.formatted_number %}"><img src="{{ MEDIA_URL }}img/delete.png" alt=""> Delete Job</a>{% endif %}
 </div>
 
 <div class="section" id="jobDetailsSection">

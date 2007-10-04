@@ -11,6 +11,7 @@
 </table>
 <div class="buttons">
   <a href="{% url edit_contact contact.id %}"><img src="{{ MEDIA_URL }}img/group_edit.png" alt=""> Edit Contact</a>
+  {% if contact.is_deleteable %}<a href="{% url delete_contact contact.id %}"><img src="{{ MEDIA_URL }}img/group_delete.png" alt=""> Delete Contact</a>{% endif %}
 </div>
 
 <h2>Activities</h2>
