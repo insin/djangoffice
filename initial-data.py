@@ -78,7 +78,7 @@ def create_initial_data():
     vacation = TaskType.objects.create(name='Vacation')
     vacation_task = Task.objects.create(job=admin_job, task_type=vacation,
                                         estimate_hours=0.0)
-    vacation_task.assigned_users = [admin, testuser, testmanager]
+    vacation_task.assigned_users = [admin, testuser, testpc, testmanager]
     admin_job.tasks.add(vacation_task)
 
     print('Creating Task Types')
