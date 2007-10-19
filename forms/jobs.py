@@ -166,11 +166,10 @@ class AddJobForm(forms.Form):
         super(AddJobForm, self).__init__(*args, **kwargs)
         self.fields['client'].choices = [(client['id'], client['name']) \
             for client in Client.objects.values('id', 'name')]
-        self.fields['director'].choices = [(u.pk, u.get_full_name()) \
-                                           for u in users if u.is_manager()]
+        self.fields['director'].choices = \
+            [(u.pk, u.get_full_name()) for u in User.objects.filter(userprofile__role='M')]
         self.fields['project_coordinator'].choices = \
-            [(u.pk, u.get_full_name()) \
-             for u in users if u.is_manager() or u.is_pc()]
+            [(u.pk, u.get_full_name()) for u in User.objects.filter(userprofile__role__in=['M','P'])]
         self.fields['project_manager'].choices = \
             self.fields['architect'].choices = [(u.pk, u.get_full_name()) \
                                                 for u in users]
