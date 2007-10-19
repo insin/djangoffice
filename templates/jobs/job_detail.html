@@ -114,6 +114,7 @@
   <thead>
     <tr>
       <th>Number</th>
+      <th>Type</th>
       <th>Created by</th>
       <th>Created at</th>
       <th>Assigned to</th>
@@ -126,6 +127,7 @@
   <tbody>
     {% for activity in activities %}<tr class="{% cycle odd,even %}">
       <td><a href="{{ activity.get_absolute_url }}">{{ activity.formatted_number }}</a></td>
+      <td>{{ activity.type|default:"-"|escape }}</a></td>
       <td><a href="{{ activity.created_by.get_absolute_url }}">{{ activity.created_by.get_full_name|escape }}</a></td>
       <td>{{ activity.created_at }}</td>
       <td>{{ activity.assigned_to.get_full_name|escape|default:"-" }}</td>

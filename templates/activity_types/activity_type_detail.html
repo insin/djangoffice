@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Activity Type '{{ activity_type.name|escape }}' | {% endblock %}
+{% block menu %}{% menu "manage" "activity_types" %}{% endblock %}
+{% block content %}
+<h1>Activity Type '{{ activity_type.name|escape }}'</h1>
+
+<table cellspacing="0">
+<tbody>
+<tr><th scope="col">Name:</th><td>{{ activity_type.name|escape }}</td></tr>
+<tr><th scope="col">Access:</th><td>{{ activity_type.get_access_display }}</td></tr>
+<tr><th scope="col">Description:</th><td>{{ activity_type.description|escape|linebreaksbr }}</td></tr>
+<tbody>
+</table>
+<div class="buttons">
+  <a href="{% url edit_activity_type activity_type.id %}"><img src="{{ MEDIA_URL }}img/pencil.png" alt=""> Edit Activity Type</a>
+  {% if activity_type.is_deleteable %}<a href="{% url delete_activity_type activity_type.id %}"><img src="{{ MEDIA_URL }}img/delete.png" alt=""> Delete Activity Type</a>{% endif %}
+</div>
+{% endblock %}

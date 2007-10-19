@@ -1,5 +1,29 @@
 {% extends "base.html" %}{% load officeaid_tags %}
 {% block title %}Activities | {% endblock %}
+{% block extrahead %}
+<script type="text/javascript">
+var ASSIGN_CONTACTS_WINDOW = "assign_contacts_window";
+Event.onDOMReady(function()
+{
+    Event.observe("selectContactButton", "click", function()
+    {
+        window.assignContactsCallback = function(win, contact)
+        {
+            $("contact_display").update(contact.first_name + " " + contact.last_name);
+            $("id_contact").value = contact.id;
+            win.close();
+        },
+        window.open("{% url assign_contacts "single" %}", ASSIGN_CONTACTS_WINDOW);
+    });
+
+    Event.observe("clearContactButton", "click", function()
+    {
+        $("contact_display").update("");
+        $("id_contact").value = "";
+    });
+});
+</script>
+{% endblock %}
 {% block menu %}{% menu "activities" %}{% endblock %}
 {% block content %}
 <h1>Activities</h1>
@@ -8,17 +32,11 @@
 <form name="activityFilterForm" id="activityFilterForm" action="." method="GET">
 <table cellspacing="0">
 <tbody>
-{{ filter_form }}
-<tr>
-  <th>Contact:</th>
-  <td>
-    <div class="buttons"
-    <span id="contactName"></span>
-    <button type="button" id="selectContactButton" class="positive"><img src="{{ MEDIA_URL }}img/group_add.png" alt=""> Select Contact</button>
-    <button type="button" id="clearContactButton" class="negative"><img src="{{ MEDIA_URL }}img/group_delete.png" alt=""> Clear Contact</button>
-    </div>
-  </td>
-</tr>
+<tr><th>{{ filter_form.job_number.label_tag }}</th><td>{% if filter_form.job_number.errors %}{{ filter_form.job_number.errors.as_ul }}{% endif %}{{ filter_form.job_number }}</td></tr>
+<tr><th>{{ filter_form.type.label_tag }}</th><td>{% if filter_form.type.errors %}{{ filter_form.type.errors.as_ul }}{% endif %}{{ filter_form.type }}</td></tr>
+<tr><th>{{ filter_form.creator.label_tag }}</th><td>{% if filter_form.creator.errors %}{{ filter_form.creator.errors.as_ul }}{% endif %}{{ filter_form.creator }}</td></tr>
+<tr><th>{{ filter_form.assigned_to.label_tag }}</th><td>{% if filter_form.assigned_to.errors %}{{ filter_form.assigned_to.errors.as_ul }}{% endif %}{{ filter_form.assigned_to }}</td></tr>
+<tr><th>{{ filter_form.contact.label_tag }}</th><td>{% if filter_form.contact.errors %}{{ filter_form.contact.errors.as_ul }}{% endif %}{{ filter_form.contact }} <input type="button" id="selectContactButton" value="Select Contact"> <input type="button" id="clearContactButton" value="Clear Contact"></td></tr>
 </tbody>
 </table>
 <div class="buttons">
@@ -37,6 +55,7 @@
   {% for activity in activity_list %}<tr class="{% cycle odd,even %}">
     <td><a href="{{ activity.get_absolute_url }}">{{ activity.formatted_number }}</a></td>
     <td><a href="{{ activity.job.get_absolute_url }}">{{ activity.job|escape }}</a></td>
+    <td>{{ activity.type|default:"-"|escape }}</a></td>
     <td>{{ activity.created_by.get_full_name|escape }}</td>
     <td>{{ activity.created_at }}</td>
     <td>{{ activity.get_priority_display }}</td>

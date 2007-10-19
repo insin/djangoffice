@@ -72,6 +72,13 @@ urlpatterns = patterns('officeaid.views',
     url(r'^expense_types/(?P<expense_type_id>\d+)/edit/$',   'expense_types.edit_expense_type',   name='edit_expense_type'),
     url(r'^expense_types/(?P<expense_type_id>\d+)/delete/$', 'expense_types.delete_expense_type', name='delete_expense_type'),
 
+    # Activity Types
+    url(r'^activity_types/$',                                  'activity_types.activity_type_list',   name='activity_type_list'),
+    url(r'^activity_types/add/$',                              'activity_types.add_activity_type',    name='add_activity_type'),
+    url(r'^activity_types/(?P<activity_type_id>\d+)/$',        'activity_types.activity_type_detail', name='activity_type_detail'),
+    url(r'^activity_types/(?P<activity_type_id>\d+)/edit/$',   'activity_types.edit_activity_type',   name='edit_activity_type'),
+    url(r'^activity_types/(?P<activity_type_id>\d+)/delete/$', 'activity_types.delete_activity_type', name='delete_activity_type'),
+
     # Timesheets
     url(r'^timesheets/$',                                                     'timesheets.timesheet_index',       name='timesheet_index'),
     url(r'^timesheets/bulk_approval/$',                                       'timesheets.bulk_approval',         name='bulk_approval'),

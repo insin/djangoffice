@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Add Activity Type | {% endblock %}
+{% block menu %}{% menu "manage" "activity_types" %}{% endblock %}
+{% block content %}
+<h1>Add Activity Type</h1>
+<form name="activityTypeForm" id="activityTypeForm" action="." method="POST">
+<table cellspacing="0">
+<tbody>
+{{ form }}
+</tbody>
+</table>
+<div class="buttons">
+  <button type="submit" class="positive"><img src="{{ MEDIA_URL }}img/add.png" alt=""> Add Activity Type</button>
+  <a href="{% url activity_type_list %}" class="negative"><img src="{{ MEDIA_URL }}img/cancel.png" alt=""> Cancel</a>
+</div>
+</form>
+{% endblock %}

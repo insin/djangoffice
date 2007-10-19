@@ -736,6 +736,36 @@ class Artifact(models.Model):
                      .filter(pk=self.id) \
                       .count() > 0
 
+class ActivityType(models.Model):
+    """
+    A type of activity, which confers an access restriction based on user
+    role.
+    """
+    name        = models.CharField(max_length=100, unique=True)
+    access      = models.CharField(max_length=1, choices=ACCESS_CHOICES)
+    description = models.TextField(blank=True)
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['name']
+
+    class Admin:
+        list_display = ('name', 'access', 'description')
+
+    @property
+    def is_deleteable(self):
+        """
+        An ActivityType is deleteable if there are no Activities with it
+        set as their type.
+        """
+        return self.activities.count() == 0
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('activity_type_detail', (smart_unicode(self.pk),))
+
 ACTIVITY_PRIORITY_CHOICES = (
     (u'L', u'Low'),
     (u'M', u'Medium'),
@@ -749,6 +779,7 @@ class Activity(models.Model):
     Contact related to a specific Job.
     """
     job         = models.ForeignKey(Job, related_name='activities')
+    type        = models.ForeignKey(ActivityType, null=True, blank=True, related_name='activities')
     created_by  = models.ForeignKey(User, related_name='created_activities')
     created_at  = models.DateTimeField(editable=False)
     description = models.TextField()
@@ -769,14 +800,14 @@ class Activity(models.Model):
         verbose_name_plural = u'Activities'
 
     class Admin:
-        list_display = ('formatted_number', 'created_by', 'job', 'description',
-                        'assigned_to', 'contact', 'due_date', 'priority',
-                        'completed')
+        list_display = ('formatted_number', 'created_by', 'job', 'type',
+                        'description', 'assigned_to', 'contact', 'due_date',
+                        'priority', 'completed')
         list_filter = ('due_date', 'priority', 'completed')
         fields = (
             (None, {
-                'fields': ('job', 'created_by', 'description', 'priority',
-                           'due_date')
+                'fields': ('job', 'type', 'created_by', 'description',
+                           'priority', 'due_date')
             }),
             (u'Assignment', {
                 'description': 'An activity may be assigned to a User or a Contact - if both are given, User takes precedence.',

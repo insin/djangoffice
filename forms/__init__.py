@@ -2,6 +2,7 @@ import md5
 import cPickle as pickle
 
 from django import newforms as forms
+from django.db.models import Model
 from django.newforms.forms import BoundField
 
 def security_hash(self, request, form):
@@ -36,7 +37,10 @@ class FilterBaseForm(forms.BaseForm):
             for field, filter in self.SEARCH_FILTERS:
                 if self.cleaned_data.has_key(field) and \
                    self.cleaned_data[field]:
-                    filters[filter] = self.cleaned_data.get(field)
+                    if isinstance(self.cleaned_data.get(field), Model):
+                        filters[filter] = self.cleaned_data.get(field).pk
+                    else:
+                        filters[filter] = self.cleaned_data.get(field)
         return filters
 
     def get_params(self):
@@ -49,7 +53,10 @@ class FilterBaseForm(forms.BaseForm):
             for field in self.fields.keys():
                 if self.cleaned_data.has_key(field) and \
                    self.cleaned_data[field]:
-                    params[field] = self.cleaned_data.get(field)
+                    if isinstance(self.cleaned_data.get(field), Model):
+                        params[field] = self.cleaned_data.get(field).pk
+                    else:
+                        params[field] = self.cleaned_data.get(field)
         return params
 
 class HiddenBaseForm(forms.BaseForm):

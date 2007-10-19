@@ -8,12 +8,13 @@ from django.template import RequestContext
 from django.views.generic import create_update, list_detail
 
 from officeaid.forms.activities import ActivityFilterForm
-from officeaid.models import Activity, Job
+from officeaid.models import Activity, ActivityType, Job
 from officeaid.views import SortHeaders
 
 LIST_HEADERS = (
     (u'Number',      'id'),
     (u'Job',         '%s.number' % Job._meta.db_table),
+    (u'Type',        None),
     (u'Created by',  None),
     (u'Created at',  'created_at'),
     (u'Priority',    'priority'),
@@ -55,7 +56,8 @@ def add_activity(request):
     Initial values for any Activity field may be specified as ``GET``
     parameters.
     """
-    fields = ('job', 'description', 'priority', 'assigned_to', 'contact', 'due_date')
+    fields = ('job', 'type', 'description', 'priority', 'assigned_to',
+              'contact', 'due_date')
     ActivityForm = forms.form_for_model(Activity, fields=fields)
     if request.method == 'POST':
         form = ActivityForm(request.POST)
@@ -93,8 +95,8 @@ def edit_activity(request, activity_id):
     if activity.completed:
         return HttpResponseForbidden(u'Completed %s may not be edited.' \
                                      % Activity._meta.verbose_name_plural)
-    fields = ('job', 'description', 'priority', 'assigned_to', 'contact',
-              'due_date', 'completed')
+    fields = ('job', 'type', 'description', 'priority', 'assigned_to',
+              'contact', 'due_date', 'completed')
     ActivityForm = forms.form_for_instance(activity, fields=fields)
     if request.method == 'POST':
         form = ActivityForm(request.POST)

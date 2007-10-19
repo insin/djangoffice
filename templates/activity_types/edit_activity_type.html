@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Edit Activity Type '{{ activity_type.name|escape }}' | {% endblock %}
+{% block menu %}{% menu "manage" "activity_types" %}{% endblock %}
+{% block content %}
+<h1>Edit Activity Type</h1>
+<form name="activityTypeForm" id="activityTypeForm" action="." method="POST">
+<table cellspacing="0">
+{{ form }}
+</table>
+<div class="buttons">
+  <button type="submit" class="positive"><img src="{{ MEDIA_URL }}img/tick.png" alt=""> Edit Activity Type</button>
+  <a href="{{ activity_type.get_absolute_url }}" class="negative"><img src="{{ MEDIA_URL }}img/cancel.png" alt=""> Cancel</a>
+</div>
+</form>
+{% endblock %}

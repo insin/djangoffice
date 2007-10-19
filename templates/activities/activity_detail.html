@@ -7,6 +7,9 @@
 <table cellspacing="0">
 <tbody>
 <tr><th scope="col">Job:</th><td><a href="{{ activity.job.get_absolute_url }}">{{ activity.job|escape }}</td></tr>
+{% if activity.type %}
+<tr><th scope="col">Type:</th><td>{{ activity.type|escape }}</td></tr>
+{% endif %}
 <tr><th scope="col">Created by:</th><td>{{ activity.created_by.get_full_name|escape }}</td></tr>
 <tr><th scope="col">Created at:</th><td>{{ activity.created_at }}</td></tr>
 <tr><th scope="col">Description:</th><td>{{ activity.description|escape|linebreaksbr }}</td></tr>

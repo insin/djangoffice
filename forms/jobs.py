@@ -22,7 +22,7 @@ USER_SEARCH_TYPE_CHOICES = (
     (1, u'Director'),
     (2, u'Project Coordinator'),
     (3, u'Associate/Project Manager'),
-    (4, u'Architect')
+    (4, u'Architect'),
     (5, u'Assigned to Job Task'),
 )
 

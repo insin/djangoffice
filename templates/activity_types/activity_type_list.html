@@ -1,0 +1,28 @@
+{% extends "base.html" %}{% load officeaid_tags %}
+{% block title %}Activity Types | {% endblock %}
+{% block menu %}{% menu "manage" "activity_types" %}{% endblock %}
+{% block content %}
+<h1>Activity Types</h1>
+
+{% if activity_type_list %}
+<table cellspacing="0" class="data">
+<thead>
+  <tr>
+{% table_header headers %}
+  </tr>
+</thead>
+<tbody>
+  {% for activity_type in activity_type_list %}<tr class="{% cycle odd,even %}">
+    <td><a href="{{ activity_type.get_absolute_url }}">{{ activity_type.name|escape }}</a></td>
+    <td>{{ activity_type.get_access_display }}</a></td>
+    <td>{{ activity_type.description|escape|linebreaksbr }}</a></td>
+  </tr>{% endfor %}
+</tbody>
+</table>
+{% else %}
+<p class="noneyet">No Activity Types yet.</p>
+{% endif %}
+<div class="buttons">
+  <a href="{% url add_activity_type %}"><img src="{{ MEDIA_URL }}img/add.png" alt=""> Add Activity Type</a>
+</div>
+{% endblock %}
