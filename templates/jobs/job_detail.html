@@ -217,6 +217,7 @@
   <thead>
     <tr>
       <th scope="col">Description</th>
+      <th scope="col">Type</th>
       <th scope="col">File</th>
       <th scope="col">Size</th>
       <th scope="col">Created On</th>
@@ -227,6 +228,7 @@
   <tbody>
     {% for artifact in artifacts %}<tr class="{% cycle odd,even %}">
       <td>{{ artifact.description|escape }}</td>
+      <td>{{ artifact.type|default:"-"|escape }}</a></td>
       <td>{{ artifact.file|escape }}</td>
       <td>{{ artifact.get_file_size }}</td>
       <td>{{ artifact.created_at }}</td>

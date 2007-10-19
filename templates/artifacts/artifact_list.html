@@ -14,6 +14,7 @@
 <tbody>
   {% for artifact in artifact_list %}<tr class="{% cycle odd,even %}">
     <td><a href="{% url artifact_detail job.formatted_number,artifact.id %}">{{ artifact.description|escape }}</a></td>
+    <td>{{ artifact.type|default:"-"|escape }}</a></td>
     <td>{{ artifact.file|escape }}</td>
     <td>{{ artifact.get_file_size }}</td>
     <td>{{ artifact.created_at }}</td>

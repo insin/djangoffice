@@ -1,0 +1,27 @@
+{% extends "base.html" %}{% load officeaid_tags %}
+{% block title %}Artifact Types | {% endblock %}
+{% block menu %}{% menu "manage" "artifact_types" %}{% endblock %}
+{% block content %}
+<h1>Artifact Types</h1>
+
+{% if artifact_type_list %}
+<table cellspacing="0" class="data">
+<thead>
+  <tr>
+{% table_header headers %}
+  </tr>
+</thead>
+<tbody>
+  {% for artifact_type in artifact_type_list %}<tr class="{% cycle odd,even %}">
+    <td><a href="{{ artifact_type.get_absolute_url }}">{{ artifact_type.name|escape }}</a></td>
+    <td>{{ artifact_type.description|escape|linebreaksbr }}</a></td>
+  </tr>{% endfor %}
+</tbody>
+</table>
+{% else %}
+<p class="noneyet">No Artifact Types yet.</p>
+{% endif %}
+<div class="buttons">
+  <a href="{% url add_artifact_type %}"><img src="{{ MEDIA_URL }}img/add.png" alt=""> Add Artifact Type</a>
+</div>
+{% endblock %}

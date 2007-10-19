@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Edit Artifact Type '{{ artifact_type.name|escape }}' | {% endblock %}
+{% block menu %}{% menu "manage" "artifact_types" %}{% endblock %}
+{% block content %}
+<h1>Edit Artifact Type</h1>
+<form name="artifactTypeForm" id="artifactTypeForm" action="." method="POST">
+<table cellspacing="0">
+{{ form }}
+</table>
+<div class="buttons">
+  <button type="submit" class="positive"><img src="{{ MEDIA_URL }}img/tick.png" alt=""> Edit Artifact Type</button>
+  <a href="{{ artifact_type.get_absolute_url }}" class="negative"><img src="{{ MEDIA_URL }}img/cancel.png" alt=""> Cancel</a>
+</div>
+</form>
+{% endblock %}

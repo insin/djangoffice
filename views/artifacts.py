@@ -15,6 +15,7 @@ from officeaid.views.generic import add_object, edit_object
 
 LIST_HEADERS = (
     (u'Description', None),
+    (u'Type',        None),
     (u'File',        'file'),
     (u'Size',        None),
     (u'Created At',  'created_at'),
@@ -53,7 +54,7 @@ def add_artifact(request, job_number):
     job = get_object_or_404(Job, number=int(job_number))
     if not job.is_accessible_to_user(request.user):
         return permission_denied()
-    ArtifactForm = forms.form_for_model(Artifact, fields=('file',
+    ArtifactForm = forms.form_for_model(Artifact, fields=('file', 'type',
                                         'description', 'access'))
     if request.method == 'POST':
         form = ArtifactForm(data=request.POST, files=request.FILES)
@@ -107,7 +108,7 @@ def edit_artifact(request, job_number, artifact_id):
     if not job.is_accessible_to_user(request.user) or \
        not artifact.is_accessible_to_user(request.user):
         return permission_denied()
-    ArtifactForm = forms.form_for_instance(artifact, fields=('file',
+    ArtifactForm = forms.form_for_instance(artifact, fields=('file', 'type'
                                            'description', 'access'))
     if request.method == 'POST':
         form = ArtifactForm(data=request.POST, files=request.FILES)

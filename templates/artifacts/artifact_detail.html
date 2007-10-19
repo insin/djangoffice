@@ -8,6 +8,9 @@
 <tbody>
   <tr><th scope="col">Job:</th><td><a href="{{ job.get_absolute_url }}">{{ job|escape }}</td></tr>
   <tr><th scope="col">Description:</th><td>{{ artifact.description|escape }}</td></tr>
+  {% if artifact.type %}
+  <td><th scope="col">Type:</th>{{ artifact.type|default:"-"|escape }}</a></td>
+  {% endif %}
   <tr><th scope="col">File:</th><td>{{ artifact.file|escape }}</td></tr></tr>
   <tr><th scope="col">File size:</th><td>{{ artifact.get_file_size }}</td></tr>
   <tr><th scope="col">Created at:</th><td>{{ artifact.created_at }}</td></tr>

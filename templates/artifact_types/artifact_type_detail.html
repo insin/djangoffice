@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Artifact Type '{{ artifact_type.name|escape }}' | {% endblock %}
+{% block menu %}{% menu "manage" "artifact_types" %}{% endblock %}
+{% block content %}
+<h1>Artifact Type '{{ artifact_type.name|escape }}'</h1>
+
+<table cellspacing="0">
+<tbody>
+<tr><th scope="col">Name:</th><td>{{ artifact_type.name|escape }}</td></tr>
+<tr><th scope="col">Description:</th><td>{{ artifact_type.description|escape|linebreaksbr }}</td></tr>
+<tbody>
+</table>
+<div class="buttons">
+  <a href="{% url edit_artifact_type artifact_type.id %}"><img src="{{ MEDIA_URL }}img/pencil.png" alt=""> Edit Artifact Type</a>
+  {% if artifact_type.is_deleteable %}<a href="{% url delete_artifact_type artifact_type.id %}"><img src="{{ MEDIA_URL }}img/delete.png" alt=""> Delete Artifact Type</a>{% endif %}
+</div>
+{% endblock %}

@@ -28,6 +28,7 @@ PAGES = {
         ('task_types',     'Task Types',     'task_type_list',     is_admin_or_manager),
         ('expense_types',  'Expense Types',  'expense_type_list',  is_admin_or_manager),
         ('activity_types', 'Activity Types', 'activity_type_list', is_admin_or_manager),
+        ('artifact_types', 'Artifact Types', 'artifact_type_list', is_admin_or_manager),
     ),
     'invoices': (
         ('invoices',        'Invoices',        'invoice_list',    is_admin_or_manager),

@@ -679,6 +679,34 @@ class Task(models.Model):
         # TODO Implement
         pass
 
+class ArtifactType(models.Model):
+    """
+    A type of artifact.
+    """
+    name        = models.CharField(max_length=100, unique=True)
+    description = models.TextField(blank=True)
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['name']
+
+    class Admin:
+        list_display = ('name', 'description')
+
+    @property
+    def is_deleteable(self):
+        """
+        An ArtifactType is deleteable if there are no Artifacts created
+        with it set as their type.
+        """
+        return self.artifacts.count() == 0
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('artifact_type_detail', (smart_unicode(self.id),))
+
 class ArtifactManager(models.Manager):
     def accessible_to_user(self, user):
         """
@@ -687,10 +715,10 @@ class ArtifactManager(models.Manager):
         """
         user_profile = user.get_profile()
         qs = super(ArtifactManager, self).get_query_set()
-        if user_profile.is_admin():
-            pass
-        elif user_profile.is_manager():
-            qs = qs.filter(access__in=['M','U'])
+        if user_profile.is_manager():
+            qs = qs.filter(access__in=['M','P','U'])
+        elif user_profile.is_pc():
+            qs = qs.filter(access__in=['P','U'])
         elif user_profile.is_user():
             qs = qs.filter(access='U')
         return qs
@@ -702,6 +730,7 @@ class Artifact(models.Model):
     """
     job         = models.ForeignKey(Job, related_name='artifacts')
     file        = models.FileField(upload_to='artifacts')
+    type        = models.ForeignKey(ArtifactType, null=True, blank=True, related_name='artifacts')
     description = models.CharField(max_length=100)
     created_at  = models.DateTimeField(editable=False)
     updated_at  = models.DateTimeField(editable=False)
@@ -716,7 +745,7 @@ class Artifact(models.Model):
         ordering = ['-created_at']
 
     class Admin:
-        list_display = ('file', 'job', 'description', 'created_at', 'access')
+        list_display = ('file', 'job', 'type', 'description', 'created_at', 'access')
         list_filter = ('created_at', 'access')
 
     def save(self):
