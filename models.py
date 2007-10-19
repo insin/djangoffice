@@ -21,18 +21,21 @@ qn = connection.ops.quote_name
 ###########
 
 class EmailOptions(dbsettings.Group):
-    job_over_hours           = dbsettings.BooleanValue(u'Send email when a Job goes over hours')
-    job_missed_end_date      = dbsettings.BooleanValue(u'Send email when a Job misses its end date')
-    incomplete_timesheet     = dbsettings.BooleanValue(u'Send email when a Timesheet is incomplete at the end of the week')
-    expense_over_limit       = dbsettings.BooleanValue(u'Send email when an Expense amount is over limit')
-    activity_missed_due_date = dbsettings.BooleanValue(u'Send email when an Activity misses its due date')
+    job_over_hours            = dbsettings.BooleanValue(u'Send email when a Job goes over hours')
+    job_missed_end_date       = dbsettings.BooleanValue(u'Send email when a Job misses its end date')
+    incomplete_timesheet      = dbsettings.BooleanValue(u'Send email when a Timesheet is incomplete at the end of the week')
+    expense_over_limit        = dbsettings.BooleanValue(u'Send email when an Expense amount is over limit')
+    activity_missed_due_date  = dbsettings.BooleanValue(u'Send email when an Activity misses its due date')
+    activity_user_assigned    = dbsettings.BooleanValue(u'Send an email to a User when they are assigned to an Activity')
+    activity_contact_assigned = dbsettings.BooleanValue(u'Send an email to a Contact when they are assigned to an Activity')
 
 email = EmailOptions()
 
 class AccessOptions(dbsettings.Group):
-    managers_view_all_jobs  = dbsettings.BooleanValue(u'Managers may view all Jobs')
-    managers_view_all_users = dbsettings.BooleanValue(u'Managers may view all Users')
-    users_view_all_jobs     = dbsettings.BooleanValue(u'Users may view all Jobs')
+    managers_view_all_jobs            = dbsettings.BooleanValue(u'Managers may view all Jobs')
+    managers_view_all_users           = dbsettings.BooleanValue(u'Managers may view all Users')
+    pc_restricted_to_coordinated_jobs = dbsettings.BooleanValue(u'PCs only have PC access to Jobs for which they are the Project Coordinator')
+    users_view_all_jobs               = dbsettings.BooleanValue(u'Users may view all Jobs')
 
 access = AccessOptions()
 
