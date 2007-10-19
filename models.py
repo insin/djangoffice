@@ -970,6 +970,8 @@ class Invoice(models.Model):
     end_period      = models.DateField(null=True, blank=True, validator_list=[INVOICE_PERIOD_VALIDATOR])
     amount_invoiced = models.DecimalField(max_digits=8, decimal_places=2)
     amount_received = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
+    adjustment      = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
+    comment         = models.TextField(blank=True)
     pdf             = models.FileField(upload_to='invoices', blank=True)
 
     options = InvoiceOptions()
@@ -984,12 +986,12 @@ class Invoice(models.Model):
     class Admin:
         list_display = ('formatted_number', 'job', 'date', 'type',
                         'start_period', 'end_period','amount_invoiced',
-                        'amount_received')
+                        'amount_received', 'adjustment', 'comment')
         fields = (
             (None, {
                 'fields': ('job', 'number', 'type', 'start_period',
                            'end_period', 'amount_invoiced', 'amount_received',
-                           'pdf')
+                           'adjustment', 'comment', 'pdf')
             }),
         )
 
