@@ -537,11 +537,12 @@ class Job(models.Model):
             (None, {
                 'fields': ('client', 'name', 'number', 'reference',
                            'reference_date', 'add_reference',
-                           'add_reference_date', 'type', 'status', 'notes',
+                           'add_reference_date', 'status', 'notes',
                            'invoice_notes', 'contingency')
             }),
             (u'Users', {
-                'fields': ('director', 'coordinator', 'project_manager', 'architect')
+                'fields': ('director', 'project_coordinator',
+                           'project_manager', 'architect')
             }),
             (u'Contacts', {
                 'fields': ('primary_contact', 'billing_contact',
