@@ -29,6 +29,14 @@ def create_initial_data():
     testuser.rates.create(effective_from=today, standard_rate=50.00,
                           overtime_rate=60.00, editable=False)
 
+    testpc = User.objects.create_user('testpc', 'tp@tp.com', 'testpc')
+    testpc.first_name = 'Test'
+    testpc.last_name = 'PC'
+    testpc.save()
+    UserProfile.objects.create(user=testpc, role='P')
+    testpc.rates.create(effective_from=today, standard_rate=60.00,
+                          overtime_rate=70.00, editable=False)
+
     testmanager = User.objects.create_user('testmanager', 'tm@tm.com',
                                            'testmanager')
     testmanager.first_name = 'Test'

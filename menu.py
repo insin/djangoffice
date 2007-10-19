@@ -1,8 +1,8 @@
 from django.core.urlresolvers import reverse
 from django.utils.html import escape
 
-from officeaid.auth import (is_admin, is_admin_or_manager, is_authenticated,
-    is_not_authenticated)
+from officeaid.auth import (is_admin, is_admin_or_manager,
+    is_admin_manager_or_pc, is_authenticated, is_not_authenticated)
 
 # 4-tuples of (section id, label, URL name, user permission test function)
 SECTIONS = (

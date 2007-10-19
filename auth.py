@@ -21,6 +21,7 @@ is_authenticated = lambda u: u.is_authenticated()
 is_not_authenticated = lambda u: not u.is_authenticated()
 is_admin = user_has_role(['A'])
 is_admin_or_manager = user_has_role(['A', 'M'])
+is_admin_manager_or_pc = user_has_role(['A', 'M', 'P'])
 
 def user_can_access_user(logged_in_user, user):
     """
@@ -47,6 +48,13 @@ def user_can_access_user(logged_in_user, user):
                 return True
             except:
                 return False
+    elif profile.is_pc():
+        # PCs can only access their managed users
+        try:
+            profile.managed_users.get(id=user.id)
+            return True
+        except:
+            return False
 
 def user_has_permission(test_func):
     """

@@ -48,6 +48,7 @@ ACCESS_CHOICES = (
 
 USER_ROLE_CHOICES = (
     (u'U', u'User'),
+    (u'P', u'PC'),
     (u'M', u'Manager'),
     (u'A', u'Administrator'),
 )
@@ -81,6 +82,9 @@ class UserProfile(models.Model):
 
     def is_manager(self):
         return self.role == u'M'
+
+    def is_pc(self):
+        return self.role == u'P'
 
     def is_user(self):
         return self.role == u'U'
