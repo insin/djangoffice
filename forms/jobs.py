@@ -20,8 +20,10 @@ SEARCH_TYPE_CHOICES = (
 
 USER_SEARCH_TYPE_CHOICES = (
     (1, u'Director'),
-    (2, u'Associate/Project Manager'),
-    (3, u'Assigned to Job Task'),
+    (2, u'Project Coordinator'),
+    (3, u'Associate/Project Manager'),
+    (4, u'Architect')
+    (5, u'Assigned to Job Task'),
 )
 
 JOB_STATUS_SEARCH_CHOICES = ((u'', 'All Jobs'),) + JOB_STATUS_CHOICES
@@ -95,8 +97,12 @@ class JobFilterForm(FilterBaseForm, forms.Form):
             if user_search_type == 1:
                 filters.append(Q(director=search_user))
             elif user_search_type == 2:
-                filters.append(Q(project_manager=search_user))
+                filters.append(Q(project_coordinator=search_user))
             elif user_search_type == 3:
+                filters.append(Q(project_manager=search_user))
+            elif user_search_type == 4:
+                filters.append(Q(architect=search_user))
+            elif user_search_type == 5:
                 filters.append(Q(tasks__assigned_users=search_user))
                 self.make_distinct = True
 
@@ -132,32 +138,42 @@ class AddJobForm(forms.Form):
     """
     A form for adding a new Job.
     """
-    client          = forms.ModelChoiceField(queryset=Client.objects.all())
-    name            = forms.CharField(max_length=100)
-    number          = forms.IntegerField(required=False, min_value=1)
-    reference       = forms.CharField(required=False, max_length=16)
-    reference_date  = forms.DateField(required=False)
-    status          = forms.ChoiceField(choices=JOB_STATUS_CHOICES)
-    notes           = forms.CharField(required=False, widget=forms.Textarea())
-    director        = forms.ModelChoiceField(queryset=User.objects.exclude(userprofile__role='A'))
-    project_manager = forms.ModelChoiceField(queryset=User.objects.exclude(userprofile__role='A'))
-    architect       = forms.ModelChoiceField(queryset=User.objects.exclude(userprofile__role='A'))
-    primary_contact = DynamicModelChoiceField(Contact)
-    billing_contact = DynamicModelChoiceField(Contact)
-    job_contacts    = MultipleDynamicModelChoiceField(Contact, required=False)
-    start_date      = forms.DateField(required=False)
-    end_date        = forms.DateField(required=False)
-    fee_basis       = forms.ChoiceField(required=False, choices=FEE_BASIS_CHOICES)
-    fee_amount      = forms.DecimalField(required=False, max_digits=8, decimal_places=2)
-    fee_currency    = forms.ChoiceField(choices=FEE_CURRENCY_CHOICES)
-    contingency     = forms.DecimalField(required=False, max_digits=6, decimal_places=2)
+    client              = forms.ModelChoiceField(queryset=Client.objects.all())
+    name                = forms.CharField(max_length=100)
+    number              = forms.IntegerField(required=False, min_value=1)
+    reference           = forms.CharField(required=False, max_length=16)
+    reference_date      = forms.DateField(required=False)
+    add_reference       = forms.CharField(required=False, max_length=16)
+    add_reference_date  = forms.DateField(required=False)
+    status              = forms.ChoiceField(choices=JOB_STATUS_CHOICES)
+    notes               = forms.CharField(required=False, widget=forms.Textarea())
+    invoice_notes       = forms.CharField(required=False, widget=forms.Textarea())
+    director            = forms.ModelChoiceField(queryset=User.objects.filter(userprofile__role='M'))
+    project_coordinator = forms.ModelChoiceField(queryset=User.objects.filter(userprofile__role__in=['M', 'P']))
+    project_manager     = forms.ModelChoiceField(queryset=User.objects.exclude(userprofile__role='A'))
+    architect           = forms.ModelChoiceField(queryset=User.objects.exclude(userprofile__role='A'))
+    primary_contact     = DynamicModelChoiceField(Contact)
+    billing_contact     = DynamicModelChoiceField(Contact)
+    job_contacts        = MultipleDynamicModelChoiceField(Contact, required=False)
+    start_date          = forms.DateField(required=False)
+    end_date            = forms.DateField(required=False)
+    fee_basis           = forms.ChoiceField(required=False, choices=FEE_BASIS_CHOICES)
+    fee_amount          = forms.DecimalField(required=False, max_digits=8, decimal_places=2)
+    fee_currency        = forms.ChoiceField(choices=FEE_CURRENCY_CHOICES)
+    contingency         = forms.DecimalField(required=False, max_digits=6, decimal_places=2)
 
     def __init__(self, users, *args, **kwargs):
         super(AddJobForm, self).__init__(*args, **kwargs)
         self.fields['client'].choices = [(client['id'], client['name']) \
             for client in Client.objects.values('id', 'name')]
-        self.fields['director'].choices = self.fields['project_manager'].choices = \
-            self.fields['architect'].choices = users
+        self.fields['director'].choices = [(u.pk, u.get_full_name()) \
+                                           for u in users if u.is_manager()]
+        self.fields['project_coordinator'].choices = \
+            [(u.pk, u.get_full_name()) \
+             for u in users if u.is_manager() or u.is_pc()]
+        self.fields['project_manager'].choices = \
+            self.fields['architect'].choices = [(u.pk, u.get_full_name()) \
+                                                for u in users]
 
     def clean_number(self):
         if self.cleaned_data['number']:
@@ -200,10 +216,10 @@ class AddTaskForm(forms.Form):
     start_date     = forms.DateField(required=False)
     end_date       = forms.DateField(required=False)
 
-    def __init__(self, task_type, users, *args, **kwargs):
+    def __init__(self, task_type, user_choices, *args, **kwargs):
         kwargs['prefix'] = 'task%s' % task_type.id
         super(AddTaskForm, self).__init__(*args, **kwargs)
-        self.fields['assigned_users'].choices = users
+        self.fields['assigned_users'].choices = user_choices
         self.task_type = task_type
 
     def clean_assigned_users(self):
@@ -266,11 +282,12 @@ class EditTaskForm(forms.Form):
     start_date     = forms.DateField(required=False)
     end_date       = forms.DateField(required=False)
 
-    def __init__(self, task, users, *args, **kwargs):
+    def __init__(self, task, user_choices, *args, **kwargs):
         kwargs['prefix'] = 'task%s' % task.task_type_id
         super(EditTaskForm, self).__init__(*args, **kwargs)
-        self.fields['assigned_users'].choices = users
-        self.fields['assigned_users'].initial = [user['id'] for user in task.assigned_users.values('id')]
+        self.fields['assigned_users'].choices = user_choices
+        self.fields['assigned_users'].initial = \
+            [user['id'] for user in task.assigned_users.values('id')]
         self.fields['estimate_hours'].initial = task.estimate_hours
         self.fields['start_date'].initial = task.start_date
         self.fields['end_date'].initial = task.end_date

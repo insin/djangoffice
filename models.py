@@ -42,6 +42,7 @@ access = AccessOptions()
 ACCESS_CHOICES = (
     (u'A', u'Admin'),
     (u'M', u'Manager'),
+    (u'P', u'PC'),
     (u'U', u'User'),
 )
 
@@ -405,8 +406,8 @@ class JobManager(models.Manager):
         Creates a ``QuerySet`` containing Jobs the given User may access
         based on their role.
 
-        Admins may always see all Jobs, as may Managers and Users when
-        the appropriate access setting is enabled.
+        Admins may always see all Jobs, as may other roles when the
+        appropriate access setting is enabled.
 
         Otherwise, Users may only see Jobs for which they are assigned
         to work on a Task.
@@ -421,12 +422,10 @@ class JobManager(models.Manager):
                .exclude(pk=settings.ADMIN_JOB_ID)
         if profile.is_admin() or \
            profile.is_manager() and access.managers_view_all_jobs or \
+           profile.is_pc() and access.users_view_all_jobs or \
            profile.is_user() and access.users_view_all_jobs:
             pass
-        elif profile.is_manager():
-            # TODO Do we ever want to restrict Jobs Mangers can see?
-            pass
-        elif profile.is_user():
+        else:
             opts = self.model._meta
             task_opts = Task._meta
             assigned_users_rel = find_field('assigned_users',
@@ -451,6 +450,13 @@ class JobManager(models.Manager):
                 }],
                 params=[user.id],
             )
+
+            if profile.is_manager():
+                qs = qs | super(JobManager, self).get_query_set() \
+                                                  .filter(director_id=user.pk)
+            elif profile.is_pc():
+                qs = qs | super(JobManager, self).get_query_set() \
+                                                  .filter(project_coordinator_id=user.pk)
         return qs
 
 JOB_STATUS_CHOICES = (
@@ -479,19 +485,23 @@ class Job(models.Model):
     Each Job has a number of Tasks which define the work to be carried
     out for it.
     """
-    client         = models.ForeignKey(Client, related_name='jobs')
-    name           = models.CharField(max_length=100)
-    number         = models.PositiveIntegerField(unique=True)
-    reference      = models.CharField(max_length=16, blank=True)
-    reference_date = models.DateField(null=True, blank=True)
-    status         = models.CharField(max_length=1, choices=JOB_STATUS_CHOICES)
-    notes          = models.TextField(blank=True)
-    contingency    = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    client             = models.ForeignKey(Client, related_name='jobs')
+    name               = models.CharField(max_length=100)
+    number             = models.PositiveIntegerField(unique=True)
+    reference          = models.CharField(max_length=16, blank=True)
+    reference_date     = models.DateField(null=True, blank=True)
+    add_reference      = models.CharField(max_length=16, blank=True)
+    add_reference_date = models.DateField(null=True, blank=True)
+    status             = models.CharField(max_length=1, choices=JOB_STATUS_CHOICES)
+    notes              = models.TextField(blank=True)
+    invoice_notes      = models.TextField(blank=True)
+    contingency        = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
 
     # Users
-    director        = models.ForeignKey(User, related_name='directed_jobs')
-    project_manager = models.ForeignKey(User, related_name='managed_jobs')
-    architect       = models.ForeignKey(User, related_name='architected_jobs')
+    director            = models.ForeignKey(User, related_name='directed_jobs')
+    project_coordinator = models.ForeignKey(User, null=True, blank=True, related_name='coordinated_jobs')
+    project_manager     = models.ForeignKey(User, related_name='managed_jobs')
+    architect           = models.ForeignKey(User, related_name='architected_jobs')
 
     # Contacts
     primary_contact = models.ForeignKey(Contact, related_name='primary_contact_jobs')
@@ -526,11 +536,12 @@ class Job(models.Model):
         fields = (
             (None, {
                 'fields': ('client', 'name', 'number', 'reference',
-                           'reference_date', 'type', 'status', 'notes',
-                           'contingency')
+                           'reference_date', 'add_reference',
+                           'add_reference_date', 'type', 'status', 'notes',
+                           'invoice_notes', 'contingency')
             }),
             (u'Users', {
-                'fields': ('director', 'project_manager', 'architect')
+                'fields': ('director', 'coordinator', 'project_manager', 'architect')
             }),
             (u'Contacts', {
                 'fields': ('primary_contact', 'billing_contact',

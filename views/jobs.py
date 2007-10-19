@@ -67,9 +67,9 @@ def add_job(request):
     This consists of defining a Job's details and, optionally, some
     Tasks.
     """
-    users = [(u.id, u.get_full_name()) \
-             for u in User.objects.exclude(userprofile__role='A') \
-                                   .order_by('first_name', 'last_name')]
+    users = list(User.objects.exclude(userprofile__role='A') \
+                              .order_by('first_name', 'last_name'))
+    user_choices = [(u.pk, u.get_full_name()) for u in users]
     task_types = TaskType.objects.non_admin()
 
     if request.method == 'POST':
@@ -84,7 +84,7 @@ def add_job(request):
         task_forms = []
         completed_task_forms = []
         for task_type in task_types:
-            task_form = AddTaskForm(task_type, users, data=request.POST)
+            task_form = AddTaskForm(task_type, user_choices, data=request.POST)
             task_forms.append(task_form)
             if task_form.is_valid():
                 if task_form.cleaned_data['add']:
@@ -105,7 +105,8 @@ def add_job(request):
             return HttpResponseRedirect(job.get_absolute_url())
     else:
         job_form = AddJobForm(users)
-        task_forms = [AddTaskForm(task_type, users) for task_type in task_types]
+        task_forms = [AddTaskForm(task_type, user_choices) \
+                      for task_type in task_types]
     return render_to_response('jobs/add_job.html', {
             'job_form': job_form,
             'task_forms': task_forms,
@@ -140,9 +141,9 @@ def edit_job(request, job_number):
     Tasks for the Job.
     """
     job = get_object_or_404(Job, number=job_number)
-    users = [(u.id, u.get_full_name()) \
-             for u in User.objects.exclude(userprofile__role='A') \
-                                   .order_by('first_name', 'last_name')]
+    users = list(User.objects.exclude(userprofile__role='A') \
+                              .order_by('first_name', 'last_name'))
+    user_choices = [(u.pk, u.get_full_name()) for u in users]
     tasks = Task.objects.with_task_type_name().filter(job=job)
     task_types = TaskType.objects.exclude_by_job(job.pk)
 
@@ -153,7 +154,7 @@ def edit_job(request, job_number):
         tasks_valid = True
         task_forms = []
         for task in tasks:
-            task_form = EditTaskForm(task, users, data=request.POST)
+            task_form = EditTaskForm(task, user_choices, data=request.POST)
             task_forms.append(task_form)
             if not task_form.is_valid() and tasks_valid:
                 tasks_valid = False
@@ -163,7 +164,7 @@ def edit_job(request, job_number):
         new_task_forms = []
         completed_new_task_forms = []
         for task_type in task_types:
-            task_form = AddTaskForm(task_type, users, data=request.POST)
+            task_form = AddTaskForm(task_type, user_choices, data=request.POST)
             new_task_forms.append(task_form)
             if task_form.is_valid():
                 if task_form.cleaned_data['add']:
@@ -185,8 +186,8 @@ def edit_job(request, job_number):
             return HttpResponseRedirect(job.get_absolute_url())
     else:
         job_form = EditJobForm(job, users)
-        task_forms = [EditTaskForm(task, users) for task in tasks]
-        new_task_forms = [AddTaskForm(task_type, users) \
+        task_forms = [EditTaskForm(task, user_choices) for task in tasks]
+        new_task_forms = [AddTaskForm(task_type, user_choices) \
                           for task_type in task_types]
     return render_to_response('jobs/edit_job.html', {
             'job': job,
