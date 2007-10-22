@@ -1,7 +1,25 @@
+"""
+Functions which may be used to enforce role-based authorisation, based on
+the ``role`` attribute in each user's ``UserProfile``.
+
+Access to other users
+=====================
+
+The rules for the logged-in user accessing other users' details are as
+follows, as implemented in the ``user_can_access_user`` and
+``get_accessible_users`` functions.
+
+* Admins have unrestricted access to all users.
+* Managers can access everyone but admins when the appropriate system
+  setting is enabled; otherwise, they can access their managed users.
+* Project coordinators can access their managed users.
+* Users can only access their own details.
+"""
 from urllib import quote
 
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 
 from officeaid import models
@@ -25,36 +43,52 @@ is_admin_manager_or_pc = user_has_role(['A', 'M', 'P'])
 
 def user_can_access_user(logged_in_user, user):
     """
-    Validates that the given logged in user has permission to access
-    another user's details throughout the application.
+    Determines if the given logged-in user has permission to access
+    another user's details.
     """
-    if logged_in_user.id == user.id:
-        # Everyone can access their own details
+    if logged_in_user.pk == user.pk:
         return True
 
     profile = logged_in_user.get_profile()
     if profile.is_user():
-        return False # Users may only access their own details
+        return False
     elif profile.is_admin():
-        return True  # Admins can access everyone
+        return True
     elif profile.is_manager():
         if models.access.managers_view_all_users:
-            return True # Managers can access everyone when the
-                        # appropriate setting is enabled.
+            return True
         else:
-            # Otherwise, managers can only access their managed users
             try:
-                profile.managed_users.get(id=user.id)
+                profile.managed_users.get(pk=user.pk)
                 return True
-            except:
+            except User.DoesNotExist:
                 return False
     elif profile.is_pc():
-        # PCs can only access their managed users
         try:
-            profile.managed_users.get(id=user.id)
+            profile.managed_users.get(pk=user.pk)
             return True
-        except:
+        except User.DoesNotExist:
             return False
+
+def get_accessible_users(logged_in_user):
+    """
+    Returns a ``QuerySet`` of users accessible by the logged-in user. This
+    will also include the logged-in user themselves.
+    """
+    profile = logged_in_user.get_profile()
+    if profile.is_user():
+        return User.objects.filter(pk=logged_in_user.pk)
+    elif profile.is_admin():
+        return User.objects.all()
+    elif profile.is_manager():
+        if models.access.managers_view_all_users:
+            return User.objects.exclude(userprofile__role='A')
+        else:
+            return User.objects.filter(pk=logged_in_user.pk) | \
+                profile.managed_users.all()
+    elif profile.is_pc():
+        return User.objects.filter(pk=logged_in_user.pk) | \
+            profile.managed_users.all()
 
 def user_has_permission(test_func):
     """
