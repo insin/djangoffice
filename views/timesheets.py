@@ -18,13 +18,26 @@ from officeaid.forms.timesheets import (BulkApprovalForm, AddTimeEntryForm,
     ApprovedExpenseForm)
 from officeaid.models import (Expense, ExpenseType, Job, Task, TimeEntry,
     Timesheet)
-from officeaid.utils.dates import (week_commencing_date,
-    week_commencing_date_or_404, week_ending_date)
+from officeaid.utils.dates import (is_week_commencing_date,
+    week_commencing_date, week_ending_date)
 from officeaid.views import permission_denied
 
 #####################
 # Utility functions #
 #####################
+
+def week_commencing_date_or_404(year, month, day):
+    """
+    Converts date URL parameters to a date, raising ``Http404`` if the
+    date is invalid or does not represent the first day of the week.
+    """
+    try:
+        date = datetime.date(*time.strptime(year+month+day, '%Y%m%d')[:3])
+        if not is_week_commencing_date(date):
+            raise Http404
+    except ValueError:
+        raise Http404
+    return date
 
 def get_jobs_and_tasks_for_user(user):
     """

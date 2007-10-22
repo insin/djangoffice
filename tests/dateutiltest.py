@@ -3,7 +3,9 @@ from datetime import date
 
 from django.http import Http404
 
-from officeaid.utils.dates import *
+from officeaid.utils.dates import (is_week_commencing_date,
+    is_week_ending_date, week_commencing_date, week_ending_date)
+from officeaid.views.timesheets import week_commencing_date_or_404
 
 class DateUtilTest(unittest.TestCase):
     def testIsWeekCommencingDate(self):
