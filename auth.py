@@ -23,7 +23,6 @@ from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 
 from officeaid import models
-from officeaid.views import permission_denied
 
 def user_has_role(roles):
     """
@@ -108,6 +107,7 @@ def user_has_permission(test_func):
             if request.user.is_authenticated():
                 if test_func(request.user):
                     return view_func(request, *args, **kwargs)
+                from officeaid.views import permission_denied
                 return permission_denied(request)
             return HttpResponseRedirect('%s?%s=%s' % (settings.LOGIN_URL, REDIRECT_FIELD_NAME, quote(request.get_full_path())))
         _checkuser.__doc__ = view_func.__doc__
