@@ -6,18 +6,18 @@
 
 <table cellspacing="0">
 <tbody>
-  <tr><th scope="col">Job:</th><td><a href="{{ job.get_absolute_url }}">{{ job|escape }}</td></tr>
-  <tr><th scope="col">Description:</th><td>{{ artifact.description|escape }}</td></tr>
+  <tr><th scope="row">Job:</th><td><a href="{{ job.get_absolute_url }}">{{ job|escape }}</td></tr>
+  <tr><th scope="row">Description:</th><td>{{ artifact.description|escape }}</td></tr>
   {% if artifact.type %}
-  <td><th scope="col">Type:</th>{{ artifact.type|default:"-"|escape }}</a></td>
+  <td><th scope="row">Type:</th>{{ artifact.type|default:"-"|escape }}</a></td>
   {% endif %}
-  <tr><th scope="col">File:</th><td>{{ artifact.file|escape }}</td></tr></tr>
-  <tr><th scope="col">File size:</th><td>{{ artifact.get_file_size }}</td></tr>
-  <tr><th scope="col">Created at:</th><td>{{ artifact.created_at }}</td></tr>
+  <tr><th scope="row">File:</th><td>{{ artifact.file|escape }}</td></tr></tr>
+  <tr><th scope="row">File size:</th><td>{{ artifact.get_file_size }}</td></tr>
+  <tr><th scope="row">Created at:</th><td>{{ artifact.created_at }}</td></tr>
   {% ifnotequal artifact.created_at artifact.updated_at %}
-  <tr><th scope="col">Updated at:</th><td>{{ artifact.updated_at }}</td></tr>
+  <tr><th scope="row">Updated at:</th><td>{{ artifact.updated_at }}</td></tr>
   {% endifnotequal %}
-  <tr><th scope="col">Access:</th><td>{{ artifact.get_access_display }}</td></tr>
+  <tr><th scope="row">Access:</th><td>{{ artifact.get_access_display }}</td></tr>
 </tbody>
 </table>
 <div class="buttons">

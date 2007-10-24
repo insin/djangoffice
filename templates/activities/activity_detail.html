@@ -6,23 +6,23 @@
 
 <table cellspacing="0">
 <tbody>
-<tr><th scope="col">Job:</th><td><a href="{{ activity.job.get_absolute_url }}">{{ activity.job|escape }}</td></tr>
+<tr><th scope="row">Job:</th><td><a href="{{ activity.job.get_absolute_url }}">{{ activity.job|escape }}</td></tr>
 {% if activity.type %}
-<tr><th scope="col">Type:</th><td>{{ activity.type|escape }}</td></tr>
+<tr><th scope="row">Type:</th><td>{{ activity.type|escape }}</td></tr>
 {% endif %}
-<tr><th scope="col">Created by:</th><td>{{ activity.created_by.get_full_name|escape }}</td></tr>
-<tr><th scope="col">Created at:</th><td>{{ activity.created_at }}</td></tr>
-<tr><th scope="col">Description:</th><td>{{ activity.description|escape|linebreaksbr }}</td></tr>
-<tr><th scope="col">Priority:</th><td>{{ activity.get_priority_display }}</td></tr>
+<tr><th scope="row">Created by:</th><td>{{ activity.created_by.get_full_name|escape }}</td></tr>
+<tr><th scope="row">Created at:</th><td>{{ activity.created_at }}</td></tr>
+<tr><th scope="row">Description:</th><td>{{ activity.description|escape|linebreaksbr }}</td></tr>
+<tr><th scope="row">Priority:</th><td>{{ activity.get_priority_display }}</td></tr>
 {% if activity.assigned_to %}
-<tr><th scope="col">Assigned to:</th><td>{{ activity.assigned_to.get_full_name|escape }}</td></tr>
+<tr><th scope="row">Assigned to:</th><td>{{ activity.assigned_to.get_full_name|escape }}</td></tr>
 {% else %}
-<tr><th scope="col">Contact:</th><td>{{ activity.contact.full_name|escape }}</td></tr>
+<tr><th scope="row">Contact:</th><td>{{ activity.contact.full_name|escape }}</td></tr>
 {% endif %}
-<tr><th scope="col">Due date:</th><td>{{ activity.due_date }}</td></tr>
-<tr><th scope="col">Completed:</th><td>{{ activity.completed|yesno:"Yes,No" }}</td></tr>
+<tr><th scope="row">Due date:</th><td>{{ activity.due_date }}</td></tr>
+<tr><th scope="row">Completed:</th><td>{{ activity.completed|yesno:"Yes,No" }}</td></tr>
 {% if activity.completed %}
-<tr><th scope="col">Completed at:</th><td>{{ activity.completed_at }}</td></tr>
+<tr><th scope="row">Completed at:</th><td>{{ activity.completed_at }}</td></tr>
 {% endif %}
 </tbody>
 </table>

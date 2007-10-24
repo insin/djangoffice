@@ -6,9 +6,9 @@
 
 <table cellspacing="0">
 <tbody>
-<tr><th scope="col">Name:</th><td>{{ activity_type.name|escape }}</td></tr>
-<tr><th scope="col">Access:</th><td>{{ activity_type.get_access_display }}</td></tr>
-<tr><th scope="col">Description:</th><td>{{ activity_type.description|escape|linebreaksbr }}</td></tr>
+<tr><th scope="row">Name:</th><td>{{ activity_type.name|escape }}</td></tr>
+<tr><th scope="row">Access:</th><td>{{ activity_type.get_access_display }}</td></tr>
+<tr><th scope="row">Description:</th><td>{{ activity_type.description|escape|linebreaksbr }}</td></tr>
 <tbody>
 </table>
 <div class="buttons">

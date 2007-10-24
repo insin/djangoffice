@@ -6,11 +6,11 @@
 
 <table cellspacing="0">
 <tbody>
-<tr><th scope="col">Name:</th><td>{{ user_.get_full_name|escape }}</td></tr>
-<tr><th scope="col">Role:</th><td>{{ profile.get_role_display }}</td></tr>
+<tr><th scope="row">Name:</th><td>{{ user_.get_full_name|escape }}</td></tr>
+<tr><th scope="row">Role:</th><td>{{ profile.get_role_display }}</td></tr>
 {% if profile.is_manager and profile.managed_users.count %}
 <tr>
-  <th scope="col">Managed users:</th>
+  <th scope="row">Managed users:</th>
   <td>
     <ul>
       {% for managed_user in profile.managed_users.all %}<li>
@@ -20,10 +20,10 @@
   </td>
 </tr>
 {% endif %}
-<tr><th scope="col">Phone number:</th><td>{{ profile.phone_number|escape }}</td></tr>
-<tr><th scope="col">Mobile number:</th><td>{{ profile.mobile_number|escape|default:"&nbsp;" }}</td></tr>
-<tr><th scope="col">Email:</th><td><a href="mailto:{{ user.email|escape }}">{{ user.email|escape }}</a></td></tr>
-<tr><th scope="col">Disabled:</th><td>{{ user_.is_active|yesno:"No,Yes" }}</td></tr>
+<tr><th scope="row">Phone number:</th><td>{{ profile.phone_number|escape }}</td></tr>
+<tr><th scope="row">Mobile number:</th><td>{{ profile.mobile_number|escape|default:"&nbsp;" }}</td></tr>
+<tr><th scope="row">Email:</th><td><a href="mailto:{{ user.email|escape }}">{{ user.email|escape }}</a></td></tr>
+<tr><th scope="row">Disabled:</th><td>{{ user_.is_active|yesno:"No,Yes" }}</td></tr>
 </tbody>
 </table>
 <div class="buttons">
@@ -37,9 +37,9 @@
 <table cellspacing="0" class="data">
 <thead>
   <tr>
-    <th>Effective From</th>
-    <th>Standard Rate</th>
-    <th>Overtime Rate</th>
+    <th scope="col">Effective From</th>
+    <th scope="col">Standard Rate</th>
+    <th scope="col">Overtime Rate</th>
   </tr>
 </thead>
 <tbody>
@@ -63,13 +63,13 @@
 <table cellspacing="0" class="data">
 <thead>
   <tr>
-    <th>Number</th>
-    <th>Job</th>
-    <th>Type</th>
-    <th>Created by</th>
-    <th>Created at</th>
-    <th>Priority</th>
-    <th>Description</th>
+    <th scope="col">Number</th>
+    <th scope="col">Job</th>
+    <th scope="col">Type</th>
+    <th scope="col">Created by</th>
+    <th scope="col">Created at</th>
+    <th scope="col">Priority</th>
+    <th scope="col">Description</th>
   </tr>
 </thead>
 <tbody>

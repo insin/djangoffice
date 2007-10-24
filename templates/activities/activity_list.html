@@ -32,11 +32,11 @@ Event.onDOMReady(function()
 <form name="activityFilterForm" id="activityFilterForm" action="." method="GET">
 <table cellspacing="0">
 <tbody>
-<tr><th>{{ filter_form.job_number.label_tag }}</th><td>{% if filter_form.job_number.errors %}{{ filter_form.job_number.errors.as_ul }}{% endif %}{{ filter_form.job_number }}</td></tr>
-<tr><th>{{ filter_form.type.label_tag }}</th><td>{% if filter_form.type.errors %}{{ filter_form.type.errors.as_ul }}{% endif %}{{ filter_form.type }}</td></tr>
-<tr><th>{{ filter_form.creator.label_tag }}</th><td>{% if filter_form.creator.errors %}{{ filter_form.creator.errors.as_ul }}{% endif %}{{ filter_form.creator }}</td></tr>
-<tr><th>{{ filter_form.assigned_to.label_tag }}</th><td>{% if filter_form.assigned_to.errors %}{{ filter_form.assigned_to.errors.as_ul }}{% endif %}{{ filter_form.assigned_to }}</td></tr>
-<tr><th>{{ filter_form.contact.label_tag }}</th><td>{% if filter_form.contact.errors %}{{ filter_form.contact.errors.as_ul }}{% endif %}{{ filter_form.contact }} <input type="button" id="selectContactButton" value="Select Contact"> <input type="button" id="clearContactButton" value="Clear Contact"></td></tr>
+<tr><th scope="row">{{ filter_form.job_number.label_tag }}</th><td>{% if filter_form.job_number.errors %}{{ filter_form.job_number.errors.as_ul }}{% endif %}{{ filter_form.job_number }}</td></tr>
+<tr><th scope="row">{{ filter_form.type.label_tag }}</th><td>{% if filter_form.type.errors %}{{ filter_form.type.errors.as_ul }}{% endif %}{{ filter_form.type }}</td></tr>
+<tr><th scope="row">{{ filter_form.creator.label_tag }}</th><td>{% if filter_form.creator.errors %}{{ filter_form.creator.errors.as_ul }}{% endif %}{{ filter_form.creator }}</td></tr>
+<tr><th scope="row">{{ filter_form.assigned_to.label_tag }}</th><td>{% if filter_form.assigned_to.errors %}{{ filter_form.assigned_to.errors.as_ul }}{% endif %}{{ filter_form.assigned_to }}</td></tr>
+<tr><th scope="row">{{ filter_form.contact.label_tag }}</th><td>{% if filter_form.contact.errors %}{{ filter_form.contact.errors.as_ul }}{% endif %}{{ filter_form.contact }} <input type="button" id="selectContactButton" value="Select Contact"> <input type="button" id="clearContactButton" value="Clear Contact"></td></tr>
 </tbody>
 </table>
 <div class="buttons">

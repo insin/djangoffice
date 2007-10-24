@@ -1,11 +1,11 @@
 <form name="jobFilterForm" id="jobFilterForm" action="." method="GET">
 <table cellspacing="0">
 <tbody>
-<tr><th>Search:</th><td>{{ filter_form.search }} is {{ filter_form.search_type }}</td></tr>
-<tr><th>User:</th><td>{{ filter_form.user }} is {{ filter_form.user_search_type }}</td></tr>
-<tr><th>Status:</th><td>{{ filter_form.status }}</td></tr>
-<tr><th>Client:</th><td>{{ filter_form.client }}</td></tr>
-<tr><th>Date:</th><td>{{ filter_form.date_search_type }} is between {{ filter_form.start_date }} and {{ filter_form.end_date}}</td></tr>
+<tr><th scope="row">Search:</th><td>{{ filter_form.search }} is {{ filter_form.search_type }}</td></tr>
+<tr><th scope="row">User:</th><td>{{ filter_form.user }} is {{ filter_form.user_search_type }}</td></tr>
+<tr><th scope="row">Status:</th><td>{{ filter_form.status }}</td></tr>
+<tr><th scope="row">Client:</th><td>{{ filter_form.client }}</td></tr>
+<tr><th scope="row">Date:</th><td>{{ filter_form.date_search_type }} is between {{ filter_form.start_date }} and {{ filter_form.end_date}}</td></tr>
 </tbody>
 </table>
 <div class="buttons">
