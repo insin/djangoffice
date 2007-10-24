@@ -125,13 +125,13 @@ def invoice_detail(request, invoice_number):
 @user_has_permission(is_admin_or_manager)
 def edit_invoice(request, invoice_number):
     """
-    Edits an Invoice - this may only be done to indicate that an amount
-    was received.
+    Edits an Invoice.
     """
     invoice = get_object_or_404(Invoice.objects.with_job_details(),
                                 number=invoice_number)
     return edit_object(request, Invoice, invoice.id,
-        fields=('amount_received',), template_object_name='invoice',
+        fields=('adjustment', 'amount_received', 'comment'),
+        template_object_name='invoice',
         template_name='invoices/edit_invoice.html', extra_context={
             'invoice': invoice,
         })
