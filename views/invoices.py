@@ -1,5 +1,3 @@
-import os
-
 from django import newforms as forms
 from django.conf import settings
 from django.db import transaction
@@ -12,7 +10,7 @@ from officeaid.auth import is_admin_or_manager, user_has_permission
 from officeaid.forms.invoices import (InvoiceFilterForm, InvoiceCriteriaForm,
     SelectJobsForInvoiceForm)
 from officeaid.models import Invoice, Job
-from officeaid.views import SortHeaders
+from officeaid.views import send_file, SortHeaders
 from officeaid.views.generic import edit_object
 from officeaid.views.jobs import filter_jobs
 
@@ -140,26 +138,8 @@ def edit_invoice(request, invoice_number):
 def download_invoice(request, invoice_number):
     """
     Sends the PDF associated with the given Invoice for download.
-
-    Implementation based on http://www.satchmoproject.com/trac/browser/satchmo/trunk/satchmo/shop/views/download.py
-
-    For this to work, your server must support the X-Sendfile header -
-    Apache and lighttpd should both work with the headers used.
-
-    For Apache, you will need `mod_xsendfile`_.
-
-    For lighttpd, allow-x-send-file must be enabled.
-
-    .. _`mod_xsendfile`: http://tn123.ath.cx/mod_xsendfile/
     """
-    invoice = get_object_or_404(Invoice, number=invoice_number)
-    response = HttpResponse()
-    response['X-Sendfile'] = response['X-LIGHTTPD-send-file'] = \
-        invoice.get_pdf_filename()
-    response['Content-Disposition'] = 'attachment; filename=%s' % \
-        os.path.split(invoice.get_pdf_filename())[1]
-    response['Content-length'] =  os.stat(invoice.get_pdf_filename()).st_size
-    return response
+    return send_file(invoice.get_pdf_filename())
 
 @user_has_permission(is_admin_or_manager)
 def delete_invoice(request, invoice_number):

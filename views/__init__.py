@@ -1,3 +1,7 @@
+import mimetypes
+import os
+
+from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 
@@ -126,6 +130,31 @@ def permission_denied(request, message=u''):
     return render_to_response('permission_denied.html', {
             message: message,
         }, RequestContext(request))
+
+def send_file(filename):
+    """
+    Creates a response which sends a file for download, guessing its MIME
+    type.
+
+    Implementation based on http://www.satchmoproject.com/trac/browser/satchmo/trunk/satchmo/shop/views/download.py
+
+    For this to work, your server must support the X-Sendfile header -
+    Apache and lighttpd should both work with the headers used.
+
+    For Apache, you will need `mod_xsendfile`_.
+
+    For lighttpd, allow-x-send-file must be enabled.
+
+    .. _`mod_xsendfile`: http://tn123.ath.cx/mod_xsendfile/
+    """
+    response = HttpResponse()
+    response['X-Sendfile'] = response['X-LIGHTTPD-send-file'] = filename
+    mimetype = mimetypes.guess(filename)[0]
+    response['Content-Type'] = mimetype or 'application/octet-stream'
+    response['Content-Disposition'] = \
+        'attachment; filename=%s' % os.path.split(filename)[1]
+    response['Content-Length'] = os.stat(filename).st_size
+    return response
 
 # Make the menu tag global
 from django.template import add_to_builtins

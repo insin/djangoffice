@@ -10,7 +10,7 @@ from django.template import RequestContext
 from django.views.generic import list_detail
 
 from officeaid.models import Artifact, Job
-from officeaid.views import permission_denied, SortHeaders
+from officeaid.views import permission_denied, send_file, SortHeaders
 from officeaid.views.generic import add_object, edit_object
 
 LIST_HEADERS = (
@@ -94,9 +94,11 @@ def artifact_detail(request, job_number, artifact_id):
 @login_required
 def download_artifact(request, job_number, artifact_id):
     """
-    Downloads an Artifact.
+    Sends an Artifact for download.
     """
-    raise NotImplementedError
+    artifact = get_object_or_404(Artifact.objects.accessible_to_user(request.user),
+                                 pk=artifact_id)
+    return send_file(artifact.get_file_filename())
 
 @login_required
 def edit_artifact(request, job_number, artifact_id):
