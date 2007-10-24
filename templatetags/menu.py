@@ -11,7 +11,8 @@ def menu(context, section=None, page=None):
 
     Sample usage::
 
-        {% menu "
+        {% menu "some_section" %}
+        {% menu "some_section" "some_page" %}
     """
     section_items, page_items = build_menu_items(context['user'], section, page)
     return {
