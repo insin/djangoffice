@@ -23,11 +23,13 @@ LIST_HEADERS = (
     (u'Invoiced To',     'end_period'),
     (u'Fee Currency',    'job_fee_currency'),
     (u'Amount Invoiced', 'amount_invoiced'),
+    (u'Adjustment',      'adjustment'),
     (u'Amount Received', 'amount_received'),
     (u'Job #',           'job_number'),
     (u'Job Name',        'job_name'),
     (u'Client',          'client_name'),
     (u'Primary Contact', None),
+    (u'Comment',         None),
 )
 
 @user_has_permission(is_admin_or_manager)

@@ -19,11 +19,13 @@
     <td>{{ invoice.end_period|default:"-" }}</td>
     <td>{{ invoice.job_fee_currency|escape }}</td>
     <td>{{ invoice.amount_invoiced|money }}</td>
+    <td>{% if invoice.adjustment %}{{ invoice.adjustment|money }}{% else %}-{% endif %}</td>
     <td>{% if invoice.amount_received %}{{ invoice.amount_received|money }}{% else %}-{% endif %}</td>
     <td>{{ invoice.job_number|pad_number }}</td>
     <td>{{ invoice.job_name|escape }}</td>
     <td>{{ invoice.client_name|escape }}</td>
-    <td>{{ invoice.primary_contact_first_name }} {{ invoice.primary_contact_last_name }}</td>
+    <td>{{ invoice.primary_contact_first_name|escape }} {{ invoice.primary_contact_last_name|escape }}</td>
+    <td>{{ invoice.comment|default:"-"|escape }}</td>
   </tr>{% endfor %}
 </tbody>
 </table>
