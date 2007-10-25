@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Delete Invoice {{ invoice.formatted_number }} | {% endblock %}
+{% block menu %}{% menu "manage" "invoices" %}{% endblock %}
+{% block content %}
+<h1>Delete Invoice</h1>
+<form name="invoiceForm" id="invoiceForm" action="." method="POST">
+<p>Are you sure you want to delete Invoice {{ invoice.formatted_number}}?</p>
+<div class="buttons">
+  <button type="submit" class="negative"><img src="{{ MEDIA_URL }}img/delete.png" alt=""> Delete Invoice</button>
+  <a href="{{ invoice.get_absolute_url }}" class="negative"><img src="{{ MEDIA_URL }}img/cancel.png" alt=""> Cancel</a>
+</div>
+</form>
+{% endblock %}

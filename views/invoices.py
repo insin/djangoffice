@@ -4,7 +4,7 @@ from django.db import transaction
 from django.http import Http404, HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.views.generic import list_detail
+from django.views.generic import create_update, list_detail
 
 from officeaid.auth import is_admin_or_manager, user_has_permission
 from officeaid.forms.invoices import (InvoiceFilterForm, InvoiceCriteriaForm,
@@ -139,6 +139,7 @@ def download_invoice(request, invoice_number):
     """
     Sends the PDF associated with the given Invoice for download.
     """
+    invoice = get_object_or_404(Invoice, number=invoice_number)
     return send_file(invoice.get_pdf_filename())
 
 @user_has_permission(is_admin_or_manager)
@@ -146,4 +147,8 @@ def delete_invoice(request, invoice_number):
     """
     Deletes the given Invoice.
     """
-    raise NotImplementedError
+    invoice = get_object_or_404(Invoice, number=invoice_number)
+    return create_update.delete_object(request, Invoice,
+        post_delete_redirect=reverse('invoice_list'),
+        object_id=invoice.pk, template_object_name='invoice',
+        template_name='invoices/delete_invoice.html')
