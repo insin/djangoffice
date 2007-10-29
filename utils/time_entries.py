@@ -1,18 +1,17 @@
+"""
+Utilities for working with TimeEntry objects.
+"""
 from datetime import timedelta
 
 class DayTimeEntry:
     """
     Time booked for a task by a user on a particular day.
     """
-    def __init__(self, user, task, date, hours, is_overtime=False):
-        self.user = user
-        self.task = task
+    def __init__(self, user_id, task_id, date, hours, is_overtime=False):
+        self.user_id, self.task_id = user_id, task_id
         self.date = date
         self.hours = hours
         self.is_overtime = is_overtime
-
-    def __str__(self):
-        return '%s hours on %s' % (self.hours, self.date)
 
 DAY_ATTRS = ('mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun', 'overtime')
 def weekly_to_daily_entries(time_entries):
@@ -26,15 +25,14 @@ def weekly_to_daily_entries(time_entries):
     """
     daily_entries = []
     for time_entry in time_entries:
-        timesheet = time_entry.timesheet
         day_count = 0
         for i, day_attr in enumerate(DAY_ATTRS):
             if getattr(time_entry, day_attr) > 0:
-                day_entry = DayTimeEntry(timesheet.user, time_entry.task,
-                    timesheet.week_commencing + timedelta(days=i),
+                day_entry = DayTimeEntry(time_entry.user_id, time_entry.task_id,
+                    time_entry.week_commencing + timedelta(days=i),
                     getattr(time_entry, day_attr))
                 if day_attr == 'overtime':
-                    day_entry.date = timesheet.week_commencing
+                    day_entry.date = time_entry.week_commencing
                     day_entry.is_overtime = True
                 daily_entries.append(day_entry)
     return daily_entries
