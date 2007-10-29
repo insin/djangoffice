@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django import newforms as forms
 from officeaid.forms.widgets import DateInput, HourInput, MoneyInput
 from officeaid.models import Expense, ExpenseType, Task, TimeEntry
@@ -29,14 +31,14 @@ class AddTimeEntryForm(forms.Form):
     """
     job         = forms.ChoiceField()
     task        = forms.ChoiceField()
-    mon         = forms.DecimalField(max_digits=4, decimal_places=2, required=False, widget=HourInput())
-    tue         = forms.DecimalField(max_digits=4, decimal_places=2, required=False, widget=HourInput())
-    wed         = forms.DecimalField(max_digits=4, decimal_places=2, required=False, widget=HourInput())
-    thu         = forms.DecimalField(max_digits=4, decimal_places=2, required=False, widget=HourInput())
-    fri         = forms.DecimalField(max_digits=4, decimal_places=2, required=False, widget=HourInput())
-    sat         = forms.DecimalField(max_digits=4, decimal_places=2, required=False, widget=HourInput())
-    sun         = forms.DecimalField(max_digits=4, decimal_places=2, required=False, widget=HourInput())
-    overtime    = forms.DecimalField(max_digits=4, decimal_places=2, required=False, widget=HourInput())
+    mon         = forms.DecimalField(max_digits=4, decimal_places=2, required=False, min_value=Decimal(0), widget=HourInput())
+    tue         = forms.DecimalField(max_digits=4, decimal_places=2, required=False, min_value=Decimal(0), widget=HourInput())
+    wed         = forms.DecimalField(max_digits=4, decimal_places=2, required=False, min_value=Decimal(0), widget=HourInput())
+    thu         = forms.DecimalField(max_digits=4, decimal_places=2, required=False, min_value=Decimal(0), widget=HourInput())
+    fri         = forms.DecimalField(max_digits=4, decimal_places=2, required=False, min_value=Decimal(0), widget=HourInput())
+    sat         = forms.DecimalField(max_digits=4, decimal_places=2, required=False, min_value=Decimal(0), widget=HourInput())
+    sun         = forms.DecimalField(max_digits=4, decimal_places=2, required=False, min_value=Decimal(0), widget=HourInput())
+    overtime    = forms.DecimalField(max_digits=4, decimal_places=2, required=False, min_value=Decimal(0), widget=HourInput())
     description = forms.CharField(max_length=100, required=False)
 
     def __init__(self, jobs, tasks=None, *args, **kwargs):
@@ -139,7 +141,7 @@ class AddExpenseForm(forms.Form):
     job         = forms.ChoiceField()
     type        = forms.ChoiceField()
     date        = forms.DateField(widget=DateInput())
-    amount      = forms.DecimalField(max_digits=8, decimal_places=2, widget=MoneyInput())
+    amount      = forms.DecimalField(max_digits=8, decimal_places=2, min_value=Decimal(0), widget=MoneyInput())
     description = forms.CharField(max_length=100, required=False)
     billable    = forms.BooleanField(initial=True, required=False)
 
