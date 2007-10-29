@@ -119,6 +119,6 @@ COMPANY_URL = 'http://www.generitech.co.uk'
 # local_settings module rather than editing this file, which should
 # contain development settings.
 try:
-    from local_settings import *
+    from officeaid.local_settings import *
 except ImportError:
     pass
