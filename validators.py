@@ -1,4 +1,8 @@
+import datetime
+
 from django.core.validators import ValidationError
+
+from officeaid.utils.dates import is_week_commencing_date
 
 class OnlyAllowedIfOtherFieldEquals(object):
     """
@@ -30,6 +34,21 @@ class OnlyAllowedIfOtherFieldEquals(object):
         if all_data.has_key(self.other_field) and not \
            all_data[self.other_field] == self.other_value and field_data:
             raise ValidationError(self.error_message)
+
+def isWeekCommencingDate(field_data, all_data):
+    """
+    Validates that a date falls on the first day of the week.
+
+    >>> isWeekCommencingDate('2007-10-29', {})
+    >>> isWeekCommencingDate('2007-10-30', {})
+    Traceback (most recent call last):
+        ...
+    ValidationError: [u'Enter a date which falls on the first day of the week.']
+    """
+    year, month, day = map(int, field_data.split('-'))
+    if not is_week_commencing_date(datetime.date(year, month, day)):
+        raise ValidationError(
+            u'Enter a date which falls on the first day of the week.')
 
 def isSafeishQuery(field_data, all_data):
     """

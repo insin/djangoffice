@@ -59,6 +59,8 @@ class AddTimeEntryForm(forms.Form):
         instance.task_id = self.cleaned_data['task']
         if timesheet:
             instance.timesheet = timesheet
+            instance.week_commencing = timesheet.week_commencing
+            instance.user = timesheet.user
         if commit:
             instance.save()
         return instance
@@ -170,6 +172,7 @@ class AddExpenseForm(forms.Form):
         instance.type_id = self.cleaned_data['type']
         if timesheet:
             instance.timesheet = timesheet
+            instance.user = timesheet.user
         if commit:
             instance.save()
         return instance

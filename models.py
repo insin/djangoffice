@@ -12,7 +12,8 @@ from django.db.models.query import find_field
 from django.utils.text import truncate_words
 from django.utils.encoding import smart_unicode
 
-from officeaid.validators import isSafeishQuery, OnlyAllowedIfOtherFieldEquals
+from officeaid.validators import (isSafeishQuery, isWeekCommencingDate,
+    OnlyAllowedIfOtherFieldEquals)
 
 qn = connection.ops.quote_name
 
@@ -1033,7 +1034,7 @@ class Timesheet(models.Model):
     A record of a User's time entries and expenses for a given week.
     """
     user            = models.ForeignKey(User, related_name='timesheets')
-    week_commencing = models.DateField()
+    week_commencing = models.DateField(validator_list=[isWeekCommencingDate])
 
     options = TimesheetOptions()
     objects = TimesheetManager()
@@ -1225,18 +1226,20 @@ class TimeEntry(models.Model):
     """
     TIME_ATTRS = ('mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun', 'overtime')
 
-    timesheet   = models.ForeignKey(Timesheet, related_name='time_entries', edit_inline=models.TABULAR)
-    task        = models.ForeignKey(Task, related_name='time_entries', core=True)
-    mon         = models.DecimalField(max_digits=4, decimal_places=2, blank=True)
-    tue         = models.DecimalField(max_digits=4, decimal_places=2, blank=True)
-    wed         = models.DecimalField(max_digits=4, decimal_places=2, blank=True)
-    thu         = models.DecimalField(max_digits=4, decimal_places=2, blank=True)
-    fri         = models.DecimalField(max_digits=4, decimal_places=2, blank=True)
-    sat         = models.DecimalField(max_digits=4, decimal_places=2, blank=True)
-    sun         = models.DecimalField(max_digits=4, decimal_places=2, blank=True)
-    overtime    = models.DecimalField(max_digits=4, decimal_places=2, blank=True)
-    description = models.CharField(max_length=100, blank=True)
-    billable    = models.BooleanField(default=True)
+    timesheet       = models.ForeignKey(Timesheet, related_name='time_entries', edit_inline=models.TABULAR)
+    user            = models.ForeignKey(User, related_name='time_entries')
+    task            = models.ForeignKey(Task, related_name='time_entries', core=True)
+    week_commencing = models.DateField(validator_list=[isWeekCommencingDate])
+    mon             = models.DecimalField(max_digits=4, decimal_places=2, blank=True)
+    tue             = models.DecimalField(max_digits=4, decimal_places=2, blank=True)
+    wed             = models.DecimalField(max_digits=4, decimal_places=2, blank=True)
+    thu             = models.DecimalField(max_digits=4, decimal_places=2, blank=True)
+    fri             = models.DecimalField(max_digits=4, decimal_places=2, blank=True)
+    sat             = models.DecimalField(max_digits=4, decimal_places=2, blank=True)
+    sun             = models.DecimalField(max_digits=4, decimal_places=2, blank=True)
+    overtime        = models.DecimalField(max_digits=4, decimal_places=2, blank=True)
+    description     = models.CharField(max_length=100, blank=True)
+    billable        = models.BooleanField(default=True)
 
     # Administration
     approved_by = models.ForeignKey(User, null=True, blank=True, related_name='approved_time_entries')
@@ -1253,13 +1256,13 @@ class TimeEntry(models.Model):
         verbose_name_plural = u'Time entries'
 
     class Admin:
-        list_display = ('timesheet', 'task', 'total_time_booked', 'overtime',
-                        'description', 'billable')
+        list_display = ('user', 'task', 'week_commencing', 'total_time_booked',
+                        'overtime', 'description', 'billable')
         fields = (
             (None, {
-                'fields': ('timesheet', 'task', ('mon', 'tue', 'wed', 'thu',
-                           'fri', 'sat', 'sun'), 'overtime', 'description',
-                           'billable')
+                'fields': ('timesheet', 'user', 'task', 'week_commencing',
+                           'task', ('mon', 'tue', 'wed', 'thu', 'fri', 'sat',
+                           'sun'), 'overtime', 'description', 'billable')
             }),
             (u'Administration', {
                 'fields': ('approved_by', 'invoice'),
@@ -1388,6 +1391,7 @@ class Expense(models.Model):
     An expense incurred while working on a Job.
     """
     timesheet   = models.ForeignKey(Timesheet, related_name='expenses', edit_inline=models.TABULAR)
+    user        = models.ForeignKey(User, related_name='expenses')
     job         = models.ForeignKey(Job, related_name='expenses', core=True)
     type        = models.ForeignKey(ExpenseType, related_name='expenses', core=True)
     date        = models.DateField()
@@ -1408,7 +1412,7 @@ class Expense(models.Model):
         ordering = ['-date']
 
     class Admin:
-        list_display = ('timesheet', 'job', 'type', 'date', 'amount',
+        list_display = ('timesheet', 'user', 'job', 'type', 'date', 'amount',
                         'description', 'billable', 'approved_by', 'invoice')
 
     def is_editable(self):
