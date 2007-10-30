@@ -16,7 +16,7 @@ class RateLookup:
         self.related_object_attr = related_object_attr
         self.reset(rebuild_lookup=True)
 
-    def get_applicable_rate(self, rated_instance, date):
+    def get_applicable_rate(self, rated_instance_pk, date):
         """
         Gets the Rate object defining rates applicable for the given
         instance of a rated item on the given date, or ``None`` if no
@@ -26,7 +26,7 @@ class RateLookup:
         object's ``editable_applicable_rates_used`` list.
         """
         applicable_rate = None
-        rates = self.lookup[rated_instance.id]
+        rates = self.lookup[rated_instance_pk]
         for rate in rates:
             if applicable_rate is None or \
                (rate.effective_from > applicable_rate.effective_from and

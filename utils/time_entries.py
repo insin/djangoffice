@@ -7,11 +7,11 @@ class DayTimeEntry:
     """
     Time booked for a task by a user on a particular day.
     """
-    def __init__(self, user_id, task_id, date, hours, is_overtime=False):
+    def __init__(self, user_id, task_id, date, hours, overtime=False):
         self.user_id, self.task_id = user_id, task_id
         self.date = date
         self.hours = hours
-        self.is_overtime = is_overtime
+        self.overtime = overtime
 
 DAY_ATTRS = ('mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun', 'overtime')
 def weekly_to_daily_entries(time_entries):
@@ -33,6 +33,6 @@ def weekly_to_daily_entries(time_entries):
                     getattr(time_entry, day_attr))
                 if day_attr == 'overtime':
                     day_entry.date = time_entry.week_commencing
-                    day_entry.is_overtime = True
+                    day_entry.overtime = True
                 daily_entries.append(day_entry)
     return daily_entries
