@@ -1,3 +1,11 @@
+<script type="text/javascript">
+var mediaURL = "{{ MEDIA_URL }}";
+Event.onDOMReady(function()
+{
+    Calendar.bindEventListener("id_start_date", "job_start_date_cal");
+    Calendar.bindEventListener("id_end_date", "job_end_date_cal");
+});
+</script>
 <form name="jobFilterForm" id="jobFilterForm" action="." method="GET">
 <table cellspacing="0">
 <tbody>
@@ -5,7 +13,7 @@
 <tr><th scope="row">User:</th><td>{{ filter_form.user }} is {{ filter_form.user_search_type }}</td></tr>
 <tr><th scope="row">Status:</th><td>{{ filter_form.status }}</td></tr>
 <tr><th scope="row">Client:</th><td>{{ filter_form.client }}</td></tr>
-<tr><th scope="row">Date:</th><td>{{ filter_form.date_search_type }} is between {{ filter_form.start_date }} and {{ filter_form.end_date}}</td></tr>
+<tr><th scope="row">Date:</th><td>{{ filter_form.date_search_type }} is between {{ filter_form.start_date }} <img src="{{ MEDIA_URL }}img/cal.gif" alt="" id="job_start_date_cal"> and {{ filter_form.end_date}} <img src="{{ MEDIA_URL }}img/cal.gif" alt="" id="job_end_date_cal"></td></tr>
 </tbody>
 </table>
 <div class="buttons">

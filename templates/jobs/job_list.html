@@ -1,5 +1,9 @@
 {% extends "base.html" %}{% load officeaid_tags %}
 {% block title %}Jobs | {% endblock %}
+{% block extrahead %}
+<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/calendar.css" media="screen,projection">
+<script type="text/javascript" src="{{ MEDIA_URL }}js/Calendar.js"></script>
+{% endblock %}
 {% block menu %}{% menu "manage" "jobs" %}{% endblock %}
 {% block content %}
 <h1>Jobs</h1>

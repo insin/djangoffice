@@ -1,0 +1,20 @@
+/* Pop Up Calendar */
+#cal { border: 1px solid #000; background-color: #fff; padding: .2em; }
+#cal th { border-bottom: 1px solid #000; text-align: center; vertical-align: middle; }
+#cal td.blank { padding: .25em; vertical-align: middle; text-align: center; color: #fff; background-color: #fff; }
+#cal td.day { padding: .25em; background-color: #fff; text-align: right; vertical-align: middle; cursor: default; }
+#cal td.selected { background-color: #509DB7; color: #fff; }
+
+#cal div.month { text-align: center; padding: .25em 0; background-color: #509DB7; color: #fff; font-weight: bold; }
+#cal div.year { text-align: right; }
+#cal div.year span.current { font-weight: bold; }
+#cal div.month span.current { cursor: pointer; }
+#cal div.year span.next, #cal div.year span.previous { cursor: pointer; color: #777; }
+#cal div.month span.next, #cal div.month span.previous { cursor: pointer; }
+#cal div.month img { vertical-align: middle; }
+
+#month { cursor: default; margin-top: .2em; border: 1px solid #000; }
+#month ul { padding: 0; margin: 0; }
+#month li { list-style-type: none; padding: 0; margin: 0; background-color: #fff; padding: .2em .75em; color: #000; text-align: center; }
+#month li.current { font-weight: bold; }
+#month li.hover { background-color: #000; color: #fff;}
