@@ -463,7 +463,7 @@ class JobManager(models.Manager):
                                                   .filter(director_id=user.pk)
             elif profile.is_pm():
                 qs = qs | super(JobManager, self).get_query_set() \
-                                                  .filter(project_coordinator_id=user.pk)
+                                                  .filter(project_manager_id=user.pk)
         return qs
 
 class Job(models.Model):

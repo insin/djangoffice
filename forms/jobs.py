@@ -20,7 +20,7 @@ SEARCH_TYPE_CHOICES = (
 USER_SEARCH_TYPE_CHOICES = (
     (1, u'Director'),
     (2, u'Project Coordinator'),
-    (3, u'Associate/Project Manager'),
+    (3, u'Project Manager'),
     (4, u'Architect'),
     (5, u'Assigned to Job Task'),
 )
@@ -148,7 +148,7 @@ class AddJobForm(forms.Form):
     notes               = forms.CharField(required=False, widget=forms.Textarea())
     invoice_notes       = forms.CharField(required=False, widget=forms.Textarea())
     director            = forms.ModelChoiceField(queryset=User.objects.filter(userprofile__role=UserProfile.MANAGER_ROLE))
-    project_coordinator = forms.ModelChoiceField(queryset=User.objects.filter(userprofile__role__in=[UserProfile.MANAGER_ROLE, UserProfile.PM_ROLE]))
+    project_coordinator = forms.ModelChoiceField(queryset=User.objects.filter(userprofile__role=UserProfile.MANAGER_ROLE))
     project_manager     = forms.ModelChoiceField(queryset=User.objects.exclude(userprofile__role=UserProfile.ADMINISTRATOR_ROLE))
     architect           = forms.ModelChoiceField(queryset=User.objects.exclude(userprofile__role=UserProfile.ADMINISTRATOR_ROLE))
     primary_contact     = DynamicModelChoiceField(Contact)
@@ -166,9 +166,9 @@ class AddJobForm(forms.Form):
         self.fields['client'].choices = [(client['id'], client['name']) \
             for client in Client.objects.values('id', 'name')]
         self.fields['director'].choices = \
-            [(u.pk, u.get_full_name()) for u in User.objects.filter(userprofile__role=UserProfile.MANAGER_ROLE)]
-        self.fields['project_coordinator'].choices = \
-            [(u.pk, u.get_full_name()) for u in User.objects.filter(userprofile__role__in=[UserProfile.MANAGER_ROLE, UserProfile.PM_ROLE])]
+            self.fields['project_coordinator'].choices = \
+            [(u.pk, u.get_full_name()) for u in \
+             User.objects.filter(userprofile__role=UserProfile.MANAGER_ROLE)]
         self.fields['project_manager'].choices = \
             self.fields['architect'].choices = [(u.pk, u.get_full_name()) \
                                                 for u in users]
