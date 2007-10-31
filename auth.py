@@ -23,6 +23,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 
 from officeaid import models
+from officeaid.models import UserProfile
 
 def user_has_role(roles):
     """
@@ -36,9 +37,12 @@ def user_has_role(roles):
 # Authentication and permission test functions
 is_authenticated = lambda u: u.is_authenticated()
 is_not_authenticated = lambda u: not u.is_authenticated()
-is_admin = user_has_role(['A'])
-is_admin_or_manager = user_has_role(['A', 'M'])
-is_admin_manager_or_pc = user_has_role(['A', 'M', 'P'])
+is_admin = user_has_role([UserProfile.ADMINISTRATOR_ROLE])
+is_admin_or_manager = user_has_role([UserProfile.ADMINISTRATOR_ROLE,
+                                     UserProfile.MANAGER_ROLE])
+is_admin_manager_or_pc = user_has_role([UserProfile.ADMINISTRATOR_ROLE,
+                                        UserProfile.MANAGER_ROLE,
+                                        UserProfile.PC_ROLE])
 
 def user_can_access_user(logged_in_user, user):
     """
@@ -81,7 +85,7 @@ def get_accessible_users(logged_in_user):
         return User.objects.all()
     elif profile.is_manager():
         if models.access.managers_view_all_users:
-            return User.objects.exclude(userprofile__role='A')
+            return User.objects.exclude(userprofile__role=UserProfile.ADMINISTRATOR_ROLE)
         else:
             return User.objects.filter(pk=logged_in_user.pk) | \
                 profile.managed_users.all()

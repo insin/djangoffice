@@ -58,7 +58,7 @@ def users_accessible_to_user(user):
     profile = user.get_profile()
     if (profile.is_admin()
         or (profile.is_manager() and models.access.managers_view_all_users)):
-        return User.objects.exclude(userprofile__role='A')
+        return User.objects.exclude(userprofile__role=UserProfile.ADMINISTRATOR_ROLE)
     elif profile.is_manager():
         return User.objects.filter(Q(pk=user.id) | Q(managers=user.id))
     elif profile.is_user():
@@ -94,7 +94,7 @@ def user_list(request):
     """
     Lists Users.
     """
-    admin = User.objects.get(userprofile__role='A')
+    admin = User.objects.get(userprofile__role=UserProfile.ADMINISTRATOR_ROLE)
     sort_headers = SortHeaders(request, LIST_HEADERS)
     users = users_accessible_to_user(request.user) \
              .select_related() \
@@ -128,7 +128,8 @@ def add_user(request):
                 role=form.cleaned_data['role'],
                 phone_number=form.cleaned_data['phone_number'],
                 mobile_number=form.cleaned_data['mobile_number'])
-            if profile.role == 'M' and form.cleaned_data['managed_users']:
+            if profile.role in [UserProfile.MANAGER_ROLE, UserProfile.PC_ROLE] and \
+               form.cleaned_data['managed_users']:
                 profile.managed_users = form.cleaned_data['managed_users']
 
             # Assign the user to all Admin job tasks
@@ -166,7 +167,7 @@ def edit_user(request, username):
     """
     user = get_object_or_404(User, username=username)
     profile = user.get_profile()
-    if profile.role == 'A':
+    if profile.is_admin():
         return HttpResponseForbidden(
             u'The specified User is not editable at this location.')
     if request.method == 'POST':
@@ -184,9 +185,12 @@ def edit_user(request, username):
             for attr in ('role', 'phone_number', 'mobile_number'):
                 setattr(profile, attr, form.cleaned_data[attr])
             # Update managed users, clearing them when neccessary
-            if profile.role == 'M' and not form.cleaned_data['role'] == 'M':
-                profile.managed_users.clear() # Not a manager any more
-            elif form.cleaned_data['role'] == 'M':
+            manage_users_roles = [UserProfile.MANAGER_ROLE, UserProfile.PC_ROLE]
+            if profile.role in manage_users_roles and \
+               form.cleaned_data['role'] not in manage_users_roles:
+                # Not a manager any more
+                profile.managed_users.clear()
+            elif form.cleaned_data['role'] in manage_users_roles:
                 if not form.cleaned_data['managed_users']:
                     profile.managed_users.clear()
                 else:
@@ -304,7 +308,7 @@ def edit_admin_user(request):
     only have a small subset of their details editable.
     """
     editable_attrs = ['username', 'first_name', 'last_name', 'email']
-    admin = User.objects.get(userprofile__role='A')
+    admin = User.objects.get(userprofile__role=UserProfile.ADMINISTRATOR_ROLE)
     if request.method == 'POST':
         form = AdminUserForm(request.POST)
         if form.is_valid():
@@ -333,7 +337,7 @@ def delete_user(request, username):
     """
     user = get_object_or_404(User, username=username)
     profile = user.get_profile()
-    if profile.role == 'A':
+    if profile.is_admin():
         return HttpResponseForbidden(u'The specified User is not deleteable.')
     return create_update.delete_object(request, User,
         post_delete_redirect=reverse('user_list'), object_id=user.id,

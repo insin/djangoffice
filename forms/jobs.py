@@ -7,8 +7,7 @@ from django.db.models.query import Q
 from officeaid.forms import FilterBaseForm
 from officeaid.forms.fields import (DynamicModelChoiceField,
     MultipleDynamicModelChoiceField)
-from officeaid.models import (Client, Contact, Job, Task, FEE_BASIS_CHOICES,
-    FEE_CURRENCY_CHOICES, JOB_STATUS_CHOICES)
+from officeaid.models import Client, Contact, Job, Task, UserProfile
 
 SEARCH_TYPE_CHOICES = (
     (1, u'Job Number'),
@@ -26,7 +25,7 @@ USER_SEARCH_TYPE_CHOICES = (
     (5, u'Assigned to Job Task'),
 )
 
-JOB_STATUS_SEARCH_CHOICES = ((u'', 'All Jobs'),) + JOB_STATUS_CHOICES
+JOB_STATUS_SEARCH_CHOICES = ((u'', u'All Jobs'),) + Job.STATUS_CHOICES
 
 DATE_SEARCH_TYPE_CHOICES = (
     (1, 'Start Date'),
@@ -51,7 +50,7 @@ class JobFilterForm(FilterBaseForm, forms.Form):
         super(JobFilterForm, self).__init__(*args, **kwargs)
         self.fields['user'].choices = [(u'', '---------')] + \
             [(u.id, u.get_full_name()) \
-             for u in User.objects.exclude(userprofile__role='A')]
+             for u in User.objects.exclude(userprofile__role=UserProfile.ADMINISTRATOR_ROLE)]
         self.fields['client'].choices = [(u'', '---------')] + \
             [(c.id, c.name) for c in Client.objects.all()]
         self.make_distinct = False
@@ -145,21 +144,21 @@ class AddJobForm(forms.Form):
     reference_date      = forms.DateField(required=False)
     add_reference       = forms.CharField(required=False, max_length=16)
     add_reference_date  = forms.DateField(required=False)
-    status              = forms.ChoiceField(choices=JOB_STATUS_CHOICES)
+    status              = forms.ChoiceField(choices=Job.STATUS_CHOICES)
     notes               = forms.CharField(required=False, widget=forms.Textarea())
     invoice_notes       = forms.CharField(required=False, widget=forms.Textarea())
-    director            = forms.ModelChoiceField(queryset=User.objects.filter(userprofile__role='M'))
-    project_coordinator = forms.ModelChoiceField(queryset=User.objects.filter(userprofile__role__in=['M', 'P']))
-    project_manager     = forms.ModelChoiceField(queryset=User.objects.exclude(userprofile__role='A'))
-    architect           = forms.ModelChoiceField(queryset=User.objects.exclude(userprofile__role='A'))
+    director            = forms.ModelChoiceField(queryset=User.objects.filter(userprofile__role=UserProfile.MANAGER_ROLE))
+    project_coordinator = forms.ModelChoiceField(queryset=User.objects.filter(userprofile__role__in=[UserProfile.MANAGER_ROLE, UserProfile.PC_ROLE]))
+    project_manager     = forms.ModelChoiceField(queryset=User.objects.exclude(userprofile__role=UserProfile.ADMINISTRATOR_ROLE))
+    architect           = forms.ModelChoiceField(queryset=User.objects.exclude(userprofile__role=UserProfile.ADMINISTRATOR_ROLE))
     primary_contact     = DynamicModelChoiceField(Contact)
     billing_contact     = DynamicModelChoiceField(Contact)
     job_contacts        = MultipleDynamicModelChoiceField(Contact, required=False)
     start_date          = forms.DateField(required=False)
     end_date            = forms.DateField(required=False)
-    fee_basis           = forms.ChoiceField(required=False, choices=FEE_BASIS_CHOICES)
+    fee_basis           = forms.ChoiceField(required=False, choices=Job.FEE_BASIS_CHOICES)
     fee_amount          = forms.DecimalField(required=False, max_digits=8, decimal_places=2)
-    fee_currency        = forms.ChoiceField(choices=FEE_CURRENCY_CHOICES)
+    fee_currency        = forms.ChoiceField(choices=Job.FEE_CURRENCY_CHOICES)
     contingency         = forms.DecimalField(required=False, max_digits=6, decimal_places=2)
 
     def __init__(self, users, *args, **kwargs):
@@ -167,9 +166,9 @@ class AddJobForm(forms.Form):
         self.fields['client'].choices = [(client['id'], client['name']) \
             for client in Client.objects.values('id', 'name')]
         self.fields['director'].choices = \
-            [(u.pk, u.get_full_name()) for u in User.objects.filter(userprofile__role='M')]
+            [(u.pk, u.get_full_name()) for u in User.objects.filter(userprofile__role=UserProfile.MANAGER_ROLE)]
         self.fields['project_coordinator'].choices = \
-            [(u.pk, u.get_full_name()) for u in User.objects.filter(userprofile__role__in=['M','P'])]
+            [(u.pk, u.get_full_name()) for u in User.objects.filter(userprofile__role__in=[UserProfile.MANAGER_ROLE, UserProfile.PC_ROLE])]
         self.fields['project_manager'].choices = \
             self.fields['architect'].choices = [(u.pk, u.get_full_name()) \
                                                 for u in users]
@@ -190,12 +189,10 @@ class AddJobForm(forms.Form):
     def clean_fee_amount(self):
         if 'fee_basis' in self.cleaned_data and \
            self.cleaned_data['fee_amount'] is None:
-            if self.cleaned_data['fee_basis'] == u'S':
+            if self.cleaned_data['fee_basis'] in [Job.SET_FEE, Job.PERCENTAGE_FEE]:
                 raise forms.ValidationError(
-                    u'This field is required if Fee Basis is Set Fee.')
-            elif self.cleaned_data['fee_basis'] == u'P':
-                raise forms.ValidationError(
-                    u'This field is required if Fee Basis is Percentage.')
+                    u'This field is required if Fee Basis is %s.' \
+                    % dict(Job.FEE_BASIS_CHOICES)[self.cleaned_data['fee_basis']])
         return self.cleaned_data['fee_amount']
 
     def save(self, commit=True):

@@ -17,6 +17,9 @@ from officeaid.validators import (isSafeishQuery, isWeekCommencingDate,
 
 qn = connection.ops.quote_name
 
+sql_param_re = re.compile(r'::([a-zA-Z]+)')
+heading_re = re.compile(r'AS \'([\sa-zA-Z]+)\'')
+
 ###########
 # Options #
 ###########
@@ -51,20 +54,24 @@ ACCESS_CHOICES = (
 # User Profiles #
 #################
 
-USER_ROLE_CHOICES = (
-    (u'U', u'User'),
-    (u'P', u'PC'),
-    (u'M', u'Manager'),
-    (u'A', u'Administrator'),
-)
-
 class UserProfile(models.Model):
     """
     A User's profile - defines user details additional to those present
     in ``django.contrib.auth.models.User``.
     """
+    USER_ROLE          = u'U'
+    PC_ROLE            = u'P'
+    MANAGER_ROLE       = u'M'
+    ADMINISTRATOR_ROLE = u'A'
+    ROLE_CHOICES = (
+        (USER_ROLE, u'User'),
+        (PC_ROLE, u'PC'),
+        (MANAGER_ROLE, u'Manager'),
+        (ADMINISTRATOR_ROLE, u'Administrator'),
+    )
+
     user           = models.ForeignKey(User, unique=True)
-    role           = models.CharField(max_length=1, choices=USER_ROLE_CHOICES)
+    role           = models.CharField(max_length=1, choices=ROLE_CHOICES)
     managed_users  = models.ManyToManyField(User, null=True, blank=True, filter_interface=models.HORIZONTAL, related_name='managers', validator_list=[OnlyAllowedIfOtherFieldEquals('role', 'M', u'Only Managers may have Managed Users')])
     phone_number   = models.CharField(max_length=20, blank=True)
     mobile_number  = models.CharField(max_length=20, blank=True)
@@ -460,25 +467,6 @@ class JobManager(models.Manager):
                                                   .filter(project_coordinator_id=user.pk)
         return qs
 
-JOB_STATUS_CHOICES = (
-    (u'Q', u'Quote'),
-    (u'L', u'Live'),
-    (u'S', u'Suspended'),
-    (u'C', u'Completed'),
-    (u'A', u'Archived'),
-)
-
-FEE_BASIS_CHOICES = (
-    (u'S', u'Set Fee'),
-    (u'T', u'Time Charged'),
-    (u'P', u'Percentage'),
-)
-
-FEE_CURRENCY_CHOICES = (
-    (u'GBP', u'GBP'),
-    (u'EUR', u'Euro'),
-)
-
 class Job(models.Model):
     """
     A Job worked on for a Client.
@@ -486,6 +474,35 @@ class Job(models.Model):
     Each Job has a number of Tasks which define the work to be carried
     out for it.
     """
+    QUOTE_STATUS     = u'Q'
+    LIVE_STATUS      = u'L'
+    SUSPENDED_STATUS = u'S'
+    COMPLETED_STATUS = u'C'
+    ARCHIVED_STATUS  = u'A'
+    STATUS_CHOICES = (
+        (QUOTE_STATUS, u'Quote'),
+        (LIVE_STATUS, u'Live'),
+        (SUSPENDED_STATUS, u'Suspended'),
+        (COMPLETED_STATUS, u'Completed'),
+        (ARCHIVED_STATUS, u'Archived'),
+    )
+
+    SET_FEE          = u'S'
+    TIME_CHARGED_FEE = u'T'
+    PERCENTAGE_FEE   = u'P'
+    FEE_BASIS_CHOICES = (
+        (SET_FEE, u'Set Fee'),
+        (TIME_CHARGED_FEE, u'Time Charged'),
+        (PERCENTAGE_FEE, u'Percentage'),
+    )
+
+    GBP_CURRENCY  = u'GBP'
+    EURO_CURRENCY = u'EUR'
+    FEE_CURRENCY_CHOICES = (
+        (GBP_CURRENCY, u'GBP'),
+        (EURO_CURRENCY, u'Euro'),
+    )
+
     client             = models.ForeignKey(Client, related_name='jobs')
     name               = models.CharField(max_length=100)
     number             = models.PositiveIntegerField(unique=True)
@@ -493,7 +510,7 @@ class Job(models.Model):
     reference_date     = models.DateField(null=True, blank=True)
     add_reference      = models.CharField(max_length=16, blank=True)
     add_reference_date = models.DateField(null=True, blank=True)
-    status             = models.CharField(max_length=1, choices=JOB_STATUS_CHOICES)
+    status             = models.CharField(max_length=1, choices=STATUS_CHOICES)
     notes              = models.TextField(blank=True)
     invoice_notes      = models.TextField(blank=True)
     contingency        = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
@@ -718,11 +735,11 @@ class ArtifactManager(models.Manager):
         user_profile = user.get_profile()
         qs = super(ArtifactManager, self).get_query_set()
         if user_profile.is_manager():
-            qs = qs.filter(access__in=['M','P','U'])
+            qs = qs.filter(access__in=[UserProfile.MANAGER_ROLE, UserProfile.PC_ROLE, UserProfile.USER_ROLE])
         elif user_profile.is_pc():
-            qs = qs.filter(access__in=['P','U'])
+            qs = qs.filter(access__in=[UserProfile.PC_ROLE, UserProfile.USER_ROLE])
         elif user_profile.is_user():
-            qs = qs.filter(access='U')
+            qs = qs.filter(access=UserProfile.USER_ROLE)
         return qs
 
 class Artifact(models.Model):
@@ -797,24 +814,28 @@ class ActivityType(models.Model):
     def get_absolute_url(self):
         return ('activity_type_detail', (smart_unicode(self.pk),))
 
-ACTIVITY_PRIORITY_CHOICES = (
-    (u'L', u'Low'),
-    (u'M', u'Medium'),
-    (u'H', u'High'),
-    (u'T', u'Top'),
-)
-
 class Activity(models.Model):
     """
     A TODO item or a record of some form of interaction with a User or a
     Contact related to a specific Job.
     """
+    LOW_PRIORITY    = u'L'
+    MEDIUM_PRIORITY = u'M'
+    HIGH_PRIORITY   = u'H'
+    TOP_PRIORITY    = u'T'
+    PRIORITY_CHOICES = (
+        (LOW_PRIORITY, u'Low'),
+        (MEDIUM_PRIORITY, u'Medium'),
+        (HIGH_PRIORITY, u'High'),
+        (TOP_PRIORITY, u'Top'),
+    )
+
     job         = models.ForeignKey(Job, related_name='activities')
     type        = models.ForeignKey(ActivityType, null=True, blank=True, related_name='activities')
     created_by  = models.ForeignKey(User, related_name='created_activities')
     created_at  = models.DateTimeField(editable=False)
     description = models.TextField()
-    priority    = models.CharField(max_length=1, choices=ACTIVITY_PRIORITY_CHOICES)
+    priority    = models.CharField(max_length=1, choices=PRIORITY_CHOICES)
     assigned_to = models.ForeignKey(User, null=True, blank=True, related_name='assigned_activities', verbose_name='User', validator_list=[RequiredIfOtherFieldNotGiven('contact')])
     contact     = models.ForeignKey(Contact, null=True, blank=True, related_name='activities', validator_list=[RequiredIfOtherFieldNotGiven('assigned_to')])
     due_date    = models.DateField(null=True, blank=True)
@@ -953,21 +974,23 @@ class InvoiceManager(models.Manager):
         except IndexError:
             return 1
 
-INVOICE_TYPE_CHOICES = (
-    ('D', 'Date Restricted'),
-    ('W', 'Whole Job'),
-)
-
 INVOICE_PERIOD_VALIDATOR = RequiredIfOtherFieldEquals('type', 'D', u'Required for Date Restricted invoices.')
 
 class Invoice(models.Model):
     """
     An invoice for Time Entries and Expenses booked against a Job.
     """
+    DATE_RESTRICTED_TYPE = u'D'
+    WHOLE_JOB_TYPE       = u'W'
+    TYPE_CHOICES = (
+        (DATE_RESTRICTED_TYPE, u'Date Restricted'),
+        (WHOLE_JOB_TYPE, u'Whole Job'),
+    )
+
     job             = models.ForeignKey(Job,related_name='invoices')
     number          = models.PositiveIntegerField(unique=True)
     date            = models.DateField(editable=False)
-    type            = models.CharField(max_length=1, choices=INVOICE_TYPE_CHOICES)
+    type            = models.CharField(max_length=1, choices=TYPE_CHOICES)
     start_period    = models.DateField(null=True, blank=True, validator_list=[INVOICE_PERIOD_VALIDATOR])
     end_period      = models.DateField(null=True, blank=True, validator_list=[INVOICE_PERIOD_VALIDATOR])
     amount_invoiced = models.DecimalField(max_digits=8, decimal_places=2)
@@ -1273,8 +1296,7 @@ class TimeEntry(models.Model):
         """
         Ensure time fields are not ``None`` before a save is performed.
         """
-        for attr in ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun',
-                     'overtime']:
+        for attr in TIME_ATTRS:
             if getattr(self, attr) is None:
                 setattr(self, attr, 0.0)
         super(TimeEntry, self).save()
@@ -1446,9 +1468,6 @@ class SQLReportManager(models.Manager):
         elif user_profile.is_user():
             qs = qs.filter(access='U')
         return qs
-
-sql_param_re = re.compile(r'::([a-zA-Z]+)')
-heading_re = re.compile(r'AS \'([\sa-zA-Z]+)\'')
 
 class SQLReport(models.Model):
     """

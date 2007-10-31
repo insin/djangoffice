@@ -11,7 +11,7 @@ from django.views.generic import list_detail
 from officeaid.auth import is_admin, is_admin_or_manager, user_has_permission
 from officeaid.forms.jobs import (AddJobForm, AddTaskForm, EditJobForm,
     EditTaskForm, JobFilterForm)
-from officeaid.models import Job, Task, TaskType
+from officeaid.models import Job, Task, TaskType, UserProfile
 from officeaid.views import SortHeaders
 
 LIST_HEADERS = (
@@ -67,7 +67,7 @@ def add_job(request):
     This consists of defining a Job's details and, optionally, some
     Tasks.
     """
-    users = list(User.objects.exclude(userprofile__role='A') \
+    users = list(User.objects.exclude(userprofile__role=UserProfile.ADMINISTRATOR_ROLE) \
                               .order_by('first_name', 'last_name'))
     user_choices = [(u.pk, u.get_full_name()) for u in users]
     task_types = TaskType.objects.non_admin()
@@ -141,7 +141,7 @@ def edit_job(request, job_number):
     Tasks for the Job.
     """
     job = get_object_or_404(Job, number=job_number)
-    users = list(User.objects.exclude(userprofile__role='A') \
+    users = list(User.objects.exclude(userprofile__role=UserProfile.ADMINISTRATOR_ROLE) \
                               .order_by('first_name', 'last_name'))
     user_choices = [(u.pk, u.get_full_name()) for u in users]
     tasks = Task.objects.with_task_type_name().filter(job=job)

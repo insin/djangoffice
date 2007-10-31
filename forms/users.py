@@ -1,6 +1,8 @@
 from django import newforms as forms
 from django.contrib.auth.models import User
 
+from officeaid.models import UserProfile
+
 class AdminUserForm(forms.Form):
     username   = forms.CharField(max_length=30)
     first_name = forms.CharField(max_length=30)
@@ -16,10 +18,8 @@ class AdminUserForm(forms.Form):
             raise forms.ValidationError(u'Please ensure your passwords match.')
         return self.cleaned_data['confirm']
 
-USER_ROLE_CHOICES = (
-    ('U', 'User'),
-    ('M', 'Manager'),
-)
+USER_ROLE_CHOICES = tuple([choice for choice in UserProfile.ROLE_CHOICES \
+                           if choice[0] != UserProfile.ADMINISTRATOR_ROLE])
 
 class UserForm(forms.Form):
     role          = forms.ChoiceField(choices=USER_ROLE_CHOICES)
@@ -37,7 +37,7 @@ class UserForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(UserForm, self).__init__(*args, **kwargs)
         self.fields['managed_users'].choices = [(u.id, u.get_full_name()) \
-            for u in User.objects.filter(userprofile__role='U')]
+            for u in User.objects.filter(userprofile__role=UserProfile.USER_ROLE)]
 
     def clean_confirm(self):
         if self.cleaned_data.get('password') and \
@@ -50,10 +50,11 @@ class UserForm(forms.Form):
     def clean_managed_users(self):
         if self.cleaned_data.get('role') and \
            self.cleaned_data.get('managed_users') and \
-           self.cleaned_data['role'] != 'M' and \
+           self.cleaned_data['role'] not in [UserProfile.PC_ROLE,
+                                             UserProfile.MANAGER_ROLE] and \
            len(self.cleaned_data['managed_users']) > 0:
             raise forms.ValidationError(
-                u'Only managers may have managed users.')
+                u'Only Managers and PCs may have managed users.')
         return self.cleaned_data['managed_users']
 
     def clean_username(self):

@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 from officeaid.forms import FilterBaseForm
 from officeaid.forms.fields import DynamicModelChoiceField
-from officeaid.models import ActivityType, Contact
+from officeaid.models import ActivityType, Contact, UserProfile
 
 class ActivityFilterForm(FilterBaseForm, forms.Form):
     SEARCH_FILTERS = (
@@ -26,5 +26,6 @@ class ActivityFilterForm(FilterBaseForm, forms.Form):
             [('', '-' * 9)] + [(a.pk, a.name) \
                                for a in ActivityType.objects.all()]
         self.fields['creator'].choices = self.fields['assigned_to'].choices = \
-            [('', '-' * 9)] + [(u.pk, u.get_full_name()) \
-                               for u in User.objects.exclude(userprofile__role='A')]
+            [('', '-' * 9)] + [(u.pk, u.get_full_name()) for u in \
+                               User.objects.exclude(
+                                   userprofile__role=UserProfile.ADMINISTRATOR_ROLE)]

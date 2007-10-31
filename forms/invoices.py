@@ -4,7 +4,7 @@ from django.template.defaultfilters import pluralize
 
 from officeaid.forms import FilterBaseForm, HiddenBaseForm
 from officeaid.forms.widgets import TableSelectMultiple
-from officeaid.models import Invoice, INVOICE_TYPE_CHOICES
+from officeaid.models import Invoice
 
 class InvoiceFilterForm(FilterBaseForm, forms.Form):
     pass
@@ -35,7 +35,7 @@ class InvoiceCriteriaForm(HiddenBaseForm, forms.Form):
     A Form which handles invoice critieria for a single Job or multiple
     Jobs.
     """
-    type                         = forms.ChoiceField(choices=INVOICE_TYPE_CHOICES)
+    type                         = forms.ChoiceField(choices=Invoice.TYPE_CHOICES)
     date                         = forms.DateField()
     start_period                 = forms.DateField(required=False)
     end_period                   = forms.DateField(required=False)
@@ -85,17 +85,17 @@ class InvoiceCriteriaForm(HiddenBaseForm, forms.Form):
 
     def clean_start_period(self):
         if 'type' in self.cleaned_data and \
-           self.cleaned_data['type'] == u'D' and \
+           self.cleaned_data['type'] == Invoice.DATE_RESTRICTED_TYPE and \
            self.cleaned_data['start_period'] is None:
             raise forms.ValidationError('Required if invoice type is %s.' \
-                                        % dict(INVOICE_TYPE_CHOICES)['D'])
+                                        % dict(Invoice.TYPE_CHOICES)[Invoice.DATE_RESTRICTED_TYPE])
 
     def clean_end_period(self):
         if 'type' in self.cleaned_data and \
-           self.cleaned_data['type'] == u'D' and \
+           self.cleaned_data['type'] == Invoice.DATE_RESTRICTED_TYPE and \
            self.cleaned_data['end_period'] is None:
             raise forms.ValidationError('Required if invoice type is %s.' \
-                                        % dict(INVOICE_TYPE_CHOICES)['D'])
+                                        % dict(Invoice.TYPE_CHOICES)[Invoice.DATE_RESTRICTED_TYPE])
 
     def clean_additional_hours_cost(self):
         if self.cleaned_data['additional_hours'] is not None and \
