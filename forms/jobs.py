@@ -269,7 +269,7 @@ class EditTaskForm(forms.Form):
     """
     A form for editing a Task.
 
-    Since a Job may have multiple Jobs, but only one Task with a given
+    Since a Job may have multiple Tasks, but only one Task with a given
     Task Type, this form will automatically be prefixed with the Task's
     Task Type id.
     """
