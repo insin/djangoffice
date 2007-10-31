@@ -12,7 +12,7 @@ follows, as implemented in the ``user_can_access_user`` and
 * Admins have unrestricted access to all users.
 * Managers can access everyone but admins when the appropriate system
   setting is enabled; otherwise, they can access their managed users.
-* Project coordinators can access their managed users.
+* PMs can access their managed users.
 * Users can only access their own details.
 """
 from urllib import quote
@@ -40,9 +40,9 @@ is_not_authenticated = lambda u: not u.is_authenticated()
 is_admin = user_has_role([UserProfile.ADMINISTRATOR_ROLE])
 is_admin_or_manager = user_has_role([UserProfile.ADMINISTRATOR_ROLE,
                                      UserProfile.MANAGER_ROLE])
-is_admin_manager_or_pc = user_has_role([UserProfile.ADMINISTRATOR_ROLE,
+is_admin_manager_or_pm = user_has_role([UserProfile.ADMINISTRATOR_ROLE,
                                         UserProfile.MANAGER_ROLE,
-                                        UserProfile.PC_ROLE])
+                                        UserProfile.PM_ROLE])
 
 def user_can_access_user(logged_in_user, user):
     """
@@ -66,7 +66,7 @@ def user_can_access_user(logged_in_user, user):
                 return True
             except User.DoesNotExist:
                 return False
-    elif profile.is_pc():
+    elif profile.is_pm():
         try:
             profile.managed_users.get(pk=user.pk)
             return True
@@ -89,7 +89,7 @@ def get_accessible_users(logged_in_user):
         else:
             return User.objects.filter(pk=logged_in_user.pk) | \
                 profile.managed_users.all()
-    elif profile.is_pc():
+    elif profile.is_pm():
         return User.objects.filter(pk=logged_in_user.pk) | \
             profile.managed_users.all()
 
@@ -113,7 +113,9 @@ def user_has_permission(test_func):
                     return view_func(request, *args, **kwargs)
                 from officeaid.views import permission_denied
                 return permission_denied(request)
-            return HttpResponseRedirect('%s?%s=%s' % (settings.LOGIN_URL, REDIRECT_FIELD_NAME, quote(request.get_full_path())))
+            return HttpResponseRedirect('%s?%s=%s' % (settings.LOGIN_URL,
+                                                      REDIRECT_FIELD_NAME,
+                                                      quote(request.get_full_path())))
         _checkuser.__doc__ = view_func.__doc__
         _checkuser.__dict__ = view_func.__dict__
         return _checkuser

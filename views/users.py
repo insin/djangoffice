@@ -128,7 +128,7 @@ def add_user(request):
                 role=form.cleaned_data['role'],
                 phone_number=form.cleaned_data['phone_number'],
                 mobile_number=form.cleaned_data['mobile_number'])
-            if profile.role in [UserProfile.MANAGER_ROLE, UserProfile.PC_ROLE] and \
+            if profile.role in [UserProfile.MANAGER_ROLE, UserProfile.PM_ROLE] and \
                form.cleaned_data['managed_users']:
                 profile.managed_users = form.cleaned_data['managed_users']
 
@@ -185,7 +185,7 @@ def edit_user(request, username):
             for attr in ('role', 'phone_number', 'mobile_number'):
                 setattr(profile, attr, form.cleaned_data[attr])
             # Update managed users, clearing them when neccessary
-            manage_users_roles = [UserProfile.MANAGER_ROLE, UserProfile.PC_ROLE]
+            manage_users_roles = [UserProfile.MANAGER_ROLE, UserProfile.PM_ROLE]
             if profile.role in manage_users_roles and \
                form.cleaned_data['role'] not in manage_users_roles:
                 # Not a manager any more

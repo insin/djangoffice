@@ -19,30 +19,31 @@ def create_initial_data():
     admin.is_staff = True
     admin.is_superuser = True
     admin.save()
-    UserProfile.objects.create(user=admin, role='A')
+    UserProfile.objects.create(user=admin, role=UserProfile.ADMINISTRATOR_ROLE)
 
     testuser = User.objects.create_user('testuser', 'tu@tu.com', 'testuser')
     testuser.first_name = 'Test'
     testuser.last_name = 'User'
     testuser.save()
-    UserProfile.objects.create(user=testuser, role='U')
+    UserProfile.objects.create(user=testuser, role=UserProfile.USER_ROLE)
     testuser.rates.create(effective_from=today, standard_rate=50.00,
                           overtime_rate=60.00, editable=False)
 
-    testpc = User.objects.create_user('testpc', 'tp@tp.com', 'testpc')
-    testpc.first_name = 'Test'
-    testpc.last_name = 'PC'
-    testpc.save()
-    UserProfile.objects.create(user=testpc, role='P')
-    testpc.rates.create(effective_from=today, standard_rate=60.00,
-                          overtime_rate=70.00, editable=False)
+    testpm = User.objects.create_user('testpm', 'tp@tp.com', 'testpm')
+    testpm.first_name = 'Test'
+    testpm.last_name = 'PM'
+    testpm.save()
+    UserProfile.objects.create(user=testpm, role=UserProfile.PM_ROLE)
+    testpm.rates.create(effective_from=today, standard_rate=60.00,
+                        overtime_rate=70.00, editable=False)
 
     testmanager = User.objects.create_user('testmanager', 'tm@tm.com',
                                            'testmanager')
     testmanager.first_name = 'Test'
     testmanager.last_name = 'Manager'
     testmanager.save()
-    managerprofile = UserProfile.objects.create(user=testmanager, role='M')
+    managerprofile = UserProfile.objects.create(user=testmanager,
+                                                role=UserProfile.MANAGER_ROLE)
     managerprofile.managed_users.add(testuser)
     testmanager.rates.create(effective_from=today, standard_rate=70.00,
                              overtime_rate=85.00, editable=False)
@@ -78,7 +79,7 @@ def create_initial_data():
     vacation = TaskType.objects.create(name='Vacation')
     vacation_task = Task.objects.create(job=admin_job, task_type=vacation,
                                         estimate_hours=0.0)
-    vacation_task.assigned_users = [admin, testuser, testpc, testmanager]
+    vacation_task.assigned_users = [admin, testuser, testpm, testmanager]
     admin_job.tasks.add(vacation_task)
 
     print('Creating Task Types')

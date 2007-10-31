@@ -12,8 +12,7 @@ from django.db.models.query import find_field
 from django.utils.text import truncate_words
 from django.utils.encoding import smart_unicode
 
-from officeaid.validators import (isSafeishQuery, isWeekCommencingDate,
-    OnlyAllowedIfOtherFieldEquals)
+from officeaid.validators import isSafeishQuery, isWeekCommencingDate
 
 qn = connection.ops.quote_name
 
@@ -36,17 +35,17 @@ class EmailOptions(dbsettings.Group):
 email = EmailOptions()
 
 class AccessOptions(dbsettings.Group):
-    managers_view_all_jobs            = dbsettings.BooleanValue(u'Managers may view all Jobs')
-    managers_view_all_users           = dbsettings.BooleanValue(u'Managers may view all Users')
-    pc_restricted_to_coordinated_jobs = dbsettings.BooleanValue(u'PCs only have PC access to Jobs for which they are the Project Coordinator')
-    users_view_all_jobs               = dbsettings.BooleanValue(u'Users may view all Jobs')
+    managers_view_all_jobs        = dbsettings.BooleanValue(u'Managers may view all Jobs')
+    managers_view_all_users       = dbsettings.BooleanValue(u'Managers may view all Users')
+    pm_restricted_to_managed_jobs = dbsettings.BooleanValue(u'PMs only have PM access to Jobs for which they are the Manager')
+    users_view_all_jobs           = dbsettings.BooleanValue(u'Users may view all Jobs')
 
 access = AccessOptions()
 
 ACCESS_CHOICES = (
     (u'A', u'Admin'),
     (u'M', u'Manager'),
-    (u'P', u'PC'),
+    (u'P', u'PM'),
     (u'U', u'User'),
 )
 
@@ -60,19 +59,19 @@ class UserProfile(models.Model):
     in ``django.contrib.auth.models.User``.
     """
     USER_ROLE          = u'U'
-    PC_ROLE            = u'P'
+    PM_ROLE            = u'P'
     MANAGER_ROLE       = u'M'
     ADMINISTRATOR_ROLE = u'A'
     ROLE_CHOICES = (
         (USER_ROLE, u'User'),
-        (PC_ROLE, u'PC'),
+        (PM_ROLE, u'PM'),
         (MANAGER_ROLE, u'Manager'),
         (ADMINISTRATOR_ROLE, u'Administrator'),
     )
 
     user           = models.ForeignKey(User, unique=True)
     role           = models.CharField(max_length=1, choices=ROLE_CHOICES)
-    managed_users  = models.ManyToManyField(User, null=True, blank=True, filter_interface=models.HORIZONTAL, related_name='managers', validator_list=[OnlyAllowedIfOtherFieldEquals('role', 'M', u'Only Managers may have Managed Users')])
+    managed_users  = models.ManyToManyField(User, null=True, blank=True, filter_interface=models.HORIZONTAL, related_name='managers')
     phone_number   = models.CharField(max_length=20, blank=True)
     mobile_number  = models.CharField(max_length=20, blank=True)
     login_attempts = models.SmallIntegerField(default=3, help_text=u'The number of unsuccessful login attempts allowed on this account until it is disabled.')
@@ -90,16 +89,16 @@ class UserProfile(models.Model):
         list_filter = ('role', 'disabled')
 
     def is_admin(self):
-        return self.role == u'A'
+        return self.role == self.ADMINISTRATOR_ROLE
 
     def is_manager(self):
-        return self.role == u'M'
+        return self.role == self.MANAGER_ROLE
 
-    def is_pc(self):
-        return self.role == u'P'
+    def is_pm(self):
+        return self.role == self.PM_ROLE
 
     def is_user(self):
-        return self.role == u'U'
+        return self.role == self.USER_ROLE
 
 class UserRateManager(models.Manager):
     def get_latest_effective_from_for_user(self, user):
@@ -430,7 +429,7 @@ class JobManager(models.Manager):
                .exclude(pk=settings.ADMIN_JOB_ID)
         if profile.is_admin() or \
            profile.is_manager() and access.managers_view_all_jobs or \
-           profile.is_pc() and access.users_view_all_jobs or \
+           profile.is_pm() and access.users_view_all_jobs or \
            profile.is_user() and access.users_view_all_jobs:
             pass
         else:
@@ -462,7 +461,7 @@ class JobManager(models.Manager):
             if profile.is_manager():
                 qs = qs | super(JobManager, self).get_query_set() \
                                                   .filter(director_id=user.pk)
-            elif profile.is_pc():
+            elif profile.is_pm():
                 qs = qs | super(JobManager, self).get_query_set() \
                                                   .filter(project_coordinator_id=user.pk)
         return qs
@@ -735,9 +734,9 @@ class ArtifactManager(models.Manager):
         user_profile = user.get_profile()
         qs = super(ArtifactManager, self).get_query_set()
         if user_profile.is_manager():
-            qs = qs.filter(access__in=[UserProfile.MANAGER_ROLE, UserProfile.PC_ROLE, UserProfile.USER_ROLE])
-        elif user_profile.is_pc():
-            qs = qs.filter(access__in=[UserProfile.PC_ROLE, UserProfile.USER_ROLE])
+            qs = qs.filter(access__in=[UserProfile.MANAGER_ROLE, UserProfile.PM_ROLE, UserProfile.USER_ROLE])
+        elif user_profile.is_pm():
+            qs = qs.filter(access__in=[UserProfile.PM_ROLE, UserProfile.USER_ROLE])
         elif user_profile.is_user():
             qs = qs.filter(access=UserProfile.USER_ROLE)
         return qs
@@ -1296,7 +1295,7 @@ class TimeEntry(models.Model):
         """
         Ensure time fields are not ``None`` before a save is performed.
         """
-        for attr in TIME_ATTRS:
+        for attr in self.TIME_ATTRS:
             if getattr(self, attr) is None:
                 setattr(self, attr, 0.0)
         super(TimeEntry, self).save()

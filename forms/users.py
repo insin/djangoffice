@@ -50,11 +50,11 @@ class UserForm(forms.Form):
     def clean_managed_users(self):
         if self.cleaned_data.get('role') and \
            self.cleaned_data.get('managed_users') and \
-           self.cleaned_data['role'] not in [UserProfile.PC_ROLE,
+           self.cleaned_data['role'] not in [UserProfile.PM_ROLE,
                                              UserProfile.MANAGER_ROLE] and \
            len(self.cleaned_data['managed_users']) > 0:
             raise forms.ValidationError(
-                u'Only Managers and PCs may have managed users.')
+                u'Only Managers and PMs may have managed users.')
         return self.cleaned_data['managed_users']
 
     def clean_username(self):
