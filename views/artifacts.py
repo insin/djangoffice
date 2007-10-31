@@ -33,7 +33,7 @@ def artifact_list(request, job_number):
     """
     job = get_object_or_404(Job, number=int(job_number))
     if not job.is_accessible_to_user(request.user):
-        return permission_denied()
+        return permission_denied(request)
     user_profile = request.user.get_profile()
     queryset = Artifact.objects.accessible_to_user(request.user).filter(job=job)
     sort_headers = SortHeaders(request, LIST_HEADERS)
@@ -53,7 +53,7 @@ def add_artifact(request, job_number):
     """
     job = get_object_or_404(Job, number=int(job_number))
     if not job.is_accessible_to_user(request.user):
-        return permission_denied()
+        return permission_denied(request)
     ArtifactForm = forms.form_for_model(Artifact, fields=('file', 'type',
                                         'description', 'access'))
     if request.method == 'POST':
@@ -85,7 +85,7 @@ def artifact_detail(request, job_number, artifact_id):
     artifact = get_object_or_404(Artifact, job=job, pk=artifact_id)
     if not job.is_accessible_to_user(request.user) or \
        not artifact.is_accessible_to_user(request.user):
-        return permission_denied()
+        return permission_denied(request)
     return render_to_response('artifacts/artifact_detail.html', {
         'artifact': artifact,
         'job': job,
@@ -109,7 +109,7 @@ def edit_artifact(request, job_number, artifact_id):
     artifact = get_object_or_404(Artifact, job=job, pk=artifact_id)
     if not job.is_accessible_to_user(request.user) or \
        not artifact.is_accessible_to_user(request.user):
-        return permission_denied()
+        return permission_denied(request)
     ArtifactForm = forms.form_for_instance(artifact, fields=('file', 'type'
                                            'description', 'access'))
     if request.method == 'POST':
