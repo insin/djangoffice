@@ -8,7 +8,7 @@ from django.template import RequestContext
 from django.views.generic import create_update, list_detail
 
 from officeaid.auth import is_admin_or_manager, user_has_permission
-from officeaid.models import Client
+from officeaid.models import Client, Job
 from officeaid.views import SortHeaders
 from officeaid.views.generic import add_object, edit_object
 
@@ -45,9 +45,11 @@ def client_detail(request, client_id):
     Displays a Client's details.
     """
     client = get_object_or_404(Client, pk=client_id)
+    jobs = Job.objects.accessible_to_user(request.user) \
+                       .filter(client=client).order_by('number')
     return render_to_response('clients/client_detail.html', {
             'client': client,
-            'jobs': client.jobs.order_by('number'),
+            'jobs': jobs,
             'contacts': client.contacts.all(),
         }, RequestContext(request))
 
