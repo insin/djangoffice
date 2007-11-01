@@ -1,5 +1,7 @@
 from django import template
 
+from officeaid import auth
+
 register = template.Library()
 
 ##################
@@ -37,3 +39,7 @@ def job_filter_form(context, filter_form):
 @register.filter
 def pad_number(number):
     return u'%05d' % number
+
+@register.filter
+def is_admin_or_manager(user):
+    return auth.is_admin_or_manager(user)

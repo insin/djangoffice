@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base.html" %}{% load officeaid_tags %}
 {% block title %}Client '{{ client.name|escape }}' | {% endblock %}
 {% block menu %}{% menu "manage" "clients" %}{% endblock %}
 {% block content %}
@@ -36,9 +36,11 @@
 {% else %}
 <p>No Jobs yet.</p>
 {% endif %}
+{% if user|is_admin_or_manager %}
 <div class="buttons">
   <a href="{% url add_job %}?client={{ client.id }}"><img src="{{ MEDIA_URL }}img/add.png" alt=""> Add Job</a>
 </div>
+{% endif %}
 
 <h2>Contacts</h2>
 {% if contacts %}
