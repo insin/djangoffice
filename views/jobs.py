@@ -30,7 +30,7 @@ def filter_jobs(request):
     sort_headers = SortHeaders(request, LIST_HEADERS,
                                additional_params=filter_form.get_params())
     jobs = Job.objects.accessible_to_user(request.user) \
-            .order_by(sort_headers.get_order_by())
+                       .order_by(sort_headers.get_order_by())
 
     # Apply filters if any were specified
     filters = filter_form.get_filters()

@@ -424,15 +424,11 @@ class JobManager(models.Manager):
         time.
         """
         profile = user.get_profile()
-        qs = super(JobManager, self)\
+        qs = super(JobManager, self) \
               .get_query_set() \
                .exclude(pk=settings.ADMIN_JOB_ID)
-        if profile.is_admin() or \
-           profile.is_manager() and access.managers_view_all_jobs or \
-           profile.is_pm() and access.users_view_all_jobs or \
-           profile.is_user() and access.users_view_all_jobs:
-            pass
-        else:
+        if profile.is_manager() and not access.managers_view_all_jobs or \
+           (profile.is_pm() or profile.is_user()) and not access.users_view_all_jobs:
             opts = self.model._meta
             task_opts = Task._meta
             assigned_users_rel = find_field('assigned_users',
