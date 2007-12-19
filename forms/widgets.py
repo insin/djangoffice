@@ -78,5 +78,5 @@ class TableSelectMultiple(SelectMultiple):
                 else:
                     content = getattr(item, attr)
                 output.append(u'<td>%s</td>' % escape(content))
-            output.append('</tr>')
+            output.append(u'</tr>')
         return mark_safe(u'\n'.join(output))
