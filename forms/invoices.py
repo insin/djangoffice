@@ -23,7 +23,6 @@ class SelectJobsForInvoiceForm(HiddenBaseForm, forms.Form):
                                        for j in accessible_jobs]
 
     def clean(self):
-        print self.cleaned_data
         if 'jobs' not in self.cleaned_data or \
            len(self.cleaned_data['jobs']) == 0:
             raise forms.ValidationError(
