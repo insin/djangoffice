@@ -1,6 +1,7 @@
 from django.newforms.widgets import Input, CheckboxInput, SelectMultiple
 from django.utils.encoding import force_unicode
 from django.utils.html import escape
+from django.utils.safestring import mark_safe
 
 class DateInput(Input):
     input_type = 'text'
@@ -79,4 +80,4 @@ class TableSelectMultiple(SelectMultiple):
                     content = getattr(item, attr)
                 output.append(u'<td>%s</td>' % escape(content))
             output.append('</tr>')
-        return u'\n'.join(output)
+        return mark_safe(u'\n'.join(output))

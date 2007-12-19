@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.utils.safestring import mark_safe
 
 def app_constants(request):
     """
@@ -6,7 +7,7 @@ def app_constants(request):
     application and the client.
     """
     return {
-        'COMPANY_NAME':        settings.COMPANY_NAME,
-        'APPLICATION_NAME':    settings.APPLICATION_NAME,
-        'APPLICATION_VERSION': settings.APPLICATION_VERSION,
+        'COMPANY_NAME':        mark_safe(settings.COMPANY_NAME),
+        'APPLICATION_NAME':    mark_safe(settings.APPLICATION_NAME),
+        'APPLICATION_VERSION': mark_safe(settings.APPLICATION_VERSION),
     }

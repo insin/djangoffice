@@ -9,6 +9,7 @@ from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_unicode
 from django.utils.html import escape
 from django.utils.text import capfirst
+from django.utils.safestring import mark_safe
 
 class DynamicModelChoiceField(forms.Field):
     def __init__(self, model, *args, **kwargs):
@@ -73,7 +74,7 @@ class DynamicChoice(forms.Widget):
             'field_name': name,
             'item': item,
         }
-        return u'<input%s>%s' % (flatatt(final_attrs), display_text)
+        return mark_safe(u'<input%s>%s' % (flatatt(final_attrs), display_text))
 
     def __deepcopy__(self, memo):
         """
@@ -166,7 +167,7 @@ class DynamicSelectMultiple(forms.Widget):
             output.append(u'<option value="%s" selected="selected">%s</option>' % (
                 escape(force_unicode(option_value)), escape(force_unicode(option_label))))
         output.append(u'</select>')
-        return u'\n'.join(output)
+        return mark_safe(u'\n'.join(output))
 
     def value_from_datadict(self, data, files, name):
         if isinstance(data, MultiValueDict):
