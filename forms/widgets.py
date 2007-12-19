@@ -74,7 +74,6 @@ class TableSelectMultiple(SelectMultiple):
             output.append(u'<tr><td>%s</td>' % rendered_cb)
             for attr in self.item_attrs:
                 if callable(getattr(item, attr)):
-                    print repr(getattr(item, attr))
                     content = getattr(item, attr)()
                 else:
                     content = getattr(item, attr)
