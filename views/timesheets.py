@@ -10,6 +10,7 @@ from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from django.template.defaultfilters import pluralize
 from django.utils import simplejson
+from django.utils.safestring import mark_safe
 
 from officeaid.auth import (is_admin, is_admin_or_manager,
     user_can_access_user, user_has_permission)
@@ -233,7 +234,7 @@ def edit_timesheet(request, username, year, month, day):
             'timesheet': timesheet,
             'time_entries': time_entries,
             'expenses': expenses,
-            'task_json': create_task_json(tasks_by_job),
+            'task_json': mark_safe(create_task_json(tasks_by_job)),
             'can_approve': can_approve,
         }, RequestContext(request))
 
@@ -329,7 +330,7 @@ def add_time_entry(request, username, year, month, day):
             'user_': user,
             'timesheet': timesheet,
             'form': form,
-            'task_json': create_task_json(tasks_by_job),
+            'task_json': mark_safe(create_task_json(tasks_by_job)),
         }, RequestContext(request))
 
 @transaction.commit_on_success

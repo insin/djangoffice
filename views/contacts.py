@@ -9,6 +9,7 @@ from django.http import (HttpResponseBadRequest, HttpResponseForbidden,
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from django.utils import simplejson
+from django.utils.safestring import mark_safe
 from django.views.generic import create_update, list_detail
 
 from officeaid.models import Client, Contact, Job
@@ -96,6 +97,6 @@ def assign_contacts(request, mode):
         position=c.position) for c in contacts])
     return render_to_response('contacts/assign_contacts.html', {
             'mode': mode,
-            'contact_json': contact_json,
+            'contact_json': mark_safe(contact_json),
             'letters': string.uppercase,
         }, RequestContext(request))
