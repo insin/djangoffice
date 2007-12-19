@@ -1,5 +1,6 @@
 from django.core.urlresolvers import reverse
 from django.utils.html import escape
+from django.utils.safestring import mark_safe
 
 from officeaid.auth import (is_admin, is_admin_or_manager,
     is_admin_manager_or_pm, is_authenticated, is_not_authenticated)
@@ -100,5 +101,11 @@ def build_menu_items(user, active_section_id=None, active_page_id=None,
                 'url': reverse(url_name),
                 'label': escape(label)
             })
+
+    for i, item in enumerate(section_items):
+        section_items[i] = mark_safe(item)
+
+    for i, item in enumerate(page_items):
+        page_items[i] = mark_safe(item)
 
     return (section_items, page_items)
