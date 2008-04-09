@@ -1035,7 +1035,7 @@ class Invoice(models.Model):
 class TimesheetOptions(dbsettings.Group):
     hours_per_full_week = dbsettings.DecimalValue()
 
-class TimesheetManager(models.Model):
+class TimesheetManager(models.Manager):
     def bulk_approve(user, start_date, end_date):
         """
         Marks all unapproved Timesheet items between the given dates as
