@@ -1,9 +1,9 @@
 from django import newforms as forms
 from django.contrib.auth.models import User
 
-from officeaid.forms import FilterBaseForm
-from officeaid.forms.fields import DynamicModelChoiceField
-from officeaid.models import ActivityType, Contact, UserProfile
+from djangoffice.forms import FilterBaseForm
+from djangoffice.forms.fields import DynamicModelChoiceField
+from djangoffice.models import ActivityType, Contact, UserProfile
 
 class ActivityFilterForm(FilterBaseForm, forms.Form):
     SEARCH_FILTERS = (

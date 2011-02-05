@@ -1,7 +1,7 @@
 from decimal import Decimal
 from django import template
 from django.utils.encoding import force_unicode
-from officeaid.utils.moneyfmt import moneyfmt
+from djangoffice.utils.moneyfmt import moneyfmt
 
 register = template.Library()
 

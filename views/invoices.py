@@ -6,13 +6,13 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.views.generic import create_update, list_detail
 
-from officeaid.auth import is_admin_or_manager, user_has_permission
-from officeaid.forms.invoices import (InvoiceFilterForm, InvoiceCriteriaForm,
+from djangoffice.auth import is_admin_or_manager, user_has_permission
+from djangoffice.forms.invoices import (InvoiceFilterForm, InvoiceCriteriaForm,
     SelectJobsForInvoiceForm)
-from officeaid.models import Invoice, Job
-from officeaid.views import send_file, SortHeaders
-from officeaid.views.generic import edit_object
-from officeaid.views.jobs import filter_jobs
+from djangoffice.models import Invoice, Job
+from djangoffice.views import send_file, SortHeaders
+from djangoffice.views.generic import edit_object
+from djangoffice.views.jobs import filter_jobs
 
 LIST_HEADERS = (
     (u'Invoice #',       'number'),

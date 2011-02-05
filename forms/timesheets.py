@@ -2,9 +2,9 @@ from decimal import Decimal
 
 from django import newforms as forms
 
-from officeaid.forms.widgets import DateInput, HourInput, MoneyInput
-from officeaid.models import Expense, ExpenseType, Task, TimeEntry
-from officeaid.utils.dates import week_ending_date
+from djangoffice.forms.widgets import DateInput, HourInput, MoneyInput
+from djangoffice.models import Expense, ExpenseType, Task, TimeEntry
+from djangoffice.utils.dates import week_ending_date
 
 class BulkApprovalForm(forms.Form):
     """

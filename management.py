@@ -2,10 +2,10 @@ from decimal import Decimal
 
 from dbsettings.utils import set_defaults
 
-from officeaid import models as officeaid_app
+from djangoffice import models as djangoffice_app
 
-# Install default OfficeAid settings
-set_defaults(officeaid_app,
+# Install default Djangoffice settings
+set_defaults(djangoffice_app,
     ('',          'job_over_hours',                True),
     ('',          'job_missed_end_date',           True),
     ('',          'incomplete_timesheet',          True),

@@ -7,9 +7,9 @@ from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from django.views.generic import create_update, list_detail
 
-from officeaid.forms.activities import ActivityFilterForm
-from officeaid.models import Activity, ActivityType, Job
-from officeaid.views import SortHeaders
+from djangoffice.forms.activities import ActivityFilterForm
+from djangoffice.models import Activity, ActivityType, Job
+from djangoffice.views import SortHeaders
 
 LIST_HEADERS = (
     (u'Number',      'id'),

@@ -2,7 +2,7 @@ import datetime
 
 from django.core.validators import ValidationError
 
-from officeaid.utils.dates import is_week_commencing_date
+from djangoffice.utils.dates import is_week_commencing_date
 
 class OnlyAllowedIfOtherFieldEquals(object):
     """

@@ -6,8 +6,8 @@ from decimal import Decimal
 
 from django.db.models.query import Q
 
-from officeaid.models import TimeEntry
-from officeaid.utils.time_entries import weekly_to_daily_entries
+from djangoffice.models import TimeEntry
+from djangoffice.utils.time_entries import weekly_to_daily_entries
 
 class RateNotFound(Exception):
     """A billing rate could not be found for time which was booked."""

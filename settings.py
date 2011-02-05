@@ -1,4 +1,4 @@
-# Django settings for officeaid project.
+# Django settings for djangoffice project.
 
 import os
 DIRNAME = os.path.dirname(__file__)
@@ -37,11 +37,11 @@ MEDIA_ROOT = os.path.join(DIRNAME, 'media')
 
 # URL that handles the media served from MEDIA_ROOT.
 # Example: 'http://media.lawrence.com/'
-MEDIA_URL = 'http://localhost/media/officeaid/'
+MEDIA_URL = '/media/'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
-ADMIN_MEDIA_PREFIX = '/media/'
+ADMIN_MEDIA_PREFIX = '/admin_media/'
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '4z-(+=l(wkd)1aj+wn)(r%6z)*s*thfbi9u%1&uu_w$ids#ww='
@@ -61,10 +61,10 @@ MIDDLEWARE_CLASSES = (
 
 CACHE_BACKEND = 'dummy:///'
 
-ROOT_URLCONF = 'officeaid.urls'
+ROOT_URLCONF = 'djangoffice.urls'
 
 # Authentication settings
-AUTH_PROFILE_MODULE = 'officeaid.UserProfile'
+AUTH_PROFILE_MODULE = 'djangoffice.UserProfile'
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/jobs/'
 
@@ -76,7 +76,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.auth',
     'django.core.context_processors.debug',
     'django.core.context_processors.media',
-    'officeaid.context_processors.app_constants',
+    'djangoffice.context_processors.app_constants',
 )
 
 INSTALLED_APPS = (
@@ -85,13 +85,12 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
-    'django_docs',
     'dbsettings',
-    'officeaid',
+    'djangoffice',
 )
 
 # Application constants
-APPLICATION_NAME = 'OfficeAid&copy;'
+APPLICATION_NAME = 'Djangoffice&copy;'
 APPLICATION_VERSION = '1.5'
 
 # Number of items on each when paginating
@@ -119,6 +118,6 @@ COMPANY_URL = 'http://www.generitech.co.uk'
 # local_settings module rather than editing this file, which should
 # contain development settings.
 try:
-    from officeaid.local_settings import *
+    from djangoffice.local_settings import *
 except ImportError:
     pass

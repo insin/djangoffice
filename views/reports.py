@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 
-from officeaid.auth import is_admin_or_manager, user_has_permission
+from djangoffice.auth import is_admin_or_manager, user_has_permission
 
 @login_required
 def report_list(request):

@@ -12,16 +12,16 @@ from django.template.defaultfilters import pluralize
 from django.utils import simplejson
 from django.utils.safestring import mark_safe
 
-from officeaid.auth import (is_admin, is_admin_or_manager,
+from djangoffice.auth import (is_admin, is_admin_or_manager,
     user_can_access_user, user_has_permission)
-from officeaid.forms.timesheets import (BulkApprovalForm, AddTimeEntryForm,
+from djangoffice.forms.timesheets import (BulkApprovalForm, AddTimeEntryForm,
     EditTimeEntryForm, ApprovedTimeEntryForm, AddExpenseForm, EditExpenseForm,
     ApprovedExpenseForm)
-from officeaid.models import (Expense, ExpenseType, Job, Task, TimeEntry,
+from djangoffice.models import (Expense, ExpenseType, Job, Task, TimeEntry,
     Timesheet)
-from officeaid.utils.dates import (is_week_commencing_date,
+from djangoffice.utils.dates import (is_week_commencing_date,
     week_commencing_date, week_ending_date)
-from officeaid.views import permission_denied
+from djangoffice.views import permission_denied
 
 #####################
 # Utility functions #

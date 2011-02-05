@@ -2,7 +2,7 @@ import datetime
 
 from django.test import TestCase
 
-from officeaid.models import Invoice
+from djangoffice.models import Invoice
 
 class InvoiceManagerTest(TestCase):
     """

@@ -2,9 +2,9 @@ from django import newforms as forms
 from django.contrib.auth.models import User
 from django.template.defaultfilters import pluralize
 
-from officeaid.forms import FilterBaseForm, HiddenBaseForm
-from officeaid.forms.widgets import TableSelectMultiple
-from officeaid.models import Invoice
+from djangoffice.forms import FilterBaseForm, HiddenBaseForm
+from djangoffice.forms.widgets import TableSelectMultiple
+from djangoffice.models import Invoice
 
 class InvoiceFilterForm(FilterBaseForm, forms.Form):
     pass

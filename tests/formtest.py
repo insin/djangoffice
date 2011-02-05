@@ -4,7 +4,7 @@ from django import newforms as forms
 from django.contrib.auth.models import User
 from django.test import TestCase
 
-from officeaid.forms.fields import (DynamicChoice, DynamicModelChoiceField,
+from djangoffice.forms.fields import (DynamicChoice, DynamicModelChoiceField,
     DynamicSelectMultiple, MultipleDynamicModelChoiceField)
 
 class FormTest(TestCase):

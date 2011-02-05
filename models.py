@@ -12,7 +12,7 @@ from django.db.models.query import find_field
 from django.utils.text import truncate_words
 from django.utils.encoding import smart_unicode
 
-from officeaid.validators import isSafeishQuery, isWeekCommencingDate
+from djangoffice.validators import isSafeishQuery, isWeekCommencingDate
 
 qn = connection.ops.quote_name
 

@@ -1,6 +1,6 @@
 from django import newforms as forms
 
-from officeaid.models import TaskTypeRate, UserRate
+from djangoffice.models import TaskTypeRate, UserRate
 
 class EditRateForm(forms.Form):
     standard_rate = forms.DecimalField(max_digits=6, decimal_places=2, min_value=0)

@@ -156,6 +156,7 @@ def send_file(filename):
     response['Content-Length'] = os.stat(filename).st_size
     return response
 
-# Make the menu tag global
+# Add common and menu tags to builtins
 from django.template import add_to_builtins
-add_to_builtins('officeaid.templatetags.menu')
+add_to_builtins('djangoffice.templatetags.djangoffice_tags')
+add_to_builtins('djangoffice.templatetags.menu')

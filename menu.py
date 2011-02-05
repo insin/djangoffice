@@ -2,7 +2,7 @@ from django.core.urlresolvers import reverse
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 
-from officeaid.auth import (is_admin, is_admin_or_manager,
+from djangoffice.auth import (is_admin, is_admin_or_manager,
     is_admin_manager_or_pm, is_authenticated, is_not_authenticated)
 
 # 4-tuples of (section id, label, URL name, user permission test function)

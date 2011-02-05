@@ -7,12 +7,12 @@ from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from django.views.generic import create_update, list_detail
 
-from officeaid.auth import is_admin, user_has_permission
-from officeaid.forms.sql_reports import SQLReportParameterForm
-from officeaid.models import SQLReport
-from officeaid.utils import dtuple
-from officeaid.views import SortHeaders
-from officeaid.views.generic import add_object, edit_object
+from djangoffice.auth import is_admin, user_has_permission
+from djangoffice.forms.sql_reports import SQLReportParameterForm
+from djangoffice.models import SQLReport
+from djangoffice.utils import dtuple
+from djangoffice.views import SortHeaders
+from djangoffice.views.generic import add_object, edit_object
 
 LIST_HEADERS = (
     (u'SQL Report', 'name'),

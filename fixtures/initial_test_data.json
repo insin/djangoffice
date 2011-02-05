@@ -55,7 +55,7 @@
   },
   {
     "pk": "1",
-    "model": "officeaid.task",
+    "model": "djangoffice.task",
     "fields": {
       "task_type": 1,
       "end_date": null,
@@ -73,7 +73,7 @@
   },
   {
     "pk": "1",
-    "model": "officeaid.contact",
+    "model": "djangoffice.contact",
     "fields": {
       "phone_number": "028 1234 5678",
       "county": "",
@@ -94,7 +94,7 @@
   },
   {
     "pk": "1",
-    "model": "officeaid.job",
+    "model": "djangoffice.job",
     "fields": {
       "status": "L",
       "project_manager": 1,
@@ -122,7 +122,7 @@
   },
   {
     "pk": "1",
-    "model": "officeaid.client",
+    "model": "djangoffice.client",
     "fields": {
       "disabled": false,
       "notes": "Required for use by the Admin Job",
@@ -134,14 +134,14 @@
   },
   {
     "pk": "1",
-    "model": "officeaid.tasktype",
+    "model": "djangoffice.tasktype",
     "fields": {
       "name": "Vacation"
     }
   },
   {
     "pk": "1",
-    "model": "officeaid.userprofile",
+    "model": "djangoffice.userprofile",
     "fields": {
       "user": "1",
       "phone_number": "",
@@ -154,7 +154,7 @@
   },
   {
     "pk": "2",
-    "model": "officeaid.userprofile",
+    "model": "djangoffice.userprofile",
     "fields": {
       "user": "2",
       "phone_number": "",
@@ -167,7 +167,7 @@
   },
   {
     "pk": "3",
-    "model": "officeaid.userprofile",
+    "model": "djangoffice.userprofile",
     "fields": {
       "user": "3",
       "phone_number": "",

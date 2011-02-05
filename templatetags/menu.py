@@ -1,6 +1,6 @@
 from django import template
 
-from officeaid.menu import build_menu_items
+from djangoffice.menu import build_menu_items
 
 register = template.Library()
 

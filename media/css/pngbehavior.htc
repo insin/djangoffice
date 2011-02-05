@@ -24,7 +24,7 @@
  */
 
 var realSrc;
-var blankSrc = "http://localhost/media/officeaid/css/blank.gif";
+var blankSrc = "/media/css/blank.gif";
 var isPrinting = false;
 
 fixImage();

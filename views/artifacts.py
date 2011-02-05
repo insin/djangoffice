@@ -9,9 +9,9 @@ from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from django.views.generic import list_detail
 
-from officeaid.models import Artifact, Job
-from officeaid.views import permission_denied, send_file, SortHeaders
-from officeaid.views.generic import add_object, edit_object
+from djangoffice.models import Artifact, Job
+from djangoffice.views import permission_denied, send_file, SortHeaders
+from djangoffice.views.generic import add_object, edit_object
 
 LIST_HEADERS = (
     (u'Description', None),

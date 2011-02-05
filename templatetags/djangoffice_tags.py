@@ -1,6 +1,6 @@
 from django import template
 
-from officeaid import auth
+from djangoffice import auth
 
 register = template.Library()
 

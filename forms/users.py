@@ -1,7 +1,7 @@
 from django import newforms as forms
 from django.contrib.auth.models import User
 
-from officeaid.models import UserProfile
+from djangoffice.models import UserProfile
 
 class AdminUserForm(forms.Form):
     username   = forms.CharField(max_length=30)

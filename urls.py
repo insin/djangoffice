@@ -2,7 +2,7 @@ from django.conf.urls.defaults import *
 
 TIMESHEET_BASE = r'timesheets/(?P<username>[-\w]+)/(?P<year>\d{4})-(?P<month>\d{2})-(?P<day>\d{2})'
 
-urlpatterns = patterns('officeaid.views',
+urlpatterns = patterns('djangoffice.views',
     (r'^$', 'users.login'),
 
     # Users

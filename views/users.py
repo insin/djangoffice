@@ -12,12 +12,12 @@ from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from django.views.generic import create_update, list_detail
 
-from officeaid import models
-from officeaid.auth import is_admin, is_admin_or_manager, user_has_permission
-from officeaid.forms.rates import EditRateForm, UserRateBaseForm
-from officeaid.forms.users import AdminUserForm, EditUserForm, UserForm
-from officeaid.models import Job, Task, UserRate, UserProfile
-from officeaid.views import SortHeaders
+from djangoffice import models
+from djangoffice.auth import is_admin, is_admin_or_manager, user_has_permission
+from djangoffice.forms.rates import EditRateForm, UserRateBaseForm
+from djangoffice.forms.users import AdminUserForm, EditUserForm, UserForm
+from djangoffice.models import Job, Task, UserRate, UserProfile
+from djangoffice.views import SortHeaders
 
 #####################
 # Utility functions #

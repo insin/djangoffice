@@ -12,9 +12,9 @@ from django.utils import simplejson
 from django.utils.safestring import mark_safe
 from django.views.generic import create_update, list_detail
 
-from officeaid.models import Client, Contact, Job
-from officeaid.views import SortHeaders
-from officeaid.views.generic import add_object, edit_object
+from djangoffice.models import Client, Contact, Job
+from djangoffice.views import SortHeaders
+from djangoffice.views.generic import add_object, edit_object
 
 LIST_HEADERS = (
     (u'Name',         'last_name'),

@@ -1,11 +1,11 @@
 import os
-os.environ['DJANGO_SETTINGS_MODULE'] = 'officeaid.settings'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'djangoffice.settings'
 
 import datetime
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import transaction
-from officeaid.models import (Client, Contact, ExpenseType, Job, SQLReport,
+from djangoffice.models import (Client, Contact, ExpenseType, Job, SQLReport,
     Task, TaskType, UserProfile)
 
 @transaction.commit_on_success
@@ -49,9 +49,9 @@ def create_initial_data():
                              overtime_rate=85.00, editable=False)
 
     print('Creating Admin Client and Contact')
-    admin_contact = Contact.objects.create(first_name='OfficeAid',
+    admin_contact = Contact.objects.create(first_name='Djangoffice',
        last_name='Administrator', company_name=settings.COMPANY_NAME,
-       position='OfficeAid Administrator', notes='Required for use by the Admin Job',
+       position='Djangoffice Administrator', notes='Required for use by the Admin Job',
        **dict(settings.COMPANY_ADDRESS, **settings.COMPANY_CONTACT))
     company = Client.objects.create(name=settings.COMPANY_NAME,
                                     notes='Required for use by the Admin Job')
@@ -123,8 +123,8 @@ def create_initial_data():
    ,te.overtime AS 'Overtime Booked'
 FROM
    auth_user u
-   INNER JOIN officeaid_timesheet AS t ON u.id = t.user_id
-   INNER JOIN officeaid_timeentry AS te ON t.id = te.timesheet_id
+   INNER JOIN djangoffice_timesheet AS t ON u.id = t.user_id
+   INNER JOIN djangoffice_timeentry AS te ON t.id = te.timesheet_id
 WHERE t.week_commencing <= '::UpToDate'
   AND te.approved_by_id IS NULL
 ORDER BY 'Week Commencing' ASC, 'User' ASC""")
@@ -138,10 +138,10 @@ ORDER BY 'Week Commencing' ASC, 'User' ASC""")
    ,e.amount AS 'Expense Amount'
 FROM
     auth_user u
-    INNER JOIN officeaid_expensetype AS et ON e.type_id = et.id
-    INNER JOIN officeaid_job AS j ON e.job_id = j.id
-    INNER JOIN officeaid_timesheet AS t ON u.id = t.user_id
-    INNER JOIN officeaid_expense AS e ON t.id = e.timesheet_id
+    INNER JOIN djangoffice_expensetype AS et ON e.type_id = et.id
+    INNER JOIN djangoffice_job AS j ON e.job_id = j.id
+    INNER JOIN djangoffice_timesheet AS t ON u.id = t.user_id
+    INNER JOIN djangoffice_expense AS e ON t.id = e.timesheet_id
 WHERE e.date <= '::UpToDate'
   AND e.approved_by_id IS NULL
 ORDER BY 'Date' ASC, 'User' ASC""")

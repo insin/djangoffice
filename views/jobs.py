@@ -8,11 +8,11 @@ from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from django.views.generic import list_detail
 
-from officeaid.auth import is_admin, is_admin_or_manager, user_has_permission
-from officeaid.forms.jobs import (AddJobForm, AddTaskForm, EditJobForm,
+from djangoffice.auth import is_admin, is_admin_or_manager, user_has_permission
+from djangoffice.forms.jobs import (AddJobForm, AddTaskForm, EditJobForm,
     EditTaskForm, JobFilterForm)
-from officeaid.models import Job, Task, TaskType, UserProfile
-from officeaid.views import SortHeaders
+from djangoffice.models import Job, Task, TaskType, UserProfile
+from djangoffice.views import SortHeaders
 
 LIST_HEADERS = (
     (u'Number', 'number'),

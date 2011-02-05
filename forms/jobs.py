@@ -4,10 +4,10 @@ from django import newforms as forms
 from django.contrib.auth.models import User
 from django.db.models.query import Q
 
-from officeaid.forms import FilterBaseForm
-from officeaid.forms.fields import (DynamicModelChoiceField,
+from djangoffice.forms import FilterBaseForm
+from djangoffice.forms.fields import (DynamicModelChoiceField,
     MultipleDynamicModelChoiceField)
-from officeaid.models import Client, Contact, Job, Task, UserProfile
+from djangoffice.models import Client, Contact, Job, Task, UserProfile
 
 SEARCH_TYPE_CHOICES = (
     (1, u'Job Number'),
