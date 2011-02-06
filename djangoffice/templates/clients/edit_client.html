@@ -4,6 +4,7 @@
 {% block content %}
 <h1>Edit Client</h1>
 <form name="clientForm" id="clientForm" action="." method="POST">
+{% csrf_token %}
 <table cellspacing="0">
 {{ form }}
 </table>

@@ -1,4 +1,4 @@
-from django import newforms as forms
+from django import forms
 
 class SQLReportParameterForm(forms.Form):
     def __init__(self, param_names, *args, **kwargs):

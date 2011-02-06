@@ -5,6 +5,7 @@
 <h1>Bulk Approval {% if not form %} Results{% endif %}</h1>
 {% if form %}
 <form name="clientForm" id="clientForm" action="." method="POST">
+{% csrf_token %}
 <table cellspacing="0">
 <tbody>
 {{ form }}

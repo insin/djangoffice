@@ -6,6 +6,7 @@
 
 {% if rates %}
 <form name="editUserRatesForm" id="editUserRatesForm" action="." method="POST">
+{% csrf_token %}
 <table cellspacing="0" class="data">
 <thead>
 <tr>

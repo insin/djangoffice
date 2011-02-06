@@ -4,6 +4,7 @@
 {% block content %}
 <h1>Delete Activity Type</h1>
 <form name="activityTypeForm" id="activityTypeForm" action="." method="POST">
+{% csrf_token %}
 <p>Are you sure you want to delete the Activity Type '{{ activity_type.name|escape }}'?</p>
 <div class="buttons">
   <button type="submit" class="negative"><img src="{{ MEDIA_URL }}img/delete.png" alt=""> Delete Activity Type</button>

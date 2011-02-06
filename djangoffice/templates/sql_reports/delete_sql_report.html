@@ -4,6 +4,7 @@
 {% block content %}
 <h1>Delete SQL Report</h1>
 <form name="sqlReportForm" id="sqlReportForm" action="." method="POST">
+{% csrf_token %}
 <p>Are you sure you want to delete the SQL Report '{{ sql_report.name|escape }}'?</p>
 <div class="buttons">
   <button type="submit" class="negative"><img src="{{ MEDIA_URL }}img/script_delete.png" alt=""> Delete SQL Report</button>

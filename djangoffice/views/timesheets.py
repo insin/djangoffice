@@ -1,6 +1,7 @@
 import datetime
 import time
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -197,9 +198,8 @@ def edit_timesheet(request, username, year, month, day):
                 if form:
                     form.save(request.user, commit=True)
 
-            request.user.message_set.create(
-                message=u'The %s was successfully saved.' \
-                        % Timesheet._meta.verbose_name)
+            messages.success(request, 'The %s was successfully saved.' \
+                                       % Timesheet._meta.verbose_name)
             return HttpResponseRedirect(timesheet.get_absolute_url())
     else:
         # Create forms
@@ -255,10 +255,9 @@ def approve_timesheet(request, username, year, month, day):
         Timesheet.objects.get_or_create(user=user,
                                         week_commencing=week_commencing)
     entries, expenses = timesheet.approve(request.user)
-    request.user.message_set.add(
-        message=u'%s time entr%s and %s expense%s were approved.' \
-        % (entries, pluralize(entries, u'y,ies'),
-           expenses, pluralize(expenses)))
+    messages.success(requset, '%s time entr%s and %s expense%s were approved.' \
+                              % (entries, pluralize(entries, u'y,ies'),
+                                 expenses, pluralize(expenses)))
     return HttpResponseRedirect(timsheet.get_absolute_url())
 
 @transaction.commit_on_success
@@ -285,11 +284,10 @@ def prepopulate_timesheet(request, username, year, month, day):
                        .distinct()
         for task_type in task_types:
             TimeEntry.objects.create(timesheet=timesheet, task_type=task_type)
-        request.user.message_set.create(
-            message=u'Successfully prepopulated Time Entries from the previous week\'s Timesheet.')
+        messages.success(request,
+                         "Successfully prepopulated Time Entries from the previous week's Timesheet.")
     except Timesheet.DoesNotExist:
-        request.user.message_set.create(
-            message=u'Cannot prepopulate as there is no Timesheet for the previous week.')
+        messages.warning('Cannot prepopulate as there is no Timesheet for the previous week.')
     return HttpResponseRedirect(timesheet.get_absolute_url())
 
 @transaction.commit_on_success
@@ -318,9 +316,8 @@ def add_time_entry(request, username, year, month, day):
         form = AddTimeEntryForm(jobs, tasks=form_tasks, data=request.POST)
         if form.is_valid():
             entry = form.save(timesheet=timesheet)
-            request.user.message_set.create(
-                message=u'The %s was added successfully' \
-                        % TimeEntry._meta.verbose_name)
+            messages.success(request, 'The %s was added successfully' \
+                                      % TimeEntry._meta.verbose_name)
             return HttpResponseRedirect(reverse('edit_timesheet',
                                                 args=(username, year, month,
                                                       day)))
@@ -353,9 +350,8 @@ def delete_time_entry(request, username, year, month, day, time_entry_id):
 
     if request.method == 'POST':
         time_entry.delete()
-        request.user.message_set.create(
-            message=u'The %s was deleted successfully.' \
-                    % TimeEntry._meta.verbose_name)
+        messages.success(request, 'The %s was deleted successfully.' \
+                                  % TimeEntry._meta.verbose_name)
         return HttpResponseRedirect(timesheet.get_absolute_url())
     else:
         time_entry.job_display = u'%05d - %s' % (time_entry.job_number,
@@ -385,9 +381,8 @@ def add_expense(request, username, year, month, day):
         form = AddExpenseForm(jobs, week_commencing, data=request.POST)
         if form.is_valid():
             expense = form.save(timesheet=timesheet)
-            request.user.message_set.create(
-                message=u'The %s was added successfully' \
-                        % Expense._meta.verbose_name)
+            messages.success(request, 'The %s was added successfully' \
+                                      % Expense._meta.verbose_name)
             return HttpResponseRedirect(reverse('edit_timesheet',
                                                 args=(username, year, month,
                                                       day)))
@@ -419,9 +414,8 @@ def delete_expense(request, username, year, month, day, expense_id):
 
     if request.method == 'POST':
         expense.delete()
-        request.user.message_set.create(
-            message=u'The %s was deleted successfully.' \
-                    % Expense._meta.verbose_name)
+        messages.success(request, 'The %s was deleted successfully.' \
+                                  % Expense._meta.verbose_name)
         return HttpResponseRedirect(timesheet.get_absolute_url())
     else:
         expense.job_display = u'%05d - %s' % (expense.job_number,

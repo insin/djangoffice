@@ -1,9 +1,8 @@
 import md5
 import cPickle as pickle
 
-from django import newforms as forms
+from django import forms
 from django.db.models import Model
-from django.newforms.forms import BoundField
 
 def security_hash(self, request, form):
     """
@@ -75,6 +74,6 @@ class HiddenBaseForm(forms.BaseForm):
         """
         output = []
         for name, field in self.fields.items():
-            bf = BoundField(self, field, name)
+            bf = forms.BoundField(self, field, name)
             output.append(bf.as_hidden())
         return u'\n'.join(output)

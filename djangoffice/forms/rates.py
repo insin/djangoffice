@@ -1,4 +1,4 @@
-from django import newforms as forms
+from django import forms
 
 from djangoffice.models import TaskTypeRate, UserRate
 

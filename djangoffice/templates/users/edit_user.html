@@ -4,6 +4,7 @@
 {% block content %}
 <h1>Edit User '{{ user_.get_full_name|escape }}'</h1>
 <form name="userForm" id="userForm" action="." method="POST">
+{% csrf_token %}
 <table cellspacing="0">
 <tbody>
 {{ form }}

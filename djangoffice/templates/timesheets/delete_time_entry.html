@@ -4,6 +4,7 @@
 {% block content %}
 <h1>Delete Time Entry</h1>
 <form name="timeEntryForm" id="timeEntryForm" action="." method="POST">
+{% csrf_token %}
 <p>Are you sure you want to delete the following Time Entry?</p>
 <dl>
   <dt>For user:</dt>

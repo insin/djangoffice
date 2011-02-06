@@ -4,6 +4,7 @@
 {% block content %}
 <h1>Edit Activity Type</h1>
 <form name="activityTypeForm" id="activityTypeForm" action="." method="POST">
+{% csrf_token %}
 <table cellspacing="0">
 {{ form }}
 </table>

@@ -4,6 +4,7 @@
 {% block content %}
 <h1>Edit Invoice</h1>
 <form name="invoiceForm" id="invoiceForm" action="." method="POST">
+{% csrf_token %}
 <table cellspacing="0">
 {{ form }}
 </table>

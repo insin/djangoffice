@@ -7,6 +7,7 @@
 {{ form.non_field_errors.as_ul }}
 
 <form name="invoiceCriteriaForm" id="invoiceCriteriaForm" action="." method="POST">
+{% csrf_token %}
 <div style="float: left; width: 55%;">
   <table cellspacing="0">
   <tbody>

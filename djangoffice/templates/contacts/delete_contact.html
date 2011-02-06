@@ -4,6 +4,7 @@
 {% block content %}
 <h1>Delete Contact</h1>
 <form name="contactForm" id="contactForm" action="." method="POST">
+{% csrf_token %}
 <p>Are you sure you want to delete the Contact '{{ contact.full_name|escape }}'?</p>
 <div class="buttons">
   <button type="submit" class="negative"><img src="{{ MEDIA_URL }}img/group_delete.png" alt=""> Delete Contact</button>

@@ -5,7 +5,7 @@
 <h1>Edit Job {{ job.formatted_number }} - {{ job.name|escape }}</h1>
 
 <form name="editJobForm" id="editJobForm" action="." method="POST">
-
+{% csrf_token %}
 <h2>Job Details</h2>
 <table cellspacing="0">
 <tbody>

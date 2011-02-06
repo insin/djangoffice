@@ -1,4 +1,5 @@
 from django.conf.urls.defaults import *
+from django.conf import settings
 
 TIMESHEET_BASE = r'timesheets/(?P<username>[-\w]+)/(?P<year>\d{4})-(?P<month>\d{2})-(?P<day>\d{2})'
 
@@ -136,7 +137,11 @@ urlpatterns = patterns('djangoffice.views',
 
 # Admin and settings applications
 urlpatterns += patterns('',
-    (r'^admin/', include('django_docs.urls')),
-    (r'^admin/', include('django.contrib.admin.urls')),
+    #(r'^admin/', include('django.contrib.admin.urls')),
     (r'^settings/', include('dbsettings.urls')),
 )
+
+if settings.DEBUG:
+    urlpatterns += patterns('',
+        (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
+    )

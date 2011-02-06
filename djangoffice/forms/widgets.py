@@ -1,9 +1,10 @@
-from django.newforms.widgets import Input, CheckboxInput, SelectMultiple
+from django import forms
+from django.forms import widgets
 from django.utils.encoding import force_unicode
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 
-class DateInput(Input):
+class DateInput(widgets.Input):
     input_type = 'text'
 
     def __init__(self, attrs=None):
@@ -11,7 +12,7 @@ class DateInput(Input):
         if attrs:
             self.attrs.update(attrs)
 
-class HourInput(Input):
+class HourInput(widgets.Input):
     input_type = 'text'
 
     def __init__(self, attrs=None):
@@ -19,7 +20,7 @@ class HourInput(Input):
         if attrs:
             self.attrs.update(attrs)
 
-class MoneyInput(Input):
+class MoneyInput(widgets.Input):
     input_type = 'text'
 
     def __init__(self, attrs=None):
@@ -27,7 +28,7 @@ class MoneyInput(Input):
         if attrs:
             self.attrs.update(attrs)
 
-class TableSelectMultiple(SelectMultiple):
+class TableSelectMultiple(forms.SelectMultiple):
     """
     Provides selection of items via checkboxes, with a table row
     being rendered for each item, the first cell in which contains the
@@ -68,7 +69,7 @@ class TableSelectMultiple(SelectMultiple):
             # so that the checkboxes don't all have the same ID attribute.
             if has_id:
                 final_attrs = dict(final_attrs, id='%s_%s' % (attrs['id'], i))
-            cb = CheckboxInput(final_attrs, check_test=lambda value: value in str_values)
+            cb = forms.CheckboxInput(final_attrs, check_test=lambda value: value in str_values)
             option_value = force_unicode(option_value)
             rendered_cb = cb.render(name, option_value)
             output.append(u'<tr><td>%s</td>' % rendered_cb)

@@ -1,7 +1,8 @@
 import datetime
 
-from django import newforms as forms
+from django import forms
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
@@ -46,6 +47,11 @@ def artifact_list(request, job_number):
             'headers': list(sort_headers.headers()),
         })
 
+class ArtifactForm(forms.ModelForm):
+    class Meta:
+        model = Artifact
+        fields= ('file', 'type', 'description', 'access')
+
 @login_required
 def add_artifact(request, job_number):
     """
@@ -54,8 +60,6 @@ def add_artifact(request, job_number):
     job = get_object_or_404(Job, number=int(job_number))
     if not job.is_accessible_to_user(request.user):
         return permission_denied(request)
-    ArtifactForm = forms.form_for_model(Artifact, fields=('file', 'type',
-                                        'description', 'access'))
     if request.method == 'POST':
         form = ArtifactForm(data=request.POST, files=request.FILES)
         if form.is_valid():
@@ -64,9 +68,8 @@ def add_artifact(request, job_number):
             artifact.created_at = datetime.datetime.now()
             artifact.updated_at = artifact.created_at
             artifact.save()
-            request.user.message_set.create(
-                message=u'The %s was added successfully.' \
-                        % Artifact._meta.verbose_name)
+            messages.success(request, 'The %s was added successfully.' \
+                                      % Artifact._meta.verbose_name)
             return HttpResponseRedirect(reverse('artifact_list',
                                                 args=(job_number,)))
     else:
@@ -110,17 +113,14 @@ def edit_artifact(request, job_number, artifact_id):
     if not job.is_accessible_to_user(request.user) or \
        not artifact.is_accessible_to_user(request.user):
         return permission_denied(request)
-    ArtifactForm = forms.form_for_instance(artifact, fields=('file', 'type'
-                                           'description', 'access'))
     if request.method == 'POST':
         form = ArtifactForm(data=request.POST, files=request.FILES)
         if form.is_valid():
             artifact = form.save(commit=False)
             artifact.updated_at = datetime.datetime.now()
             artifact.save()
-            request.user.message_set.create(
-                message=u'The %s was edited successfully.' \
-                        % Artifact._meta.verbose_name)
+            messages.success(request, 'The %s was edited successfully.' \
+                                      % Artifact._meta.verbose_name)
             return HttpResponseRedirect(reverse('artifact_list',
                                         args=(job_number,)))
     else:

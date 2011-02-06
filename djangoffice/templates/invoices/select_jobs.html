@@ -16,6 +16,7 @@
 {% if jobs %}
 {{ form.non_field_errors.as_ul }}
 <form name="selectJobsForm" id="selectJobsForm" action="." method="POST">
+{% csrf_token %}
 <table cellspacing="0" class="data">
 <thead>
   <tr>

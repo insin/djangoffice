@@ -4,6 +4,7 @@
 {% block content %}
 <h1>Add Contact</h1>
 <form name="contactForm" id="contactForm" action="." method="POST">
+{% csrf_token %}
 <table cellspacing="0">
 <tbody>
 {{ form }}

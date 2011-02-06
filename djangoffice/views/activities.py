@@ -1,5 +1,7 @@
-from django import newforms as forms
+import django.forms.models
+from django import forms
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseForbidden, HttpResponseRedirect
@@ -48,6 +50,12 @@ def activity_list(request):
             'headers': list(sort_headers.headers()),
         })
 
+class AddActivityForm(forms.ModelForm):
+    class Meta:
+        model = Activity
+        fields = ('job', 'type', 'description', 'priority', 'assigned_to',
+                  'contact', 'due_date')
+
 @login_required
 def add_activity(request):
     """
@@ -56,20 +64,20 @@ def add_activity(request):
     Initial values for any Activity field may be specified as ``GET``
     parameters.
     """
-    fields = ('job', 'type', 'description', 'priority', 'assigned_to',
-              'contact', 'due_date')
-    ActivityForm = forms.form_for_model(Activity, fields=fields)
+
+    
     if request.method == 'POST':
-        form = ActivityForm(request.POST)
+        form = AddActivityForm(request.POST)
         if form.is_valid():
             activity = form.save(commit=False)
             activity.created_by = request.user
             activity.save()
-            request.user.message_set.create(message=u'The %s was created sucessfully.' % Activity._meta.verbose_name)
+            messages.success(request, 'The %s was created sucessfully.' \
+                                      % Activity._meta.verbose_name)
             return HttpResponseRedirect(activity.get_absolute_url())
     else:
         # Fields may be pre-populated with query string parameters
-        form = ActivityForm(initial=dict(request.GET.items()))
+        form = AddActivityForm(initial=dict(request.GET.items()))
     return render_to_response('activities/add_activity.html', {
             'form': form,
         }, RequestContext(request))
@@ -84,6 +92,12 @@ def activity_detail(request, activity_id):
             'activity': activity,
         }, RequestContext(request))
 
+class EditActivityForm(forms.ModelForm):
+    class Meta:
+        model = Activity
+        fields = ('job', 'type', 'description', 'priority', 'assigned_to',
+                  'contact', 'due_date', 'completed')
+
 @login_required
 def edit_activity(request, activity_id):
     """
@@ -95,17 +109,15 @@ def edit_activity(request, activity_id):
     if activity.completed:
         return HttpResponseForbidden(u'Completed %s may not be edited.' \
                                      % Activity._meta.verbose_name_plural)
-    fields = ('job', 'type', 'description', 'priority', 'assigned_to',
-              'contact', 'due_date', 'completed')
-    ActivityForm = forms.form_for_instance(activity, fields=fields)
     if request.method == 'POST':
-        form = ActivityForm(request.POST)
+        form = EditActivityForm(request.POST, instance=activity)
         if form.is_valid():
             activity = form.save()
-            request.user.message_set.create(message=u'The %s was updated sucessfully.' % Activity._meta.verbose_name)
+            messages.success(request, 'The %s was updated sucessfully.' \
+                                      % Activity._meta.verbose_name)
             return HttpResponseRedirect(activity.get_absolute_url())
     else:
-        form = ActivityForm()
+        form = EditActivityForm(instance=activity)
     return render_to_response('activities/edit_activity.html', {
             'activity': activity,
             'form': form,

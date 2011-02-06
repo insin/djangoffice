@@ -5,6 +5,7 @@
 <h1>Add Rate for '{{ task_type.name|escape }}'</h1>
 
 <form name="addTaskTypeRateForm" id="addTaskTypeRateForm" action="." method="POST">
+{% csrf_token %}
 <table cellspacing="0">
 <tbody>
 {{ form }}

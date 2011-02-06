@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from django import newforms as forms
+from django import forms
 
 from djangoffice.forms.widgets import DateInput, HourInput, MoneyInput
 from djangoffice.models import Expense, ExpenseType, Task, TimeEntry

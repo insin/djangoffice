@@ -6,6 +6,7 @@
 
 {% if rates %}
 <form name="editTaskTypeRatesForm" id="editTaskTypeRatesForm" action="." method="POST">
+{% csrf_token %}
 <table cellspacing="0" class="data">
 {% if editable_rates %}
 <col width="1">

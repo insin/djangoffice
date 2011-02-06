@@ -5,6 +5,7 @@
 <h1>Add Rate for {{ user_.get_full_name|escape }}</h1>
 
 <form name="addUserRateForm" id="addUserRateForm" action="." method="POST">
+{% csrf_token %}
 <table cellspacing="0">
 <tbody>
 {{ form }}

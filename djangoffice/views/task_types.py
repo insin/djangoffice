@@ -1,5 +1,6 @@
-from django import newforms as forms
+from django import forms
 from django.conf import settings
+from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.http import HttpResponseForbidden, HttpResponseRedirect
@@ -92,9 +93,8 @@ def edit_task_type_rates(request, task_type_id):
                     rate.standard_rate = form.cleaned_data['standard_rate']
                     rate.overtime_rate = form.cleaned_data['overtime_rate']
                     rate.save()
-                    request.user.message_set.create(
-                        message=u'%s were edited successfully.' \
-                                % TaskTypeRate._meta.verbose_name_plural)
+                    messages.success(request, '%s were edited successfully.' \
+                                              % TaskTypeRate._meta.verbose_name_plural)
                     return HttpResponseRedirect(task_type.get_absolute_url())
     else:
         for rate in task_type.rates.order_by('effective_from'):
@@ -111,15 +111,17 @@ def edit_task_type_rates(request, task_type_id):
             'editable_rates': editable_rates,
         }, RequestContext(request))
 
+class TaskTypeRateForm(TaskTypeRateBaseForm, forms.ModelForm):
+    class Meta:
+        model = TaskTypeRate
+        fields=('effective_from', 'standard_rate', 'overtime_rate')
+
 @user_has_permission(is_admin_or_manager)
 def add_task_type_rate(request, task_type_id):
     """
     Adds a new Task Type Rate.
     """
     task_type = get_object_or_404(TaskType, pk=task_type_id)
-    TaskTypeRateForm = forms.form_for_model(TaskTypeRate,
-        form=TaskTypeRateBaseForm, fields=('effective_from', 'standard_rate',
-                                           'overtime_rate'))
     if request.method == 'POST':
         form = TaskTypeRateForm(task_type, request.POST)
         if form.is_valid():
@@ -127,9 +129,8 @@ def add_task_type_rate(request, task_type_id):
             rate.task_type = task_type
             rate.editable = True
             rate.save()
-            request.user.message_set.create(
-                message=u'The %s was added successfully.' \
-                        % TaskTypeRate._meta.verbose_name)
+            messages.success(request, 'The %s was added successfully.' \
+                                      % TaskTypeRate._meta.verbose_name)
             return HttpResponseRedirect(reverse('edit_task_type_rates',
                                                 args=(task_type.id,)))
     else:

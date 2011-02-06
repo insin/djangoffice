@@ -21,6 +21,7 @@
 </dl>
 
 <form name="timesheetForm" id="timesheetForm" action="." method="POST">
+{% csrf_token %}
 {% if not user_.get_profile.is_admin %}
 <h2>Time Entries</h2>
 <table cellspacing="0" class="data">

@@ -4,6 +4,7 @@
 {% block content %}
 <h1>Add Task Type</h1>
 <form name="taskTypeForm" id="taskTypeForm" action="." method="POST">
+{% csrf_token %}
 <table cellspacing="0">
 <tbody>
 {{ form }}

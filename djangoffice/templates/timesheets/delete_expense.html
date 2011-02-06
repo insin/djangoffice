@@ -4,6 +4,7 @@
 {% block content %}
 <h1>Delete Expense</h1>
 <form name="expenseForm" id="expenseForm" action="." method="POST">
+{% csrf_token %}
 <p>Are you sure you want to delete the following Expense?</p>
 <dl>
   <dt>For user:</dt>

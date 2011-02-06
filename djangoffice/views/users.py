@@ -1,12 +1,12 @@
-from django import newforms as forms
+from django import forms
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth import views as auth_views
 from django.core.urlresolvers import reverse
 from django.db import backend, connection, transaction
 from django.db.models import Q
-from django.db.models.query import find_field
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
@@ -29,8 +29,7 @@ def assign_user_to_admin_job_tasks(user):
     """
     admin_job = Job.objects.get(id=settings.ADMIN_JOB_ID)
     task_ids = [task.id for task in admin_job.tasks.all()]
-    db_table = find_field('assigned_users',
-                          Task._meta.many_to_many, False).m2m_db_table()
+    db_table = Task._meta.get_field('assigned_users', True).m2m_db_table()
     query = 'INSERT INTO %s (%s,%s) VALUES %s' % (
         backend.quote_name(db_table),
         backend.quote_name('task_id'),
@@ -135,9 +134,7 @@ def add_user(request):
             # Assign the user to all Admin job tasks
             assign_user_to_admin_job_tasks(user)
 
-            request.user.message_set.create(
-                message=u'The %s was added successfully.' \
-                        % User._meta.verbose_name)
+            messages.success(request, 'The %s was added successfully.' % User._meta.verbose_name)
             return HttpResponseRedirect(user.get_absolute_url())
     else:
         form = UserForm()
@@ -197,9 +194,7 @@ def edit_user(request, username):
                     profile.managed_users = form.cleaned_data['managed_users']
             profile.save()
 
-            request.user.message_set.create(
-                message=u'The %s was edited successfully.' \
-                        % User._meta.verbose_name)
+            messages.success(request, 'The %s was edited successfully.' % User._meta.verbose_name)
             return HttpResponseRedirect(user.get_absolute_url())
     else:
         initial = {
@@ -253,9 +248,8 @@ def edit_user_rates(request, username):
                     rate.standard_rate = form.cleaned_data['standard_rate']
                     rate.overtime_rate = form.cleaned_data['overtime_rate']
                     rate.save()
-                    request.user.message_set.create(
-                        message=u'%s were edited successfully.' \
-                                % UserRate._meta.verbose_name_plural)
+                    messages.success(request, '%s were edited successfully.' \
+                                              % UserRate._meta.verbose_name_plural)
                     return HttpResponseRedirect(user.get_absolute_url())
     else:
         for rate in user.rates.order_by('effective_from'):
@@ -272,15 +266,17 @@ def edit_user_rates(request, username):
             'editable_rates': editable_rates,
         }, RequestContext(request))
 
+class UserRateForm(UserRateBaseForm, forms.ModelForm):
+    class Meta:
+        model = UserRate
+        fields= ('effective_from', 'standard_rate', 'overtime_rate')
+
 @user_has_permission(is_admin_or_manager)
 def add_user_rate(request, username):
     """
     Adds a new User Rate.
     """
     user = get_object_or_404(User, username=username)
-    UserRateForm = forms.form_for_model(UserRate,
-        form=UserRateBaseForm, fields=('effective_from', 'standard_rate',
-                                       'overtime_rate'))
     if request.method == 'POST':
         form = UserRateForm(user, request.POST)
         if form.is_valid():
@@ -288,9 +284,8 @@ def add_user_rate(request, username):
             rate.user = user
             rate.editable = True
             rate.save()
-            request.user.message_set.create(
-                message=u'The %s was added successfully.' \
-                        % UserRate._meta.verbose_name)
+            messages.success(request, 'The %s was added successfully.' \
+                                      % UserRate._meta.verbose_name)
             return HttpResponseRedirect(reverse('edit_user_rates',
                                                 args=(username,)))
     else:
@@ -317,9 +312,8 @@ def edit_admin_user(request):
             if form.cleaned_data['password'] is not None:
                 admin.set_password(form.cleaned_data['password'])
             admin.save()
-            request.user.message_set.create(
-                message=u'The %s was edited successfully.' \
-                        % User._meta.verbose_name)
+            messages.success(request, 'The %s was edited successfully.' \
+                                       % User._meta.verbose_name)
             return HttpResponseRedirect(reverse('user_list'))
     else:
         initial = dict([(attr, getattr(admin, attr)) \

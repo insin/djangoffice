@@ -1,6 +1,6 @@
 import operator
 
-from django import newforms as forms
+from django import forms
 from django.contrib.auth.models import User
 from django.db.models.query import Q
 

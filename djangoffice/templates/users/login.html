@@ -18,6 +18,7 @@
 <ul class="errors"><li>Your username and password didn't match. Please try again.</li></ul>
 {% endif %}
 <form name="loginForm" id="loginForm" action="." method="POST">
+{% csrf_token %}
   <table cellspacing="0">
   <tbody>
     <tr class="odd"><th scope="row"><label for="id_username">Username:</label></th><td>{{ form.username }}</td></tr>

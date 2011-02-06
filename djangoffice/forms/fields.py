@@ -1,10 +1,9 @@
 import copy
 from itertools import chain
 
-from django import newforms as forms
+from django import forms
 from django.core import validators
-from django.newforms.fields import EMPTY_VALUES
-from django.newforms.util import flatatt
+from django.forms.util import flatatt
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_unicode
 from django.utils.html import escape
@@ -28,7 +27,7 @@ class DynamicModelChoiceField(forms.Field):
         that a model instance with the given primary key exists.
         """
         value = super(DynamicModelChoiceField, self).clean(value)
-        if value in EMPTY_VALUES:
+        if value in validators.EMPTY_VALUES:
             value = None
         else:
             try:

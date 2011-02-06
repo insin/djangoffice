@@ -4,6 +4,7 @@
 {% block content %}
 <h1>Edit Artifact</h1>
 <form name="artifactForm" id="artifactForm" action="." method="POST" enctype="multipart/form-data">
+{% csrf_token %}
 <table cellspacing="0">
 <tbody>
 {{ form }}

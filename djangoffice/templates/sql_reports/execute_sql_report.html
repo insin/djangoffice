@@ -6,6 +6,7 @@
 <p>This SQL Report contains a number of parameters - please provide values for these below.</p>
 <p>Any date parameters should be specified in <code>YYYY-MM-DD</code> format; for example, today's date is <code>{% now "Y-m-d" %}</code>.</p>
 <form name="sqlReportForm" id="sqlReportForm" action="." method="POST">
+{% csrf_token %}
 <table cellspacing="0">
 {{ form }}
 </table>

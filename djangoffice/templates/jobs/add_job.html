@@ -31,7 +31,7 @@ Event.onDOMReady(function()
 <h1>Add Job</h1>
 
 <form name="addJobForm" id="addJobForm" action="." method="POST">
-
+{% csrf_token %}
 <h2>Job Details</h2>
 <table cellspacing="0">
 <tbody>

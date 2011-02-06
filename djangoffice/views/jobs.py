@@ -1,5 +1,6 @@
-from django import newforms as forms
+from django import forms
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db import transaction
@@ -99,9 +100,8 @@ def add_job(request):
             job = job_form.save()
             for task_form in completed_task_forms:
                 task_form.save(job)
-            request.user.message_set.create(
-                message=u'The %s was added successfully.' \
-                        % Job._meta.verbose_name)
+            messages.success(request, 'The %s was added successfully.' \
+                                      % Job._meta.verbose_name)
             return HttpResponseRedirect(job.get_absolute_url())
     else:
         job_form = AddJobForm(users)
@@ -180,9 +180,8 @@ def edit_job(request, job_number):
                 task_form.save()
             for task_form in completed_new_task_forms:
                 task_form.save(job)
-            request.user.message_set.create(
-                message=u'The %s was edited successfully.' \
-                        % Job._meta.verbose_name)
+            messages.success(request, 'The %s was edited successfully.' \
+                                      % Job._meta.verbose_name)
             return HttpResponseRedirect(job.get_absolute_url())
     else:
         job_form = EditJobForm(job, users)

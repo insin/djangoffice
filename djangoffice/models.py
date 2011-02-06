@@ -5,19 +5,14 @@ from decimal import Decimal
 import dbsettings
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.validators import (RequiredIfOtherFieldEquals,
-    RequiredIfOtherFieldGiven, RequiredIfOtherFieldNotGiven)
+from django.core.exceptions import ValidationError
 from django.db import connection, models
-from django.db.models.query import find_field
 from django.utils.text import truncate_words
 from django.utils.encoding import smart_unicode
 
 from djangoffice.validators import isSafeishQuery, isWeekCommencingDate
 
 qn = connection.ops.quote_name
-
-sql_param_re = re.compile(r'::([a-zA-Z]+)')
-heading_re = re.compile(r'AS \'([\sa-zA-Z]+)\'')
 
 ###########
 # Options #
@@ -71,7 +66,7 @@ class UserProfile(models.Model):
 
     user           = models.ForeignKey(User, unique=True)
     role           = models.CharField(max_length=1, choices=ROLE_CHOICES)
-    managed_users  = models.ManyToManyField(User, null=True, blank=True, filter_interface=models.HORIZONTAL, related_name='managers')
+    managed_users  = models.ManyToManyField(User, null=True, blank=True, related_name='managers')
     phone_number   = models.CharField(max_length=20, blank=True)
     mobile_number  = models.CharField(max_length=20, blank=True)
     login_attempts = models.SmallIntegerField(default=3, help_text=u'The number of unsuccessful login attempts allowed on this account until it is disabled.')
@@ -84,6 +79,7 @@ class UserProfile(models.Model):
         ordering = ['user']
 
     class Admin:
+        # managed_users filter_interface=models.HORIZONTAL,
         list_display = ('user', 'role', 'phone_number', 'mobile_number',
                         'disabled')
         list_filter = ('role', 'disabled')
@@ -117,8 +113,8 @@ class UserRate(models.Model):
     """
     User rates by date.
     """
-    user           = models.ForeignKey(User, edit_inline=models.TABULAR, num_extra_on_change=1, related_name='rates')
-    effective_from = models.DateField(core=True)
+    user           = models.ForeignKey(User, related_name='rates')
+    effective_from = models.DateField()
     standard_rate  = models.DecimalField(max_digits=6, decimal_places=2)
     overtime_rate  = models.DecimalField(max_digits=6, decimal_places=2)
     editable       = models.BooleanField(default=True)
@@ -135,6 +131,8 @@ class UserRate(models.Model):
         ordering = ['-effective_from', 'user']
 
     class Admin:
+        # user edit_inline=models.TABULAR, num_extra_on_change=1
+        # effective_From core=True
         list_display = ('user', 'effective_from', 'standard_rate',
                         'overtime_rate', 'editable')
         list_display_links = ('effective_from',)
@@ -249,7 +247,7 @@ class Client(models.Model):
     """
     name     = models.CharField(max_length=100)
     notes    = models.TextField(blank=True)
-    contacts = models.ManyToManyField(Contact, filter_interface=models.HORIZONTAL, related_name='clients')
+    contacts = models.ManyToManyField(Contact, related_name='clients')
     disabled = models.BooleanField(default=False)
 
     def __unicode__(self):
@@ -268,6 +266,7 @@ class Client(models.Model):
         ordering = ['name']
 
     class Admin:
+        # contacts filter_interface=models.HORIZONTAL
         list_display = ('name', 'notes', 'disabled')
 
     @models.permalink
@@ -360,8 +359,8 @@ class TaskTypeRate(models.Model):
     """
     Rates by date for a given type of work.
     """
-    task_type      = models.ForeignKey(TaskType, edit_inline=models.TABULAR, related_name='rates')
-    effective_from = models.DateField(core=True)
+    task_type      = models.ForeignKey(TaskType, related_name='rates')
+    effective_from = models.DateField()
     standard_rate  = models.DecimalField(max_digits=6, decimal_places=2)
     overtime_rate  = models.DecimalField(max_digits=6, decimal_places=2)
     editable       = models.BooleanField(default=True)
@@ -378,6 +377,8 @@ class TaskTypeRate(models.Model):
         verbose_name = 'Task type rate'
 
     class Admin:
+       # task_type edit_inline=models.TABULAR
+       # effective_from core=True
        list_display = ('task_type', 'effective_from', 'standard_rate',
                        'overtime_rate', 'editable')
        list_display_links = ('effective_from',)
@@ -395,10 +396,9 @@ class JobManager(models.Manager):
         LEFT JOIN %(job)s AS j2
             ON j2.%(number)s = j1.%(number)s + 1
         WHERE j2.%(number)s IS NULL
-        ORDER BY j1.%(number)s %(limit)s""" % {
+        ORDER BY j1.%(number)s LIMIT 1""" % {
             'job': qn(opts.db_table),
             'number': qn(opts.get_field('number').column),
-            'limit': connection.ops.limit_offset_sql(1),
         }
         cursor = connection.cursor()
         cursor.execute(query)
@@ -431,8 +431,6 @@ class JobManager(models.Manager):
            (profile.is_pm() or profile.is_user()) and not access.users_view_all_jobs:
             opts = self.model._meta
             task_opts = Task._meta
-            assigned_users_rel = find_field('assigned_users',
-                                            task_opts.many_to_many, False)
             qs = qs.extra(
                 where=["""
                 %(job)s.%(job_pk)s IN (
@@ -447,7 +445,7 @@ class JobManager(models.Manager):
                     'job_fk': qn(task_opts.get_field('job').column),
                     'task': qn(task_opts.db_table),
                     'task_pk': qn(task_opts.pk.column),
-                    'task_fk': qn(assigned_users_rel.m2m_column_name()),
+                    'task_fk': qn(task_opts.get_field('assigned_users', True).m2m_column_name()),
                     'assigned_users': qn(assigned_users_rel.m2m_db_table()),
                     'user_fk': qn(assigned_users_rel.m2m_reverse_name()),
                 }],
@@ -519,7 +517,7 @@ class Job(models.Model):
     # Contacts
     primary_contact = models.ForeignKey(Contact, related_name='primary_contact_jobs')
     billing_contact = models.ForeignKey(Contact, related_name='billing_contact_jobs')
-    job_contacts    = models.ManyToManyField(Contact, null=True, blank=True, filter_interface=models.HORIZONTAL, related_name='job_contact_jobs')
+    job_contacts    = models.ManyToManyField(Contact, null=True, blank=True, related_name='job_contact_jobs')
 
     # Dates
     created_at = models.DateTimeField(editable=False)
@@ -528,7 +526,7 @@ class Job(models.Model):
 
     # Fee
     fee_basis    = models.CharField(max_length=1, blank=True, choices=FEE_BASIS_CHOICES)
-    fee_amount   = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True, validator_list=[RequiredIfOtherFieldEquals('fee_basis', 'S', u'This field is required if Fee Basis is Set Fee.'), RequiredIfOtherFieldEquals('fee_basis', 'P', u'This field is required if Fee Basis is Percentage.')])
+    fee_amount   = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
     fee_currency = models.CharField(max_length=3, choices=FEE_CURRENCY_CHOICES)
 
     # Notification
@@ -544,6 +542,7 @@ class Job(models.Model):
         ordering = ['-created_at']
 
     class Admin:
+        # job_contacts filter_interface=models.HORIZONTAL
         list_display = ('name', 'number', 'status', 'client')
         list_filter = ('status', 'client')
         fields = (
@@ -572,12 +571,18 @@ class Job(models.Model):
             }),
         )
 
-    def save(self):
+    def clean(self):
+        if self.fee_basis == 'S' and not self.fee_amount:
+            raise ValidationError('Fee Amount is required if Fee Basis is Set Fee.')
+        if self.fee_basis == 'P' and not self.fee_amount:
+            raise ValidationError('Fee Amount is required if Fee Basis is Percentage.')
+
+    def save(self, *args, **kwargs):
         if not self.id:
             self.created_at = datetime.datetime.now()
         if not self.number:
             self.number = self._default_manager.get_next_free_number()
-        super(Job, self).save()
+        super(Job, self).save(*args, **kwargs)
 
     @property
     def formatted_number(self):
@@ -659,10 +664,10 @@ class Task(models.Model):
 
     Each Task may have a number of Users assigned to work on it.
     """
-    job                  = models.ForeignKey(Job, related_name='tasks', edit_inline=models.TABULAR)
-    task_type            = models.ForeignKey(TaskType, related_name='tasks', core=True)
+    job                  = models.ForeignKey(Job, related_name='tasks')
+    task_type            = models.ForeignKey(TaskType, related_name='tasks')
     estimate_hours       = models.DecimalField(max_digits=6, decimal_places=2)
-    assigned_users       = models.ManyToManyField(User, filter_interface=models.HORIZONTAL, related_name='tasks', help_text=u'These users will be able to book time against this task.')
+    assigned_users       = models.ManyToManyField(User, related_name='tasks', help_text=u'These users will be able to book time against this task.')
     start_date           = models.DateField(null=True, blank=True)
     end_date             = models.DateField(null=True, blank=True)
     remaining            = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
@@ -679,6 +684,9 @@ class Task(models.Model):
         unique_together = (('job', 'task_type'),)
 
     class Admin:
+        # job edit_inline=models.TABULAR
+        # task_type core=True
+        # assigned_users filter_interface=models.HORIZONTAL
         list_display = ('job', 'task_type', 'estimate_hours', 'start_date',
                         'end_date', 'remaining', 'remaining_overridden')
         list_display_links = ('task_type',)
@@ -762,12 +770,12 @@ class Artifact(models.Model):
         list_display = ('file', 'job', 'type', 'description', 'created_at', 'access')
         list_filter = ('created_at', 'access')
 
-    def save(self):
+    def save(self, *args, **kwargs):
         now = datetime.datetime.now()
         if not self.id:
             self.created_at = now
         self.updated_at = now
-        super(Artifact, self).save()
+        super(Artifact, self).save(*args, **kwargs)
 
     def is_accessible_to_user(self, user):
         """
@@ -831,8 +839,8 @@ class Activity(models.Model):
     created_at  = models.DateTimeField(editable=False)
     description = models.TextField()
     priority    = models.CharField(max_length=1, choices=PRIORITY_CHOICES)
-    assigned_to = models.ForeignKey(User, null=True, blank=True, related_name='assigned_activities', verbose_name='User', validator_list=[RequiredIfOtherFieldNotGiven('contact')])
-    contact     = models.ForeignKey(Contact, null=True, blank=True, related_name='activities', validator_list=[RequiredIfOtherFieldNotGiven('assigned_to')])
+    assigned_to = models.ForeignKey(User, null=True, blank=True, related_name='assigned_activities', verbose_name='User')
+    contact     = models.ForeignKey(Contact, null=True, blank=True, related_name='activities')
     due_date    = models.DateField(null=True, blank=True)
 
     # Completion
@@ -865,7 +873,11 @@ class Activity(models.Model):
             }),
         )
 
-    def save(self):
+    def clean(self):
+        if not self.contact and not self.assigned_to:
+            raise ValidationError('An activity must be assigned to a User or a Contact.')
+
+    def save(self, *args, **kwargs):
         if not self.id:
             self.created_at = datetime.datetime.now()
         if self.completed and not self.completed_at:
@@ -874,7 +886,7 @@ class Activity(models.Model):
         if self.assigned_to and self.contact:
             self.contact = None
         self.description = self.description.strip()
-        super(Activity, self).save()
+        super(Activity, self).save(*args, **kwargs)
 
     @property
     def formatted_number(self):
@@ -956,10 +968,9 @@ class InvoiceManager(models.Manager):
         LEFT JOIN %(invoice)s AS i2
             ON i2.%(number)s = i1.%(number)s + 1
         WHERE i2.%(number)s IS NULL
-        ORDER BY i1.%(number)s %(limit)s""" % {
+        ORDER BY i1.%(number)s LIMIT 1""" % {
             'invoice': qn(opts.db_table),
             'number': qn(opts.get_field('number').column),
-            'limit': connection.ops.limit_offset_sql(1),
         }
         cursor = connection.cursor()
         cursor.execute(query)
@@ -968,8 +979,6 @@ class InvoiceManager(models.Manager):
             return result[0][0]
         except IndexError:
             return 1
-
-INVOICE_PERIOD_VALIDATOR = RequiredIfOtherFieldEquals('type', 'D', u'Required for Date Restricted invoices.')
 
 class Invoice(models.Model):
     """
@@ -986,8 +995,8 @@ class Invoice(models.Model):
     number          = models.PositiveIntegerField(unique=True)
     date            = models.DateField(editable=False)
     type            = models.CharField(max_length=1, choices=TYPE_CHOICES)
-    start_period    = models.DateField(null=True, blank=True, validator_list=[INVOICE_PERIOD_VALIDATOR])
-    end_period      = models.DateField(null=True, blank=True, validator_list=[INVOICE_PERIOD_VALIDATOR])
+    start_period    = models.DateField(null=True, blank=True)
+    end_period      = models.DateField(null=True, blank=True)
     amount_invoiced = models.DecimalField(max_digits=8, decimal_places=2)
     amount_received = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
     adjustment      = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
@@ -1015,10 +1024,14 @@ class Invoice(models.Model):
             }),
         )
 
-    def save(self):
+    def clean(self):
+        if self.type == 'D' and (self.start_period is None or self.end_period is None):
+            raise ValidationError('Date Restricted invoices must have start and end periods.')
+
+    def save(self, *args, **kwargs):
         if not self.id:
             self.date = datetime.date.today()
-        super(Invoice, self).save()
+        super(Invoice, self).save(*args, **kwargs)
 
     @property
     def formatted_number(self):
@@ -1052,7 +1065,7 @@ class Timesheet(models.Model):
     A record of a User's time entries and expenses for a given week.
     """
     user            = models.ForeignKey(User, related_name='timesheets')
-    week_commencing = models.DateField(validator_list=[isWeekCommencingDate])
+    week_commencing = models.DateField(validators=[isWeekCommencingDate])
 
     options = TimesheetOptions()
     objects = TimesheetManager()
@@ -1244,10 +1257,10 @@ class TimeEntry(models.Model):
     """
     TIME_ATTRS = ('mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun', 'overtime')
 
-    timesheet       = models.ForeignKey(Timesheet, related_name='time_entries', edit_inline=models.TABULAR)
+    timesheet       = models.ForeignKey(Timesheet, related_name='time_entries')
     user            = models.ForeignKey(User, related_name='time_entries')
-    task            = models.ForeignKey(Task, related_name='time_entries', core=True)
-    week_commencing = models.DateField(validator_list=[isWeekCommencingDate])
+    task            = models.ForeignKey(Task, related_name='time_entries')
+    week_commencing = models.DateField(validators=[isWeekCommencingDate])
     mon             = models.DecimalField(max_digits=4, decimal_places=2, blank=True)
     tue             = models.DecimalField(max_digits=4, decimal_places=2, blank=True)
     wed             = models.DecimalField(max_digits=4, decimal_places=2, blank=True)
@@ -1274,6 +1287,8 @@ class TimeEntry(models.Model):
         verbose_name_plural = u'Time entries'
 
     class Admin:
+        # timesheet edit_inline=models.TABULAR
+        # task core=True
         list_display = ('user', 'task', 'week_commencing', 'total_time_booked',
                         'overtime', 'description', 'billable')
         fields = (
@@ -1287,14 +1302,14 @@ class TimeEntry(models.Model):
             }),
         )
 
-    def save(self):
+    def save(self, *args, **kwargs):
         """
         Ensure time fields are not ``None`` before a save is performed.
         """
         for attr in self.TIME_ATTRS:
             if getattr(self, attr) is None:
                 setattr(self, attr, 0.0)
-        super(TimeEntry, self).save()
+        super(TimeEntry, self).save(*args, **kwargs)
 
     @property
     def total_time_booked(self):
@@ -1407,10 +1422,10 @@ class Expense(models.Model):
     """
     An expense incurred while working on a Job.
     """
-    timesheet   = models.ForeignKey(Timesheet, related_name='expenses', edit_inline=models.TABULAR)
+    timesheet   = models.ForeignKey(Timesheet, related_name='expenses')
     user        = models.ForeignKey(User, related_name='expenses')
-    job         = models.ForeignKey(Job, related_name='expenses', core=True)
-    type        = models.ForeignKey(ExpenseType, related_name='expenses', core=True)
+    job         = models.ForeignKey(Job, related_name='expenses')
+    type        = models.ForeignKey(ExpenseType, related_name='expenses')
     date        = models.DateField()
     amount      = models.DecimalField(max_digits=8, decimal_places=2)
     description = models.CharField(max_length=100, blank=True)
@@ -1429,6 +1444,9 @@ class Expense(models.Model):
         ordering = ['-date']
 
     class Admin:
+        # timesheet edit_inline=models.TABULAR
+        # job core=True
+        # type core=True
         list_display = ('timesheet', 'user', 'job', 'type', 'date', 'amount',
                         'description', 'billable', 'approved_by', 'invoice')
 
@@ -1468,9 +1486,12 @@ class SQLReport(models.Model):
     """
     A custom report defined using SQL.
     """
+    SQL_PARAM_RE = re.compile(r'::([a-zA-Z]+)')
+    HEADING_RE = re.compile(r'AS \'([\sa-zA-Z]+)\'')
+
     name   = models.CharField(max_length=100, unique=True)
     access = models.CharField(max_length=1, choices=ACCESS_CHOICES)
-    query  = models.TextField(validator_list=[isSafeishQuery])
+    query  = models.TextField(validators=[isSafeishQuery])
 
     objects = SQLReportManager()
 
@@ -1490,7 +1511,7 @@ class SQLReport(models.Model):
         return ('sql_report_detail', (smart_unicode(self.id),))
 
     def get_sql_parameters(self):
-        return set(sql_param_re.findall(self.query))
+        return set(self.SQL_PARAM_RE.findall(self.query))
 
     def get_populated_query(self, params):
         query = self.query
@@ -1499,4 +1520,4 @@ class SQLReport(models.Model):
         return query
 
     def get_headings_from_query(self):
-        return heading_re.findall(self.query)
+        return self.HEADING_RE.findall(self.query)

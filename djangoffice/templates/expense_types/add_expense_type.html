@@ -4,6 +4,7 @@
 {% block content %}
 <h1>Add Expense Type</h1>
 <form name="expenseTypeForm" id="expenseTypeForm" action="." method="POST">
+{% csrf_token %}
 <table cellspacing="0">
 <tbody>
 {{ form }}
